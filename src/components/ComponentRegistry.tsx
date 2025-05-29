@@ -8,6 +8,11 @@ import { ProductCard } from './ProductCard'
 import { CartDrawer } from './CartDrawer'
 import { SearchModal } from './SearchModal'
 import { ImageGallery } from './ImageGallery'
+import { FeaturedProducts } from './FeaturedProducts'
+import { ProductCategories } from './ProductCategories'
+import { BrandStory } from './BrandStory'
+import { TestimonialsSection } from './TestimonialsSection'
+import { NewsletterSignup } from './NewsletterSignup'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -18,6 +23,11 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   CartDrawer,
   SearchModal,
   ImageGallery,
+  FeaturedProducts,
+  ProductCategories,
+  BrandStory,
+  TestimonialsSection,
+  NewsletterSignup,
 }
 
 // Type for component names

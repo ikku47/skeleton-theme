@@ -96,9 +96,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   const displayProducts = products.length > 0 ? products : defaultProducts
   const defaultAvatars = [
-    '/api/placeholder/40/40',
-    '/api/placeholder/40/40',
-    '/api/placeholder/40/40'
+    'https://i.pravatar.cc/300',
+    'https://i.pravatar.cc/300',
+    'https://i.pravatar.cc/300'
   ]
   const displayAvatars = customerAvatars.length > 0 ? customerAvatars : defaultAvatars
 

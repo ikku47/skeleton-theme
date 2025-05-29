@@ -1,0 +1,218 @@
+{% comment %}
+  Brand Story Section with React component integration
+  Features: Customizable content, stats, features
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title | default: 'Our Story'
+  assign subtitle = section.settings.subtitle | default: 'Crafting Excellence Since Day One'
+  assign description = section.settings.description | default: 'We believe in creating products that not only look great but also make a positive impact on your life. Our journey started with a simple idea: to bring you the finest quality products at prices that make sense.'
+  assign button_text = section.settings.button_text | default: 'Learn More'
+  assign button_url = section.settings.button_url
+  assign image = section.settings.image
+%}
+
+{% capture brand_story_props %}
+{
+  "title": "{{ title | escape }}",
+  "subtitle": "{{ subtitle | escape }}",
+  "description": "{{ description | escape }}",
+  {% if button_text != blank %}
+  "buttonText": "{{ button_text | escape }}",
+  {% endif %}
+  {% if button_url != blank %}
+  "buttonUrl": "{{ button_url }}",
+  {% endif %}
+  {% if image %}
+  "image": "{{ image | image_url: width: 800, height: 600 }}",
+  {% endif %}
+  "features": [
+    {% for block in section.blocks %}
+      {% if block.type == 'feature' %}
+        {
+          "icon": "{{ block.settings.icon | default: 'award' }}",
+          "title": "{{ block.settings.title | escape }}",
+          "description": "{{ block.settings.description | escape }}"
+        }{% unless forloop.last %},{% endunless %}
+      {% endif %}
+    {% endfor %}
+  ],
+  "stats": [
+    {% for block in section.blocks %}
+      {% if block.type == 'stat' %}
+        {
+          "label": "{{ block.settings.label | escape }}",
+          "value": "{{ block.settings.value | escape }}"
+        }{% unless forloop.last %},{% endunless %}
+      {% endif %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'BrandStory', props: brand_story_props %}
+
+{% schema %}
+{
+  "name": "Brand Story",
+  "tag": "section",
+  "class": "brand-story-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Our Story"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Crafting Excellence Since Day One"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "We believe in creating products that not only look great but also make a positive impact on your life. Our journey started with a simple idea: to bring you the finest quality products at prices that make sense."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "award", "label": "Award" },
+            { "value": "users", "label": "Users" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" }
+          ],
+          "default": "award"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "name": "Statistic",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value (e.g., 10K+)"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Story",
+      "blocks": [
+        {
+          "type": "stat",
+          "settings": {
+            "value": "10K+",
+            "label": "Happy Customers"
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "value": "50K+",
+            "label": "Products Sold"
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "value": "5+",
+            "label": "Years Experience"
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "value": "25+",
+            "label": "Countries Served"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "award",
+            "title": "Premium Quality",
+            "description": "Every product is carefully selected and tested for quality"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Fast Shipping",
+            "description": "Free shipping on orders over $50 with quick delivery"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Shopping",
+            "description": "Your data is protected with industry-leading security"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "users",
+            "title": "24/7 Support",
+            "description": "Our team is here to help you every step of the way"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

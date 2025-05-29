@@ -1,0 +1,109 @@
+{% comment %}
+  Product Categories Section with React component integration
+  Features: Actual Shopify collection data, dynamic layout
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title | default: 'Shop by Category'
+  assign subtitle = section.settings.subtitle | default: 'Explore our curated collections'
+%}
+
+{% capture categories_props %}
+{
+  "title": "{{ title | escape }}",
+  "subtitle": "{{ subtitle | escape }}",
+  "categories": [
+    {% for block in section.blocks %}
+      {% if block.type == 'collection' %}
+        {% assign collection = collections[block.settings.collection] %}
+        {% if collection %}
+          {
+            "id": "{{ collection.id }}",
+            "title": "{{ collection.title | escape }}",
+            {% if block.settings.custom_description != blank %}
+            "description": "{{ block.settings.custom_description | escape }}",
+            {% elsif collection.description != blank %}
+            "description": "{{ collection.description | strip_html | truncatewords: 15 | escape }}",
+            {% endif %}
+            "image": "{{ collection.featured_image | default: collection.products.first.featured_image | image_url: width: 800, height: 600 }}",
+            "url": "{{ collection.url }}",
+            "productCount": {{ collection.products_count }}
+          }{% unless forloop.last %},{% endunless %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'ProductCategories', props: categories_props %}
+
+{% schema %}
+{
+  "name": "Product Categories",
+  "tag": "section",
+  "class": "product-categories-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Explore our curated collections"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "textarea",
+          "id": "custom_description",
+          "label": "Custom Description",
+          "info": "Override the collection description with custom text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Categories",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,56 +1,208 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+{% comment %}
+  Enhanced Footer with Tailwind CSS styling
+  Features: Responsive design, social links, newsletter, contact info
+{% endcomment %}
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+<footer class="bg-gray-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Main Footer Content -->
+    <div class="py-12 lg:py-16">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+        <!-- Company Info -->
+        <div class="lg:col-span-1">
+          <h3 class="text-xl font-bold mb-4">{{ shop.name }}</h3>
+          {% if section.settings.footer_description %}
+            <p class="text-gray-300 mb-6 leading-relaxed">
+              {{ section.settings.footer_description }}
+            </p>
+          {% endif %}
+
+          <!-- Social Links -->
+          {% if section.settings.show_social_links %}
+            <div class="flex space-x-4">
+              {% if section.settings.social_facebook %}
+                <a href="{{ section.settings.social_facebook }}" class="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+              {% endif %}
+              {% if section.settings.social_instagram %}
+                <a href="{{ section.settings.social_instagram }}" class="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323C5.902 8.198 7.053 7.708 8.35 7.708s2.448.49 3.323 1.297c.876.876 1.366 2.027 1.366 3.324s-.49 2.448-1.366 3.323c-.875.876-2.026 1.366-3.323 1.366zm7.718 0c-1.297 0-2.448-.49-3.323-1.297-.876-.875-1.366-2.026-1.366-3.323s.49-2.448 1.366-3.323c.875-.876 2.026-1.366 3.323-1.366s2.448.49 3.323 1.366c.876.875 1.366 2.026 1.366 3.323s-.49 2.448-1.366 3.323c-.875.876-2.026 1.366-3.323 1.366z"/></svg>
+                </a>
+              {% endif %}
+              {% if section.settings.social_twitter %}
+                <a href="{{ section.settings.social_twitter }}" class="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul class="space-y-2">
+            {% for link in section.settings.menu.links %}
+              <li>
+                <a href="{{ link.url }}" class="text-gray-300 hover:text-white transition-colors">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Customer Service</h4>
+          <ul class="space-y-2">
+            <li><a href="/pages/contact" class="text-gray-300 hover:text-white transition-colors">Contact Us</a></li>
+            <li><a href="/pages/shipping" class="text-gray-300 hover:text-white transition-colors">Shipping Info</a></li>
+            <li><a href="/pages/returns" class="text-gray-300 hover:text-white transition-colors">Returns</a></li>
+            <li><a href="/pages/faq" class="text-gray-300 hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="/pages/size-guide" class="text-gray-300 hover:text-white transition-colors">Size Guide</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4">Get in Touch</h4>
+          {% if section.settings.contact_email %}
+            <p class="text-gray-300 mb-2">
+              <span class="block text-sm text-gray-400">Email:</span>
+              <a href="mailto:{{ section.settings.contact_email }}" class="hover:text-white transition-colors">
+                {{ section.settings.contact_email }}
+              </a>
+            </p>
+          {% endif %}
+          {% if section.settings.contact_phone %}
+            <p class="text-gray-300 mb-2">
+              <span class="block text-sm text-gray-400">Phone:</span>
+              <a href="tel:{{ section.settings.contact_phone }}" class="hover:text-white transition-colors">
+                {{ section.settings.contact_phone }}
+              </a>
+            </p>
+          {% endif %}
+          {% if section.settings.contact_address %}
+            <p class="text-gray-300">
+              <span class="block text-sm text-gray-400">Address:</span>
+              {{ section.settings.contact_address }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <div class="border-t border-gray-800 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+
+        <!-- Copyright -->
+        <div class="text-gray-400 text-sm">
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.
+          {% if section.settings.show_powered_by %}
+            | {{ powered_by_link }}
+          {% endif %}
+        </div>
+
+        <!-- Payment Icons -->
+        {% if section.settings.show_payment_icons %}
+          <div class="flex space-x-2">
+            {% for type in shop.enabled_payment_types %}
+              <div class="w-8 h-5 bg-white rounded flex items-center justify-center">
+                {{ type | payment_type_svg_tag: class: 'w-6 h-4' }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </footer>
 
-{% stylesheet %}
-  footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-  }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
-  }
-  footer .footer__links,
-  footer .footer__payment {
-    display: flex;
-    gap: 1rem;
-  }
-{% endstylesheet %}
-
 {% schema %}
 {
-  "name": "t:general.footer",
+  "name": "Footer",
   "settings": [
+    {
+      "type": "header",
+      "content": "Company Information"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_description",
+      "label": "Company Description"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "Footer Menu"
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Phone Number"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_address",
+      "label": "Address"
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_links",
+      "label": "Show Social Links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "social_twitter",
+      "label": "Twitter URL"
+    },
+    {
+      "type": "header",
+      "content": "Display Options"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
+      "label": "Show Payment Icons",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_powered_by",
+      "label": "Show 'Powered by Shopify'",
+      "default": false
     }
   ]
 }

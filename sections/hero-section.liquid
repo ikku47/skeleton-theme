@@ -14,9 +14,9 @@
 
   # Get featured products from collection or all products
   if featured_collection != blank
-    assign featured_products = collections[featured_collection].products | limit: 6
+    assign all_products = collections[featured_collection].products
   else
-    assign featured_products = collections.all.products | limit: 6
+    assign all_products = collections.all.products
   endif
 %}
 
@@ -29,21 +29,25 @@
   "testimonialAuthor": "{{ testimonial_author | escape }}",
   "showCustomers": {{ show_customers }},
   "products": [
-    {% for product in featured_products %}
-      {
-        "id": "{{ product.id }}",
-        "title": "{{ product.title | escape }}",
-        "image": "{{ product.featured_image | img_url: '400x500' }}",
-        "url": "{{ product.url }}",
-        "price": "{{ product.price | money }}",
-        "color": "{% cycle 'bg-orange-400', 'bg-emerald-500', 'bg-yellow-400', 'bg-sky-400', 'bg-stone-200', 'bg-emerald-600' %}"
-      }{% unless forloop.last %},{% endunless %}
+    {% assign product_count = 0 %}
+    {% for product in all_products %}
+      {% if product_count < 6 %}
+        {% assign product_count = product_count | plus: 1 %}
+        {
+          "id": "{{ product.id }}",
+          "title": "{{ product.title | escape }}",
+          "image": "{{ product.featured_image | image_url: width: 400, height: 500 }}",
+          "url": "{{ product.url }}",
+          "price": "{{ product.price | money }}",
+          "color": "{% cycle 'bg-orange-400', 'bg-emerald-500', 'bg-yellow-400', 'bg-sky-400', 'bg-stone-200', 'bg-emerald-600' %}"
+        }{% unless product_count == 6 or forloop.last %},{% endunless %}
+      {% endif %}
     {% endfor %}
   ],
   "customerAvatars": [
     {% for block in section.blocks %}
       {% if block.type == 'customer_avatar' and block.settings.avatar %}
-        "{{ block.settings.avatar | img_url: '80x80' }}"{% unless forloop.last %},{% endunless %}
+        "{{ block.settings.avatar | image_url: width: 80, height: 80 }}"{% unless forloop.last %},{% endunless %}
       {% endif %}
     {% endfor %}
   ]
