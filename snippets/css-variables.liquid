@@ -1,18 +1,65 @@
+{% comment %} Google Fonts Preconnect {% endcomment %}
+{% if settings.font_combination != 'custom' %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{% endif %}
+
 {% style %}
-  {% # Loads all font variantions with display: swap %}
-  {{ settings.type_primary_font | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {% comment %} Load Google Fonts based on selection {% endcomment %}
+  {% case settings.font_combination %}
+    {% when 'inter' %}
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    {% when 'playfair_source' %}
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
+    {% when 'poppins_open' %}
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap');
+    {% when 'custom' %}
+      {% comment %} Load Shopify font picker fonts {% endcomment %}
+      {{ settings.type_primary_font | font_face: font_display: 'swap' }}
+      {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+      {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+      {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {% endcase %}
 
   :root {
-    --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
-    --font-primary--style: {{ settings.type_primary_font.style }};
-    --font-primary--weight: {{ settings.type_primary_font.weight }};
+    {% comment %} Font family variables based on selection {% endcomment %}
+    {% case settings.font_combination %}
+      {% when 'inter' %}
+        --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+      {% when 'playfair_source' %}
+        --font-heading: 'Playfair Display', Georgia, serif;
+        --font-body: 'Source Sans Pro', system-ui, -apple-system, sans-serif;
+      {% when 'poppins_open' %}
+        --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+        --font-body: 'Open Sans', system-ui, -apple-system, sans-serif;
+      {% when 'custom' %}
+        --font-heading: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
+        --font-body: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
+    {% endcase %}
+
+    {% comment %} Legacy font variables for backward compatibility {% endcomment %}
+    --font-primary--family: var(--font-body);
+    --font-primary--style: normal;
+    --font-primary--weight: {{ settings.body_font_weight | default: 400 }};
+
+    {% comment %} Font weight variables {% endcomment %}
+    --font-heading-weight: {{ settings.heading_font_weight | default: 600 }};
+    --font-body-weight: {{ settings.body_font_weight | default: 400 }};
+
+    {% comment %} Layout variables {% endcomment %}
     --page-width: {{ settings.max_page_width }};
     --page-margin: {{ settings.min_page_margin }}px;
+
+    {% comment %} Color variables {% endcomment %}
     --color-background: {{ settings.background_color }};
     --color-foreground: {{ settings.foreground_color }};
-    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+    --color-primary: {{ settings.primary_color | default: '#2563eb' }};
+    --color-secondary: {{ settings.secondary_color | default: '#64748b' }};
+    --color-accent: {{ settings.accent_color | default: '#f59e0b' }};
+
+    {% comment %} Style variables {% endcomment %}
+    --style-border-radius-inputs: {{ settings.input_corner_radius | default: 6 }}px;
+    --style-border-radius-buttons: {{ settings.button_corner_radius | default: 6 }}px;
   }
 {% endstyle %}

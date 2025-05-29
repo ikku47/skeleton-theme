@@ -20,6 +20,49 @@
         "default": "work_sans_n4",
         "label": "t:general.primary"
       },
+      {
+        "type": "select",
+        "id": "font_combination",
+        "label": "Font Combination",
+        "options": [
+          {
+            "value": "inter",
+            "label": "Inter (Modern & Clean)"
+          },
+          {
+            "value": "playfair_source",
+            "label": "Playfair Display + Source Sans Pro (Elegant)"
+          },
+          {
+            "value": "poppins_open",
+            "label": "Poppins + Open Sans (Friendly)"
+          },
+          {
+            "value": "custom",
+            "label": "Use Shopify Font Picker"
+          }
+        ],
+        "default": "inter",
+        "info": "Choose a pre-configured Google Font combination or use custom fonts"
+      },
+      {
+        "type": "range",
+        "id": "heading_font_weight",
+        "min": 400,
+        "max": 900,
+        "step": 100,
+        "label": "Heading Font Weight",
+        "default": 600
+      },
+      {
+        "type": "range",
+        "id": "body_font_weight",
+        "min": 300,
+        "max": 600,
+        "step": 100,
+        "label": "Body Font Weight",
+        "default": 400
+      }
     ]
   },
   {
@@ -57,6 +100,10 @@
     "name": "t:general.colors",
     "settings": [
       {
+        "type": "header",
+        "content": "Basic Colors"
+      },
+      {
         "type": "color",
         "id": "background_color",
         "default": "#FFFFFF",
@@ -69,14 +116,53 @@
         "label": "t:labels.foreground"
       },
       {
+        "type": "header",
+        "content": "Brand Colors"
+      },
+      {
+        "type": "color",
+        "id": "primary_color",
+        "default": "#2563eb",
+        "label": "Primary Color",
+        "info": "Used for buttons, links, and key brand elements"
+      },
+      {
+        "type": "color",
+        "id": "secondary_color",
+        "default": "#64748b",
+        "label": "Secondary Color",
+        "info": "Used for secondary buttons and accents"
+      },
+      {
+        "type": "color",
+        "id": "accent_color",
+        "default": "#f59e0b",
+        "label": "Accent Color",
+        "info": "Used for highlights and call-to-action elements"
+      },
+      {
+        "type": "header",
+        "content": "Interface"
+      },
+      {
         "type": "range",
         "id": "input_corner_radius",
         "min": 0,
-        "max": 10,
+        "max": 20,
         "step": 1,
         "unit": "px",
         "label": "t:labels.input_corner_radius",
-        "default": 4
+        "default": 6
+      },
+      {
+        "type": "range",
+        "id": "button_corner_radius",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Button Corner Radius",
+        "default": 6
       }
     ]
   }

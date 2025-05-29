@@ -1,0 +1,14 @@
+{
+  "name": "joycommerce-shopify-theme",
+  "version": "1.0.0",
+  "description": "A modern, high-quality Shopify theme built with Tailwind CSS v4",
+  "scripts": {
+    "dev": "tailwindcss -i src/styles/main.css -o assets/application.css --watch",
+    "build": "tailwindcss -i src/styles/main.css -o assets/application.css --minify",
+    "preview": "shopify theme dev"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  },
+  "type": "module"
+}

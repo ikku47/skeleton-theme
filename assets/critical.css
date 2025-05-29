@@ -73,9 +73,15 @@ p:empty {
 
 /** Theme styles below */
 body {
-  font-family: var(--font-primary--family);
+  font-family: var(--font-body);
+  font-weight: var(--font-body-weight);
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
 }
 
 /** Section layout utilities */

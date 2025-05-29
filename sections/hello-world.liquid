@@ -1,134 +1,110 @@
 {% comment %}
-  Welcome to Shopify theme development!
+  Welcome to Shopify theme development with Tailwind CSS!
 {% endcomment %}
 
-<div class="welcome full-width">
-  <div class="welcome-content">
-    <div>
-      <h1>Hello, World!</h1>
+<div class="welcome full-width bg-gradient-to-br from-blue-50 to-indigo-100">
+  <div class="welcome-content container mx-auto px-6 py-16">
+    <div class="max-w-2xl">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+        Hello, <span class="text-blue-600">Modern</span> World!
+      </h1>
 
-      <p class="welcome-description">
-        The Skeleton theme is a minimal, carefully structured Shopify theme designed to help you quickly get started.
-        Designed with modularity, maintainability, and Shopify's best practices in mind.
+      <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+        This Skeleton theme now features <strong class="text-blue-600">Tailwind CSS v4</strong> and
+        <strong class="text-blue-600">Google Fonts</strong> integration. Built with modularity,
+        maintainability, and Shopify's best practices in mind.
       </p>
 
-      <p class="welcome-description">
-        Themes shape the online store experience for merchants and their customers. Build fast, flexible themes at scale
-        using Liquid, Shopify's theme templating language, along with HTML, CSS, JavaScript, and JSON.
+      <p class="text-lg text-gray-700 mb-8 leading-relaxed">
+        Create fast, flexible, and beautiful themes at scale using modern CSS utilities,
+        optimized typography, and Shopify's powerful Liquid templating language.
       </p>
+
+      <div class="flex flex-wrap gap-4">
+        <a href="#features" class="btn btn-primary">
+          Explore Features
+        </a>
+        <a href="https://shopify.dev/docs/storefronts/themes" class="btn btn-outline" target="_blank">
+          View Documentation
+        </a>
+      </div>
     </div>
-    <div class="icon">
-      <img src="{{ 'shoppy-x-ray.svg' | asset_url }}" width="300" height="300">
+    <div class="hidden lg:block">
+      <img src="{{ 'shoppy-x-ray.svg' | asset_url }}" width="300" height="300" class="animate-fade-in">
     </div>
   </div>
 </div>
 
-<div class="highlights">
-  <div class="highlight">
-    <h3>Key Concepts</h3>
-    <p class="highlight-description">
-      Shopify themes are a package of template files, building blocks, and supporting assets. Use these building blocks
-      to create modular, customizable themes.
-    </p>
-    <p>{{ 'Learn more about key concepts' | link_to: 'https://shopify.dev/docs/storefronts/themes/architecture' }}</p>
+<section id="features" class="py-16 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        Modern Theme Features
+      </h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Built with the latest technologies and best practices for optimal performance and developer experience.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Tailwind CSS v4</h3>
+          <p class="text-gray-600 mb-4 flex-1">
+            Modern utility-first CSS framework with optimized build process and custom component library.
+          </p>
+          <a href="https://tailwindcss.com" class="text-blue-600 hover:text-blue-700 font-medium" target="_blank">
+            Learn more →
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Google Fonts</h3>
+          <p class="text-gray-600 mb-4 flex-1">
+            Optimized typography with multiple font combinations and proper loading strategies for performance.
+          </p>
+          <a href="https://fonts.google.com" class="text-blue-600 hover:text-blue-700 font-medium" target="_blank">
+            Explore fonts →
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">Best Practices</h3>
+          <p class="text-gray-600 mb-4 flex-1">
+            Following Shopify's recommended patterns for performance, accessibility, and maintainability.
+          </p>
+          <a href="https://shopify.dev/docs/storefronts/themes/best-practices" class="text-blue-600 hover:text-blue-700 font-medium" target="_blank">
+            View guidelines →
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <div class="highlight">
-    <h3>Liquid</h3>
-    <p class="highlight-description">
-      The Liquid templating language is the backbone of Shopify themes, and is used to load dynamic content on
-      storefronts. Extend Liquid objects to store and present custom data using metafields.
-    </p>
-    <p>{{ 'View the Liquid reference' | link_to: 'https://shopify.dev/docs/api/liquid' }}</p>
-  </div>
-
-  <div class="highlight">
-    <h3>Best Practices</h3>
-    <p class="highlight-description">
-      To optimize your theme development experience, Shopify has established a set of best practices that you can refer
-      to when developing your theme and setting up your toolchains and processes.
-    </p>
-    <p>{{ 'Follow best practices' | link_to: 'https://shopify.dev/docs/storefronts/themes/best-practices' }}</p>
-  </div>
-</div>
-
-{% stylesheet %}
-  .welcome {
-    display: grid;
-    grid-template-columns: var(--content-grid);
-    background-color: #f6f6f7;
-    padding: 72px 0;
-  }
-
-  .welcome-content {
-    grid-column: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    padding: 0 24px;
-  }
-
-  .welcome-description {
-    max-width: 80ch;
-    line-height: 1.4;
-    margin-top: 1.5rem;
-  }
-
-  .icon {
-    width: 300px;
-  }
-
-  .highlights {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(3, 1fr);
-    margin-top: 50px;
-  }
-
-  @media (max-width: 1100px) {
-    .highlights {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .highlight {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 24px;
-    border-radius: 8px;
-    background-color: #eef3ff;
-    color: rgb(92, 95, 98);
-    line-height: 1.4;
-  }
-
-  .highlight > * + * {
-    margin-top: 1rem;
-  }
-
-  .highlight h3 {
-    font-size: 1rem;
-    color: rgb(32, 34, 35);
-  }
-
-  .highlight-description {
-    flex: 1 1;
-  }
-
-  .highlight a {
-    display: flex;
-    width: fit-content;
-    background-color: rgb(250, 251, 251);
-    box-shadow: rgba(0, 0, 0, 0.2) 0px -3px 0px 0px inset, rgba(255, 255, 255, 0.9) 0px 2px 0px 0px inset;
-    border: 1px solid rgb(140, 145, 150);
-    border-radius: 4px;
-    color: rgb(92, 95, 98);
-    padding: 3px 10px 5px;
-    text-decoration: none;
-  }
-{% endstylesheet %}
+{% comment %}
+  All styles are now handled by Tailwind CSS in application.css
+  This provides better performance and maintainability
+{% endcomment %}
 
 {% schema %}
 {

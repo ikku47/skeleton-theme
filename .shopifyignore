@@ -11,3 +11,16 @@
 #
 # Ignore templates and sections with a regular expression:
 #   /(templates|sections)/.*\.json/
+
+# Build and development files
+node_modules/
+src/
+package.json
+package-lock.json
+tailwind.config.js
+.env
+.env.local
+
+# Build artifacts (keep only the final compiled CSS)
+assets/application*.css
+!assets/application.css
