@@ -7,6 +7,7 @@ module.exports = {
     './templates/**/*.liquid',
     './templates/**/*.json',
     './blocks/**/*.liquid',
+    './src/**/*.{js,ts,jsx,tsx}',
     './test-classes.html'
   ],
   theme: {

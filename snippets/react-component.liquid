@@ -1,0 +1,34 @@
+{% comment %}
+  Renders a React component
+  
+  Accepts:
+  - component: {String} Name of the React component to render
+  - props: {Object} Props to pass to the component (optional)
+  - class: {String} CSS classes to add to the container (optional)
+  - id: {String} ID for the container (optional)
+  
+  Usage:
+  {% render 'react-component', component: 'AnimatedButton', props: button_props, class: 'my-4' %}
+{% endcomment %}
+
+{%- liquid
+  assign component_name = component | default: ''
+  assign component_props = props | default: blank
+  assign container_class = class | default: ''
+  assign container_id = id | default: blank
+-%}
+
+{%- if component_name != blank -%}
+  <div
+    data-component="{{ component_name }}"
+    {%- if component_props != blank -%}
+      data-props="{{ component_props | escape }}"
+    {%- endif -%}
+    {%- if container_class != blank -%}
+      class="{{ container_class }}"
+    {%- endif -%}
+    {%- if container_id != blank -%}
+      id="{{ container_id }}"
+    {%- endif -%}
+  ></div>
+{%- endif -%}

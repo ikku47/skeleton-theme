@@ -2,159 +2,248 @@
   <br>
     <img src="./assets/shoppy-x-ray.svg" alt="logo" width="200">
   <br>
-  Shopify Skeleton Theme
+  JoyCommerce Shopify Theme
 </h1>
 
-A minimal, carefully structured Shopify theme designed to help you quickly get started. Designed with modularity, maintainability, and Shopify's best practices in mind.
+<p align="center">
+  <strong>A modern, high-performance Shopify theme built with cutting-edge technologies</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS v3">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18">
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Framer_Motion-11-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion">
+</p>
 
 <p align="center">
   <a href="./LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
-  <a href="./actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Shopify/skeleton-theme/actions/workflows/ci.yml/badge.svg"></a>
+  <img src="https://img.shields.io/badge/Shopify-Compatible-95BF47?logo=shopify&logoColor=white" alt="Shopify Compatible">
+  <img src="https://img.shields.io/badge/Hot_Reload-✅-brightgreen" alt="Hot Reload">
 </p>
 
-## Getting started
+## ✨ Features
+
+- 🎨 **Tailwind CSS v3** - Modern utility-first CSS framework with JIT compilation
+- ⚛️ **React 18** - Interactive components with TypeScript support
+- 🎭 **Framer Motion** - Smooth animations and micro-interactions
+- 🎯 **Lucide Icons** - Beautiful, consistent iconography
+- 🔥 **Hot Reload** - Instant development feedback for CSS and React changes
+- 📱 **Responsive Design** - Mobile-first approach with modern layouts
+- 🛍️ **Shopify Integration** - Native product data and Liquid templating
+- ⚡ **Performance Optimized** - Fast loading with optimized builds
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-Before starting, ensure you have the latest Shopify CLI installed:
+- **Node.js** (v18 or higher)
+- **Bun** (recommended) or npm
+- **Shopify CLI** - [Install here](https://shopify.dev/docs/api/shopify-cli)
+- **Git**
 
-- [Shopify CLI](https://shopify.dev/docs/api/shopify-cli) – helps you download, upload, preview themes, and streamline your workflows
+### Installation
 
-If you use VS Code:
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd joycommerce-shopify-theme
+   ```
 
-- [Shopify Liquid VS Code Extension](https://shopify.dev/docs/storefronts/themes/tools/shopify-liquid-vscode) – provides syntax highlighting, linting, inline documentation, and auto-completion specifically designed for Liquid templates
+2. **Install dependencies:**
+   ```bash
+   bun install
+   # or
+   npm install
+   ```
 
-### Clone
+3. **Configure Shopify CLI:**
+   ```bash
+   shopify auth login
+   ```
 
-Clone this repository using Git or Shopify CLI:
+4. **Check your setup:**
+   ```bash
+   bun run info
+   ```
+
+### Development
+
+Start the development server with hot reload:
 
 ```bash
-git clone git@github.com:Shopify/skeleton-theme.git
-# or
-shopify theme init
+# Start asset watchers (CSS + JS)
+bun run dev
+
+# Start with enhanced output and Shopify server
+bun run dev:full
+
+# Individual watchers
+bun run dev:css    # CSS only
+bun run dev:js     # React/JS only
+bun run dev:shopify # Shopify server only
 ```
 
-### Preview
-
-Preview this theme using Shopify CLI:
+### Build & Deploy
 
 ```bash
-shopify theme dev
+# Build for production
+bun run build
+
+# Deploy to Shopify
+bun run deploy
+
+# Pull latest from Shopify
+bun run pull
 ```
 
-## Theme architecture
+## 🏗️ Project Structure
 
 ```bash
 .
-├── assets          # Stores static assets (CSS, JS, images, fonts, etc.)
-├── blocks          # Reusable, nestable, customizable UI components
-├── config          # Global theme settings and customization options
-├── layout          # Top-level wrappers for pages (layout templates)
-├── locales         # Translation files for theme internationalization
-├── sections        # Modular full-width page components
-├── snippets        # Reusable Liquid code or HTML fragments
-└── templates       # Templates combining sections to define page structures
+├── src/                    # Source files
+│   ├── components/         # React components
+│   │   ├── HeroSection.tsx # Expressive hero with product showcase
+│   │   ├── ProductCard.tsx # Interactive product cards
+│   │   ├── CartDrawer.tsx  # Sliding cart drawer
+│   │   └── ...            # More components
+│   ├── styles/            # CSS source files
+│   │   └── main.css       # Main Tailwind CSS file
+│   └── main.tsx           # React entry point
+├── assets/                # Compiled assets
+│   ├── application.css    # Compiled Tailwind CSS
+│   └── application.js     # Compiled React bundle
+├── sections/              # Shopify sections
+│   ├── hero-section.liquid # Hero section with React integration
+│   ├── product.liquid     # Product page with React components
+│   └── ...               # More sections
+├── templates/             # Shopify templates
+├── snippets/              # Reusable Liquid code
+├── config/                # Theme settings
+└── scripts/               # Development scripts
 ```
 
-To learn more, refer to the [theme architecture documentation](https://shopify.dev/docs/storefronts/themes/architecture).
+## 🔥 Hot Reload Development
 
-### Templates
+This theme features an optimized development workflow with instant hot reloading:
 
-[Templates](https://shopify.dev/docs/storefronts/themes/architecture/templates#template-types) control what's rendered on each type of page in a theme.
+### What You Get
 
-The Skeleton Theme scaffolds [JSON templates](https://shopify.dev/docs/storefronts/themes/architecture/templates/json-templates) to make it easy for merchants to customize their store.
+- **⚡ CSS Hot Reload**: Tailwind changes reflect instantly without page refresh
+- **🔄 React Hot Reload**: Component changes update while preserving state
+- **🛍️ Shopify Live Reload**: Browser refreshes automatically on Liquid changes
+- **🐛 Source Maps**: Debug React components with original file names
+- **📊 Fast Builds**: Development builds in ~2 seconds, production optimized
 
-None of the template types are required, and not all of them are included in the Skeleton Theme. Refer to the [template types reference](https://shopify.dev/docs/storefronts/themes/architecture/templates#template-types) for a full list.
+### Development Workflow
 
-### Sections
+1. **Start Development:**
+   ```bash
+   bun run dev:full
+   ```
 
-[Sections](https://shopify.dev/docs/storefronts/themes/architecture/sections) are Liquid files that allow you to create reusable modules of content that can be customized by merchants. They can also include blocks which allow merchants to add, remove, and reorder content within a section.
+2. **Make Changes:**
+   - Edit React components in `src/components/`
+   - Modify styles in `src/styles/main.css` or add Tailwind classes
+   - Update Liquid files in `sections/`, `templates/`, `snippets/`
 
-Sections are made customizable by including a `{% schema %}` in the body. For more information, refer to the [section schema documentation](https://shopify.dev/docs/storefronts/themes/architecture/sections/section-schema).
+3. **See Changes Instantly:**
+   - CSS changes appear immediately
+   - React changes hot reload with state preservation
+   - Liquid changes trigger browser refresh
 
-### Blocks
+## ⚛️ React Components
 
-[Blocks](https://shopify.dev/docs/storefronts/themes/architecture/blocks) let developers create flexible layouts by breaking down sections into smaller, reusable pieces of Liquid. Each block has its own set of settings, and can be added, removed, and reordered within a section.
+### Available Components
 
-Blocks are made customizable by including a `{% schema %}` in the body. For more information, refer to the [block schema documentation](https://shopify.dev/docs/storefronts/themes/architecture/blocks/theme-blocks/schema).
+- **HeroSection** - Expressive hero with product showcase and testimonials
+- **ProductCard** - Interactive product cards with hover effects
+- **CartDrawer** - Sliding cart drawer with animations
+- **SearchModal** - Modal search interface
+- **ImageGallery** - Product image gallery with zoom
+- **AnimatedButton** - Buttons with Framer Motion animations
+- **IconButton** - Icon buttons with Lucide icons
 
-## Schemas
+### Using Components in Liquid
 
-When developing components defined by schema settings, we recommend these guidelines to simplify your code:
+```liquid
+{% assign hero_props = '{"title": "Your Title", "products": [...]}' %}
+{% render 'react-component', component: 'HeroSection', props: hero_props %}
+```
 
-- **Single property settings**: For settings that correspond to a single CSS property, use CSS variables:
+## 🎨 Styling with Tailwind CSS
 
-  ```liquid
-  <div class="collection" style="--gap: {{ block.settings.gap }}px">
-    ...
-  </div>
+This theme uses Tailwind CSS v3 with JIT compilation for optimal performance:
 
-  {% stylesheet %}
-    .collection {
-      gap: var(--gap);
-    }
-  {% endstylesheet %}
+### Key Features
 
-  {% schema %}
-  {
-    "settings": [{
-      "type": "range",
-      "label": "gap",
-      "id": "gap",
-      "min": 0,
-      "max": 100,
-      "unit": "px",
-      "default": 0,
-    }]
-  }
-  {% endschema %}
-  ```
+- **JIT Compilation**: Only generates CSS for classes you actually use
+- **Custom Configuration**: Optimized for Shopify theme development
+- **Google Fonts Integration**: Multiple font combinations with optimized loading
+- **Responsive Design**: Mobile-first approach with modern breakpoints
+- **Dark Mode Support**: Built-in dark mode utilities
 
-- **Multiple property settings**: For settings that control multiple CSS properties, use CSS classes:
+### Adding Styles
 
-  ```liquid
-  <div class="collection {{ block.settings.layout }}">
-    ...
-  </div>
+```html
+<!-- Use Tailwind classes directly -->
+<div class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition-colors">
+  Beautiful button
+</div>
 
-  {% stylesheet %}
-    .collection--full-width {
-      /* multiple styles */
-    }
-    .collection--narrow {
-      /* multiple styles */
-    }
-  {% endstylesheet %}
+<!-- Responsive design -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <!-- Content -->
+</div>
+```
 
-  {% schema %}
-  {
-    "settings": [{
-      "type": "select",
-      "id": "layout",
-      "label": "layout",
-      "values": [
-        { "value": "collection--full-width", "label": "t:options.full" },
-        { "value": "collection--narrow", "label": "t:options.narrow" }
-      ]
-    }]
-  }
-  {% endschema %}
-  ```
+## 📊 Performance
 
-## CSS & JavaScript
+### Development vs Production
 
-For CSS and JavaScript, we recommend using the [`{% stylesheet %}`](https://shopify.dev/docs/api/liquid/tags#stylesheet) and [`{% javascript %}`](https://shopify.dev/docs/api/liquid/tags/javascript) tags. They can be included multiple times, but the code will only appear once.
+| Mode | Bundle Size | Build Time | Features |
+|------|-------------|------------|----------|
+| Development | ~8MB | ~2s | Source maps, no minification, hot reload |
+| Production | ~750KB | ~3s | Minified, optimized, compressed |
 
-### `critical.css`
+### Optimization Features
 
-The Skeleton Theme explicitly separates essential CSS necessary for every page into a dedicated `critical.css` file.
+- **Tree Shaking**: Removes unused code
+- **Code Splitting**: Loads only necessary components
+- **Image Optimization**: Responsive images with lazy loading
+- **CSS Purging**: Removes unused Tailwind classes
+- **Bundle Compression**: Gzip compression for faster loading
 
-## Contributing
+## 🛠️ Development Commands
 
-We're excited for your contributions to the Skeleton Theme! This repository aims to remain as lean, lightweight, and fundamental as possible, and we kindly ask your contributions to align with this intention.
+| Command | Description |
+|---------|-------------|
+| `bun run info` | Show setup information and available commands |
+| `bun run dev` | Start CSS and JS watchers |
+| `bun run dev:full` | Start all watchers with enhanced output |
+| `bun run dev:css` | Watch CSS changes only |
+| `bun run dev:js` | Watch React/JS changes only |
+| `bun run dev:shopify` | Start Shopify development server |
+| `bun run build` | Build for production |
+| `bun run deploy` | Deploy to Shopify |
+| `bun run pull` | Pull latest theme from Shopify |
+| `bun run check` | Check theme for issues |
 
-Visit our [CONTRIBUTING.md](./CONTRIBUTING.md) for a detailed overview of our process, guidelines, and recommendations.
+## 🤝 Contributing
 
-## License
+We welcome contributions! Please read our development guidelines:
 
-Skeleton Theme is open-sourced under the [MIT](./LICENSE.md) License.
+1. **Code Style**: Follow TypeScript and React best practices
+2. **Components**: Create reusable, accessible components
+3. **Performance**: Optimize for speed and bundle size
+4. **Documentation**: Document new features and components
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE.md).
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ for modern Shopify development</strong>
+</p>

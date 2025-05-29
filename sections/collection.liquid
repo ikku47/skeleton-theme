@@ -10,22 +10,20 @@
 <div class="collection-products">
   {% paginate collection.products by 20 %}
     {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
+      {% capture product_card_props %}
+      {
+        "title": "{{ product.title | escape }}",
+        "price": "{{ product.price | money }}",
+        {% if product.compare_at_price > product.price %}
+        "compareAtPrice": "{{ product.compare_at_price | money }}",
         {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
-        </div>
-      </div>
+        "imageUrl": "{{ product.featured_image | img_url: '400x400' }}",
+        "imageAlt": "{{ product.featured_image.alt | escape }}",
+        "productUrl": "{{ product.url }}",
+        "className": "collection-product-card"
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductCard', props: product_card_props %}
     {% endfor %}
 
     {{ paginate | default_pagination }}
@@ -35,7 +33,36 @@
 {% stylesheet %}
   .collection-products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+
+  .collection-product-card {
+    width: 100%;
+    height: 100%;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: var(--color-foreground);
+  }
+
+  @media (min-width: 768px) {
+    .collection-products {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .collection-products {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
   }
 {% endstylesheet %}
 

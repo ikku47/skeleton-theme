@@ -9,12 +9,39 @@
  */
 {
   "sections": {
+    "hero": {
+      "type": "hero-section",
+      "settings": {
+        "title": "Elevate Your Style With Bold Fashion",
+        "primary_button_text": "Explore Collections",
+        "primary_button_url": "/collections/all",
+        "testimonial_text": "TrendZone styles are fresh, bold and exactly what I needed to upgrade my wardrobe. Love the quality and vibe!",
+        "testimonial_author": "Ruby Chen",
+        "show_customers": true
+      },
+      "blocks": {
+        "avatar1": {
+          "type": "customer_avatar",
+          "settings": {}
+        },
+        "avatar2": {
+          "type": "customer_avatar",
+          "settings": {}
+        },
+        "avatar3": {
+          "type": "customer_avatar",
+          "settings": {}
+        }
+      },
+      "block_order": ["avatar1", "avatar2", "avatar3"]
+    },
     "main": {
       "type": "hello-world",
       "settings": {}
     }
   },
   "order": [
+    "hero",
     "main"
   ]
 }

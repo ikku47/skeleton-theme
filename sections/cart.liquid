@@ -1,33 +1,233 @@
 {% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+  This section is used in the cart template to render /cart page with React components.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
 {% endcomment %}
 
-<h1>{{ 'cart.title' | t }}</h1>
+<div class="cart-page">
+  <h1 class="cart-title">{{ 'cart.title' | t }}</h1>
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+  {% if cart.item_count > 0 %}
+    <!-- Enhanced Cart with React Components -->
+    <div class="cart-items">
+      {% for item in cart.items %}
+        <div class="cart-item" data-item-key="{{ item.key }}">
+          <div class="cart-item-image">
+            {% render 'image', image: item.image, width: 100, height: 100 %}
+          </div>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+          <div class="cart-item-details">
+            <h3>{{ item.product.title }}</h3>
+            <p class="cart-item-variant">{{ item.variant.title }}</p>
+            <p class="cart-item-price">{{ item.price | money }}</p>
+          </div>
+
+          <div class="cart-item-quantity">
+            <form action="{{ routes.cart_url }}" method="post" class="cart-quantity-form">
+              <input type="hidden" name="id" value="{{ item.key }}">
+              <div class="quantity-controls">
+                {% assign minus_props = '{"icon": "Minus", "variant": "outline", "size": 16}' %}
+                <button type="button" onclick="updateQuantity(this, -1)">
+                  {% render 'react-component', component: 'IconButton', props: minus_props %}
+                </button>
+
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="0" class="quantity-input">
+
+                {% assign plus_props = '{"icon": "Plus", "variant": "outline", "size": 16}' %}
+                <button type="button" onclick="updateQuantity(this, 1)">
+                  {% render 'react-component', component: 'IconButton', props: plus_props %}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="cart-item-remove">
+            {% assign remove_props = '{"icon": "Trash2", "variant": "ghost", "aria-label": "Remove item"}' %}
+            <a href="{{ item.url_to_remove }}">
+              {% render 'react-component', component: 'IconButton', props: remove_props %}
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+      <div class="cart-total">
+        <h3>Total: {{ cart.total_price | money }}</h3>
+      </div>
+
+      <div class="cart-actions">
+        {% assign checkout_props = '{"children": "Checkout", "variant": "primary", "size": "lg"}' %}
+        <form action="{{ routes.cart_url }}" method="post">
+          <input type="hidden" name="checkout" value="1">
+          {% render 'react-component', component: 'AnimatedButton', props: checkout_props, class: 'checkout-button' %}
+        </form>
+
+        {% assign continue_shopping_props = '{"children": "Continue Shopping", "variant": "outline", "href": "/collections/all"}' %}
+        {% render 'react-component', component: 'AnimatedButton', props: continue_shopping_props %}
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Empty Cart State -->
+    <div class="cart-empty">
+      <div class="empty-cart-icon">
+        {% assign empty_cart_icon_props = '{"icon": "ShoppingBag", "size": 64}' %}
+        {% render 'react-component', component: 'IconButton', props: empty_cart_icon_props, class: 'empty-cart-icon-button' %}
+      </div>
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added anything to your cart yet.</p>
+
+      {% assign shop_now_props = '{"children": "Start Shopping", "variant": "primary", "size": "lg", "href": "/collections/all"}' %}
+      {% render 'react-component', component: 'AnimatedButton', props: shop_now_props %}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .cart-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .cart-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+
+  .cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--color-muted);
+    background: white;
+  }
+
+  .cart-item-details h3 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart-item-variant {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  .cart-item-price {
+    font-weight: bold;
+    color: var(--color-primary);
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .quantity-input {
+    width: 60px;
+    text-align: center;
+    padding: 0.25rem;
+    border: 1px solid var(--color-muted);
+  }
+
+  .cart-summary {
+    border-top: 2px solid var(--color-muted);
+    padding-top: 2rem;
+    text-align: center;
+  }
+
+  .cart-total h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .cart-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cart-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-cart-icon {
+    margin-bottom: 2rem;
+  }
+
+  .empty-cart-icon-button {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .cart-empty h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .cart-empty p {
+    color: var(--color-muted);
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .cart-item {
+      grid-template-columns: 80px 1fr;
+      grid-template-rows: auto auto;
+      gap: 0.5rem;
+    }
+
+    .cart-item-quantity,
+    .cart-item-remove {
+      grid-column: 2;
+      justify-self: end;
+    }
+
+    .cart-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  function updateQuantity(button, change) {
+    const form = button.closest('.cart-quantity-form');
+    const input = form.querySelector('.quantity-input');
+    const currentValue = parseInt(input.value);
+    const newValue = Math.max(0, currentValue + change);
+
+    input.value = newValue;
+
+    // Auto-submit the form to update the cart
+    if (newValue === 0) {
+      // Remove item if quantity is 0
+      const removeLink = button.closest('.cart-item').querySelector('.cart-item-remove a');
+      if (removeLink) {
+        window.location.href = removeLink.href;
+      }
+    } else {
+      // Update quantity
+      form.submit();
+    }
+  }
+</script>
 
 {% schema %}
 {

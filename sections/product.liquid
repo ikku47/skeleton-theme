@@ -5,13 +5,34 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/product
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+<div class="product-container">
+  <div class="product-images">
+  {% if product.images.size > 1 %}
+    <!-- Use React Image Gallery for multiple images -->
+    {% capture gallery_props %}
+    {
+      "images": [
+        {% for image in product.images %}
+          {
+            "id": "{{ image.id }}",
+            "src": "{{ image | img_url: '800x800' }}",
+            "alt": "{{ image.alt | escape }}",
+            "thumbnail": "{{ image | img_url: '100x100' }}"
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ],
+      "className": "product-gallery"
+    }
+    {% endcapture %}
+    {% render 'react-component', component: 'ImageGallery', props: gallery_props %}
+  {% elsif product.featured_image %}
+    <!-- Single image fallback -->
+    {% render 'image', class: 'product-image', image: product.featured_image %}
+  {% endif %}
+  </div>
 
-<div class="product-info">
+  <div class="product-content">
+    <div class="product-info">
   <h1>{{ product.title }}</h1>
   <p>{{ product.price | money }}</p>
   <p>{{ product.description }}</p>
@@ -34,12 +55,83 @@
       {% endfor %}
     </select>
 
-    <input type="text" name="quantity" min="1" value="1">
+    <div class="product-quantity">
+      <label for="quantity">Quantity:</label>
+      <input type="number" name="quantity" id="quantity" min="1" value="1" class="quantity-input">
+    </div>
 
-    <input type="submit" value="Add to cart">
+    <!-- Animated Add to Cart Button -->
+    {% assign add_to_cart_props = '{"children": "Add to Cart", "variant": "primary", "size": "lg", "type": "submit"}' %}
+    {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props, class: 'product-add-to-cart' %}
+
+    <!-- Wishlist Button -->
+    <div class="product-wishlist">
+      {% assign wishlist_props = '{"icon": "Heart", "variant": "outline", "aria-label": "Add to wishlist"}' %}
+      {% render 'react-component', component: 'IconButton', props: wishlist_props %}
+    </div>
+
     {{ form | payment_button }}
   {% endform %}
+  </div>
 </div>
+
+{% stylesheet %}
+  .product-images {
+    margin-bottom: 2rem;
+  }
+
+  .product-gallery {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .product-info {
+    margin-bottom: 2rem;
+  }
+
+  .product-info h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+  }
+
+  .product-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .quantity-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--color-muted);
+    text-align: center;
+  }
+
+  .product-add-to-cart {
+    width: 100%;
+  }
+
+  .product-wishlist {
+    align-self: flex-start;
+  }
+
+  @media (min-width: 768px) {
+    .product-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
