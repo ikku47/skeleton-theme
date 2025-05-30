@@ -5,6 +5,7 @@ import { HeroSection } from './HeroSection'
 import { AnimatedButton } from './AnimatedButton'
 import { IconButton } from './IconButton'
 import { ProductCard } from './ProductCard'
+import { CollectionCard } from './CollectionCard'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -12,6 +13,7 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   AnimatedButton,
   IconButton,
   ProductCard,
+  CollectionCard,
 }
 
 // Type for component names

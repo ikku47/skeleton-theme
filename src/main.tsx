@@ -13,6 +13,29 @@ declare global {
 // Store roots for cleanup
 const componentRoots = new Map()
 
+// Helper function to decode HTML entities and sanitize JSON
+function decodeHtmlEntities(str: string): string {
+  const textarea = document.createElement('textarea')
+  textarea.innerHTML = str
+  return textarea.value
+}
+
+// Helper function to sanitize JSON string
+function sanitizeJsonString(str: string): string {
+  // First decode HTML entities
+  let sanitized = decodeHtmlEntities(str)
+
+  // Remove or escape control characters that break JSON parsing
+  sanitized = sanitized
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+    .replace(/\n/g, '\\n')  // Escape newlines
+    .replace(/\r/g, '\\r')  // Escape carriage returns
+    .replace(/\t/g, '\\t')  // Escape tabs
+    .trim() // Remove leading/trailing whitespace
+
+  return sanitized
+}
+
 // Initialize components
 function initializeComponents() {
   // Find all elements with data-component attribute
@@ -30,7 +53,13 @@ function initializeComponents() {
     if (componentName && ComponentRegistry[componentName]) {
       try {
         const Component = ComponentRegistry[componentName]
-        const props = propsData ? JSON.parse(propsData) : {}
+        let props = {}
+
+        if (propsData) {
+          // Sanitize and parse JSON
+          const sanitizedProps = sanitizeJsonString(propsData)
+          props = JSON.parse(sanitizedProps)
+        }
 
         // Create React root and render component
         const root = ReactDOM.createRoot(element as HTMLElement)
@@ -43,7 +72,29 @@ function initializeComponents() {
         componentRoots.set(element, root)
       } catch (error) {
         console.error(`Error initializing component ${componentName}:`, error)
+        console.error('Original props data:', propsData)
+
+        if (propsData) {
+          const sanitizedProps = sanitizeJsonString(propsData)
+          console.error('Sanitized props data:', sanitizedProps)
+
+          // Try to identify the specific issue
+          try {
+            JSON.parse(sanitizedProps)
+          } catch (parseError) {
+            console.error('JSON parse error details:', parseError)
+          }
+        }
+
+        // Add error indicator to the element
+        element.innerHTML = `<div style="color: red; padding: 1rem; border: 1px solid red; border-radius: 4px; font-size: 12px;">
+          <strong>Error loading ${componentName} component</strong><br>
+          ${error instanceof Error ? error.message : 'Unknown error'}<br>
+          <small>Check console for details</small>
+        </div>`
       }
+    } else if (componentName) {
+      console.warn(`Component "${componentName}" not found in registry`)
     }
   })
 }
@@ -72,9 +123,16 @@ const observer = new MutationObserver((mutations) => {
   })
 
   if (shouldReinitialize) {
-    setTimeout(initializeComponents, 0)
+    // Use a longer timeout to ensure DOM is fully updated
+    setTimeout(initializeComponents, 100)
   }
 })
+
+// Global function to manually reinitialize components
+function reinitializeComponents() {
+  console.log('Manually reinitializing React components...')
+  initializeComponents()
+}
 
 // Start observing
 observer.observe(document.body, {
@@ -95,3 +153,5 @@ window.openCartDrawer = function() {
 
 // Make functions available globally (no exports needed for IIFE)
 ;(window as any).ComponentRegistry = ComponentRegistry
+;(window as any).reinitializeComponents = reinitializeComponents
+;(window as any).initializeComponents = initializeComponents

@@ -3,8 +3,8 @@
 {% endcomment %}
 
 {% liquid
-  assign title = section.settings.title | default: 'Stay Updated'
-  assign description = section.settings.description | default: 'Subscribe to our newsletter for the latest updates and exclusive offers.'
+  assign title = section.settings.title | default: 'Stay Updated with ' | append: shop.name
+  assign description = section.settings.description | default: 'Subscribe to our newsletter for the latest updates and exclusive offers from ' | append: shop.name | append: '.'
 %}
 
 <section class="py-16 bg-gray-50">
@@ -44,13 +44,13 @@
       "type": "text",
       "id": "title",
       "label": "Section Title",
-      "default": "Stay Updated"
+      "info": "Leave empty to use shop name"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "Subscribe to our newsletter for the latest updates and exclusive offers."
+      "info": "Leave empty to use default text with shop name"
     }
   ],
   "presets": [

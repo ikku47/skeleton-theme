@@ -10,7 +10,7 @@
         {{ 'collections.title' | t | default: 'All Collections' }}
       </h1>
       <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        Browse our curated collections and find exactly what you're looking for.
+        Browse our curated collections at {{ shop.name }} and find exactly what you're looking for.
       </p>
     </div>
 
@@ -19,47 +19,21 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for collection in collections %}
           {% unless collection.handle == 'frontpage' %}
-            <a href="{{ collection.url }}" class="group block">
-              <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                <!-- Collection Image -->
-                {% if collection.featured_image %}
-                  <div class="aspect-square overflow-hidden">
-                    <img
-                      src="{{ collection.featured_image | img_url: width: 600, height: 600 }}"
-                      alt="{{ collection.featured_image.alt | escape }}"
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    >
-                  </div>
-                {% else %}
-                  <div class="aspect-square bg-gray-100 flex items-center justify-center">
-                    <span class="text-gray-400">{{ collection.title | slice: 0, 1 | upcase }}</span>
-                  </div>
-                {% endif %}
-
-                <!-- Collection Content -->
-                <div class="p-6">
-                  <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                    {{ collection.title }}
-                  </h3>
-
-                  {% if collection.description != blank %}
-                    <p class="text-gray-600 text-sm mb-3">
-                      {{ collection.description | strip_html | truncatewords: 15 }}
-                    </p>
-                  {% endif %}
-
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-500">
-                      {{ collection.products_count }}
-                      {% if collection.products_count == 1 %}product{% else %}products{% endif %}
-                    </span>
-                    <span class="text-primary font-medium text-sm group-hover:underline">
-                      View Collection →
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </a>
+            {% capture collection_card_props %}
+            {
+              "title": "{{ collection.title | escape }}",
+              {% if collection.description != blank %}
+              "description": "{{ collection.description | strip_html | truncatewords: 15 | escape }}",
+              {% endif %}
+              {% if collection.featured_image %}
+              "imageUrl": "{{ collection.featured_image | image_url: width: 600, height: 600 }}",
+              "imageAlt": "{{ collection.featured_image.alt | escape }}",
+              {% endif %}
+              "collectionUrl": "{{ collection.url }}",
+              "productCount": {{ collection.products_count }}
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'CollectionCard', props: collection_card_props %}
           {% endunless %}
         {% endfor %}
       </div>

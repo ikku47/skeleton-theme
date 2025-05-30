@@ -2,29 +2,18 @@
   "sections": {
     "hero": {
       "type": "hero-section",
-      "settings": {
-        "title": "Welcome to Our Store",
-        "subtitle": "Premium Collection",
-        "description": "Discover our curated selection of premium products designed to elevate your lifestyle.",
-        "cta_text": "Shop Now",
-        "cta_url": "/collections/all"
-      }
+      "settings": {}
     },
     "featured_products": {
       "type": "featured-products",
       "settings": {
-        "title": "Featured Products",
         "products_limit": 8,
-        "show_view_all": true,
-        "view_all_url": "/collections/all"
+        "show_view_all": true
       }
     },
     "newsletter": {
       "type": "newsletter",
-      "settings": {
-        "title": "Stay Updated",
-        "description": "Subscribe to our newsletter for the latest updates and exclusive offers."
-      }
+      "settings": {}
     }
   },
   "order": [

@@ -9,6 +9,8 @@ interface HeroSectionProps {
   description?: string
   cta_text?: string
   cta_url?: string
+  secondary_cta_text?: string
+  secondary_cta_url?: string
   background_image?: string
 }
 
@@ -36,11 +38,13 @@ const itemVariants = {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  title = "Welcome to Our Store",
-  subtitle = "Premium Collection",
-  description = "Discover our curated selection of premium products designed to elevate your lifestyle.",
+  title,
+  subtitle,
+  description,
   cta_text = "Shop Now",
   cta_url = "/collections/all",
+  secondary_cta_text = "Browse Collections",
+  secondary_cta_url = "/collections",
   background_image
 }) => {
   const backgroundStyle = background_image 
@@ -96,11 +100,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {cta_text}
             </AnimatedButton>
             <AnimatedButton
-              href="/collections"
+              href={secondary_cta_url}
               variant="outline"
               size="lg"
             >
-              Browse Collections
+              {secondary_cta_text}
             </AnimatedButton>
           </motion.div>
         </motion.div>

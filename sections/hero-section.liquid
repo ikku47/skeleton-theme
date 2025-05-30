@@ -3,22 +3,26 @@
 {% endcomment %}
 
 {% liquid
-  assign title = section.settings.title | default: 'Welcome to Our Store'
-  assign subtitle = section.settings.subtitle | default: 'Premium Collection'
-  assign description = section.settings.description | default: 'Discover our curated selection of premium products designed to elevate your lifestyle.'
+  assign title = section.settings.title | default: shop.name
+  assign subtitle = section.settings.subtitle | default: shop.description
+  assign description = section.settings.description | default: shop.metafields.custom.hero_description | default: 'Discover our curated selection of premium products.'
   assign cta_text = section.settings.cta_text | default: 'Shop Now'
-  assign cta_url = section.settings.cta_url | default: '/collections/all'
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign secondary_cta_text = section.settings.secondary_cta_text | default: 'Browse Collections'
+  assign secondary_cta_url = section.settings.secondary_cta_url | default: routes.collections_url
   assign background_image = section.settings.background_image
 %}
 
 {% capture hero_props %}
 {
-  "title": "{{ title | escape }}",
-  "subtitle": "{{ subtitle | escape }}",
-  "description": "{{ description | escape }}",
-  "cta_text": "{{ cta_text | escape }}",
-  "cta_url": "{{ cta_url }}"{% if background_image %},
-  "background_image": "{{ background_image | image_url: width: 1920, height: 1080 }}"{% endif %}
+  "title": {{ title | json }},
+  "subtitle": {{ subtitle | json }},
+  "description": {{ description | json }},
+  "cta_text": {{ cta_text | json }},
+  "cta_url": {{ cta_url | json }},
+  "secondary_cta_text": {{ secondary_cta_text | json }},
+  "secondary_cta_url": {{ secondary_cta_url | json }}{% if background_image %},
+  "background_image": {{ background_image | image_url: width: 1920, height: 1080 | json }}{% endif %}
 }
 {% endcapture %}
 
@@ -34,19 +38,19 @@
       "type": "text",
       "id": "title",
       "label": "Main Title",
-      "default": "Welcome to Our Store"
+      "info": "Leave empty to use shop name"
     },
     {
       "type": "text",
       "id": "subtitle",
       "label": "Subtitle",
-      "default": "Premium Collection"
+      "info": "Leave empty to use shop description"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "Discover our curated selection of premium products designed to elevate your lifestyle."
+      "info": "Leave empty to use shop metafield or default text"
     },
     {
       "type": "text",
@@ -58,7 +62,19 @@
       "type": "url",
       "id": "cta_url",
       "label": "Button URL",
-      "default": "/collections/all"
+      "info": "Leave empty to use all products collection"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "Secondary Button Text",
+      "default": "Browse Collections"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_url",
+      "label": "Secondary Button URL",
+      "info": "Leave empty to use collections page"
     },
     {
       "type": "image_picker",
