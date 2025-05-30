@@ -1,251 +1,35 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "hero": {
       "type": "hero-section",
       "settings": {
-        "title": "Elevate Your Style With Bold Fashion",
-        "primary_button_text": "Explore Collections",
-        "primary_button_url": "/collections/all",
-        "testimonial_text": "TrendZone styles are fresh, bold and exactly what I needed to upgrade my wardrobe. Love the quality and vibe!",
-        "testimonial_author": "Ruby Chen",
-        "show_customers": true
-      },
-      "blocks": {
-        "avatar1": {
-          "type": "customer_avatar",
-          "settings": {}
-        },
-        "avatar2": {
-          "type": "customer_avatar",
-          "settings": {}
-        },
-        "avatar3": {
-          "type": "customer_avatar",
-          "settings": {}
-        }
-      },
-      "block_order": ["avatar1", "avatar2", "avatar3"]
+        "title": "Welcome to Our Store",
+        "subtitle": "Premium Collection",
+        "description": "Discover our curated selection of premium products designed to elevate your lifestyle.",
+        "cta_text": "Shop Now",
+        "cta_url": "/collections/all"
+      }
     },
     "featured_products": {
       "type": "featured-products",
       "settings": {
         "title": "Featured Products",
-        "subtitle": "Discover our most popular items",
         "products_limit": 8,
         "show_view_all": true,
         "view_all_url": "/collections/all"
       }
     },
-    "product_categories": {
-      "type": "product-categories",
-      "settings": {
-        "title": "Shop by Category",
-        "subtitle": "Explore our curated collections"
-      },
-      "blocks": {
-        "category1": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Discover the latest trends in fashion"
-          }
-        },
-        "category2": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Premium accessories for every occasion"
-          }
-        },
-        "category3": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Comfortable and stylish footwear"
-          }
-        },
-        "category4": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Essential items for your wardrobe"
-          }
-        },
-        "category5": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Seasonal collections and limited editions"
-          }
-        },
-        "category6": {
-          "type": "collection",
-          "settings": {
-            "custom_description": "Special offers and bestsellers"
-          }
-        }
-      },
-      "block_order": ["category1", "category2", "category3", "category4", "category5", "category6"]
-    },
-    "brand_story": {
-      "type": "brand-story",
-      "settings": {
-        "title": "Our Story",
-        "subtitle": "Crafting Excellence Since Day One",
-        "description": "We believe in creating products that not only look great but also make a positive impact on your life. Our journey started with a simple idea: to bring you the finest quality products at prices that make sense.",
-        "button_text": "Learn More"
-      },
-      "blocks": {
-        "stat1": {
-          "type": "stat",
-          "settings": {
-            "value": "10K+",
-            "label": "Happy Customers"
-          }
-        },
-        "stat2": {
-          "type": "stat",
-          "settings": {
-            "value": "50K+",
-            "label": "Products Sold"
-          }
-        },
-        "stat3": {
-          "type": "stat",
-          "settings": {
-            "value": "5+",
-            "label": "Years Experience"
-          }
-        },
-        "stat4": {
-          "type": "stat",
-          "settings": {
-            "value": "25+",
-            "label": "Countries Served"
-          }
-        },
-        "feature1": {
-          "type": "feature",
-          "settings": {
-            "icon": "award",
-            "title": "Premium Quality",
-            "description": "Every product is carefully selected and tested for quality"
-          }
-        },
-        "feature2": {
-          "type": "feature",
-          "settings": {
-            "icon": "truck",
-            "title": "Fast Shipping",
-            "description": "Free shipping on orders over $50 with quick delivery"
-          }
-        },
-        "feature3": {
-          "type": "feature",
-          "settings": {
-            "icon": "shield",
-            "title": "Secure Shopping",
-            "description": "Your data is protected with industry-leading security"
-          }
-        },
-        "feature4": {
-          "type": "feature",
-          "settings": {
-            "icon": "users",
-            "title": "24/7 Support",
-            "description": "Our team is here to help you every step of the way"
-          }
-        }
-      },
-      "block_order": ["stat1", "stat2", "stat3", "stat4", "feature1", "feature2", "feature3", "feature4"]
-    },
-    "testimonials": {
-      "type": "testimonials",
-      "settings": {
-        "title": "What Our Customers Say",
-        "subtitle": "Real reviews from real customers"
-      },
-      "blocks": {
-        "testimonial1": {
-          "type": "testimonial",
-          "settings": {
-            "name": "Sarah Johnson",
-            "role": "Verified Customer",
-            "content": "Amazing quality and fast shipping! The product exceeded my expectations and the customer service was outstanding.",
-            "rating": 5,
-            "product": "Premium Collection"
-          }
-        },
-        "testimonial2": {
-          "type": "testimonial",
-          "settings": {
-            "name": "Michael Chen",
-            "role": "Repeat Customer",
-            "content": "I've been shopping here for over a year and they never disappoint. Great products, great prices, great service!",
-            "rating": 5
-          }
-        },
-        "testimonial3": {
-          "type": "testimonial",
-          "settings": {
-            "name": "Emma Davis",
-            "role": "Fashion Blogger",
-            "content": "This store has become my go-to for unique pieces. The quality is consistently excellent and the style is always on-trend.",
-            "rating": 5
-          }
-        }
-      },
-      "block_order": ["testimonial1", "testimonial2", "testimonial3"]
-    },
     "newsletter": {
       "type": "newsletter",
       "settings": {
-        "title": "Stay in the Loop",
-        "subtitle": "Get exclusive offers and updates",
-        "description": "Be the first to know about new products, sales, and special events. Plus, get 10% off your first order!",
-        "placeholder": "Enter your email address",
-        "button_text": "Subscribe",
-        "discount": "10%"
-      },
-      "blocks": {
-        "benefit1": {
-          "type": "benefit",
-          "settings": {
-            "text": "Exclusive discounts and offers"
-          }
-        },
-        "benefit2": {
-          "type": "benefit",
-          "settings": {
-            "text": "Early access to new products"
-          }
-        },
-        "benefit3": {
-          "type": "benefit",
-          "settings": {
-            "text": "Style tips and inspiration"
-          }
-        },
-        "benefit4": {
-          "type": "benefit",
-          "settings": {
-            "text": "Special event invitations"
-          }
-        }
-      },
-      "block_order": ["benefit1", "benefit2", "benefit3", "benefit4"]
+        "title": "Stay Updated",
+        "description": "Subscribe to our newsletter for the latest updates and exclusive offers."
+      }
     }
   },
   "order": [
     "hero",
     "featured_products",
-    "product_categories",
-    "brand_story",
-    "testimonials",
     "newsletter"
   ]
 }

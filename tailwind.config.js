@@ -7,36 +7,40 @@ module.exports = {
     './templates/**/*.liquid',
     './templates/**/*.json',
     './blocks/**/*.liquid',
-    './src/**/*.{js,ts,jsx,tsx}',
-    './test-classes.html'
+    './src/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
     extend: {
       fontFamily: {
         'heading': ['var(--font-heading)', 'system-ui', 'sans-serif'],
-        'body': ['var(--font-body)', 'system-ui', 'sans-serif'],
-        'primary': ['var(--font-primary--family)', 'system-ui', 'sans-serif']
+        'body': ['var(--font-body)', 'system-ui', 'sans-serif']
       },
       colors: {
-        'background': 'var(--color-background)',
-        'foreground': 'var(--color-foreground)',
         'primary': 'var(--color-primary)',
         'secondary': 'var(--color-secondary)',
-        'accent': 'var(--color-accent)',
-        'muted': 'var(--color-muted)',
-        'success': 'var(--color-success)',
-        'warning': 'var(--color-warning)',
-        'error': 'var(--color-error)'
+        'accent': 'var(--color-accent)'
       },
       spacing: {
-        'page-margin': 'var(--page-margin)',
+        '18': '4.5rem',
+        '88': '22rem'
       },
-      maxWidth: {
-        'page': 'var(--page-width)'
+      aspectRatio: {
+        'product': '3/4',
+        'hero': '16/9'
       },
-      borderRadius: {
-        'input': 'var(--style-border-radius-inputs)',
-        'button': 'var(--style-border-radius-buttons)'
+      animation: {
+        'fade-in': 'fadeIn 0.3s ease-in-out',
+        'slide-up': 'slideUp 0.4s ease-out'
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        }
       }
     }
   },

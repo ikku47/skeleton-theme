@@ -1,18 +1,10 @@
 import React from 'react'
 
-// Import all components here
+// Import essential components
 import { HeroSection } from './HeroSection'
 import { AnimatedButton } from './AnimatedButton'
 import { IconButton } from './IconButton'
 import { ProductCard } from './ProductCard'
-import { CartDrawer } from './CartDrawer'
-import { SearchModal } from './SearchModal'
-import { ImageGallery } from './ImageGallery'
-import { FeaturedProducts } from './FeaturedProducts'
-import { ProductCategories } from './ProductCategories'
-import { BrandStory } from './BrandStory'
-import { TestimonialsSection } from './TestimonialsSection'
-import { NewsletterSignup } from './NewsletterSignup'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -20,14 +12,6 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   AnimatedButton,
   IconButton,
   ProductCard,
-  CartDrawer,
-  SearchModal,
-  ImageGallery,
-  FeaturedProducts,
-  ProductCategories,
-  BrandStory,
-  TestimonialsSection,
-  NewsletterSignup,
 }
 
 // Type for component names

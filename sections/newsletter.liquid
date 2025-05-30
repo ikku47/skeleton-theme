@@ -1,133 +1,61 @@
 {% comment %}
-  Newsletter Signup Section with React component integration
-  Features: Email capture, benefits list, discount offer
+  Simple Newsletter Section
 {% endcomment %}
 
 {% liquid
-  assign title = section.settings.title | default: 'Stay in the Loop'
-  assign subtitle = section.settings.subtitle | default: 'Get exclusive offers and updates'
-  assign description = section.settings.description | default: 'Be the first to know about new products, sales, and special events. Plus, get 10% off your first order!'
-  assign placeholder = section.settings.placeholder | default: 'Enter your email address'
-  assign button_text = section.settings.button_text | default: 'Subscribe'
-  assign discount = section.settings.discount | default: '10%'
+  assign title = section.settings.title | default: 'Stay Updated'
+  assign description = section.settings.description | default: 'Subscribe to our newsletter for the latest updates and exclusive offers.'
 %}
 
-{% capture newsletter_props %}
-{
-  "title": "{{ title | escape }}",
-  "subtitle": "{{ subtitle | escape }}",
-  "description": "{{ description | escape }}",
-  "placeholder": "{{ placeholder | escape }}",
-  "buttonText": "{{ button_text | escape }}",
-  {% if discount != blank %}
-  "discount": "{{ discount | escape }}",
-  {% endif %}
-  "benefits": [
-    {% for block in section.blocks %}
-      {% if block.type == 'benefit' %}
-        "{{ block.settings.text | escape }}"{% unless forloop.last %},{% endunless %}
-      {% endif %}
-    {% endfor %}
-  ]
-}
-{% endcapture %}
-
-{% render 'react-component', component: 'NewsletterSignup', props: newsletter_props %}
+<section class="py-16 bg-gray-50">
+  <div class="container">
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ title }}</h2>
+      <p class="text-lg text-gray-600 mb-8">{{ description }}</p>
+      
+      <form action="{{ routes.root_url }}contact#contact_form" method="post" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+        <input type="hidden" name="form_type" value="customer">
+        <input type="hidden" name="utf8" value="✓">
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        
+        <input 
+          type="email" 
+          name="contact[email]" 
+          placeholder="Enter your email"
+          required
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+        >
+        
+        <button type="submit" class="btn btn-primary whitespace-nowrap">
+          Subscribe
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "Newsletter Signup",
+  "name": "Newsletter",
   "tag": "section",
-  "class": "newsletter-section",
+  "class": "newsletter",
   "settings": [
-    {
-      "type": "header",
-      "content": "Content"
-    },
     {
       "type": "text",
       "id": "title",
-      "label": "Title",
-      "default": "Stay in the Loop"
-    },
-    {
-      "type": "text",
-      "id": "subtitle",
-      "label": "Subtitle",
-      "default": "Get exclusive offers and updates"
+      "label": "Section Title",
+      "default": "Stay Updated"
     },
     {
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "Be the first to know about new products, sales, and special events. Plus, get 10% off your first order!"
-    },
-    {
-      "type": "header",
-      "content": "Form Settings"
-    },
-    {
-      "type": "text",
-      "id": "placeholder",
-      "label": "Email Placeholder",
-      "default": "Enter your email address"
-    },
-    {
-      "type": "text",
-      "id": "button_text",
-      "label": "Button Text",
-      "default": "Subscribe"
-    },
-    {
-      "type": "text",
-      "id": "discount",
-      "label": "Discount Offer",
-      "default": "10%",
-      "info": "Leave blank to hide discount badge"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "benefit",
-      "name": "Benefit",
-      "settings": [
-        {
-          "type": "text",
-          "id": "text",
-          "label": "Benefit Text"
-        }
-      ]
+      "default": "Subscribe to our newsletter for the latest updates and exclusive offers."
     }
   ],
   "presets": [
     {
-      "name": "Newsletter Signup",
-      "blocks": [
-        {
-          "type": "benefit",
-          "settings": {
-            "text": "Exclusive discounts and offers"
-          }
-        },
-        {
-          "type": "benefit",
-          "settings": {
-            "text": "Early access to new products"
-          }
-        },
-        {
-          "type": "benefit",
-          "settings": {
-            "text": "Style tips and inspiration"
-          }
-        },
-        {
-          "type": "benefit",
-          "settings": {
-            "text": "Special event invitations"
-          }
-        }
-      ]
+      "name": "Newsletter"
     }
   ]
 }

@@ -1,23 +1,20 @@
 {
-  "name": "joycommerce-shopify-theme",
+  "name": "shopify-react-tailwind-boilerplate",
   "version": "1.0.0",
-  "description": "A modern, high-quality Shopify theme built with Tailwind CSS v3, React, Framer Motion, and Lucide Icons",
+  "description": "A minimal Shopify theme boilerplate with React, Tailwind CSS v3, and hot reload",
   "scripts": {
     "dev": "concurrently --kill-others \"bun run dev:css\" \"bun run dev:js\"",
     "dev:full": "concurrently --kill-others --names \"CSS,JS,SHOPIFY\" --prefix-colors \"blue,green,magenta\" \"bun run dev:css\" \"bun run dev:js\" \"bun run dev:shopify\"",
-    "dev:assets": "concurrently --kill-others --names \"CSS,JS\" --prefix-colors \"blue,green\" \"bun run dev:css\" \"bun run dev:js\"",
     "dev:css": "tailwindcss -i src/styles/main.css -o assets/application.css --watch",
     "dev:js": "vite build --watch --mode development",
-    "dev:shopify": "shopify theme dev --store joycommerce-dxb --live-reload=hot-reload",
+    "dev:shopify": "shopify theme dev --live-reload=hot-reload",
     "build": "bun run build:css && bun run build:js",
     "build:css": "tailwindcss -i src/styles/main.css -o assets/application.css --minify",
     "build:js": "vite build --mode production",
-    "preview": "shopify theme dev --store joycommerce-dxb",
-    "deploy": "shopify theme push --store joycommerce-dxb",
-    "pull": "shopify theme pull --store joycommerce-dxb",
-    "check": "shopify theme check",
-    "setup": "node scripts/dev-setup.js",
-    "info": "node scripts/dev-setup.js"
+    "preview": "shopify theme dev",
+    "deploy": "shopify theme push",
+    "pull": "shopify theme pull",
+    "check": "shopify theme check"
   },
   "dependencies": {
     "framer-motion": "^11.0.0",
@@ -31,7 +28,6 @@
     "@vitejs/plugin-react": "^4.2.0",
     "concurrently": "^8.2.0",
     "tailwindcss": "^3.4.0",
-    "terser": "^5.40.0",
     "typescript": "^5.3.0",
     "vite": "^5.0.0"
   },

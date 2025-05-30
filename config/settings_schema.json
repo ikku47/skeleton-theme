@@ -34,6 +34,10 @@
             "label": "Playfair Display + Source Sans Pro (Elegant)"
           },
           {
+            "value": "poppins_roboto",
+            "label": "Poppins + Roboto Mono (Lifestyle Brand)"
+          },
+          {
             "value": "poppins_open",
             "label": "Poppins + Open Sans (Friendly)"
           },
@@ -42,7 +46,7 @@
             "label": "Use Shopify Font Picker"
           }
         ],
-        "default": "inter",
+        "default": "poppins_roboto",
         "info": "Choose a pre-configured Google Font combination or use custom fonts"
       },
       {
@@ -139,6 +143,38 @@
         "default": "#f59e0b",
         "label": "Accent Color",
         "info": "Used for highlights and call-to-action elements"
+      },
+      {
+        "type": "header",
+        "content": "Lifestyle Brand Colors"
+      },
+      {
+        "type": "color",
+        "id": "brand_indigo_deep",
+        "default": "#1E1B4B",
+        "label": "Deep Indigo",
+        "info": "Primary brand color for backgrounds and headers"
+      },
+      {
+        "type": "color",
+        "id": "brand_coral_vibrant",
+        "default": "#FF6B6B",
+        "label": "Vibrant Coral",
+        "info": "CTA color for buttons and attention-grabbing elements"
+      },
+      {
+        "type": "color",
+        "id": "brand_blue_electric",
+        "default": "#4B5EAA",
+        "label": "Electric Blue",
+        "info": "Accent color for hover effects and secondary elements"
+      },
+      {
+        "type": "color",
+        "id": "brand_white_soft",
+        "default": "#F5F5F5",
+        "label": "Soft White",
+        "info": "Background color for light sections and text"
       },
       {
         "type": "header",

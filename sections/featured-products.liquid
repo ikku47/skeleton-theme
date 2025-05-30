@@ -1,81 +1,68 @@
 {% comment %}
-  Featured Products Section with React component integration
-  Features: Actual Shopify product data, ratings, quick add functionality
+  Simple Featured Products Section
 {% endcomment %}
 
 {% liquid
   assign title = section.settings.title | default: 'Featured Products'
-  assign subtitle = section.settings.subtitle | default: 'Discover our most popular items'
-  assign featured_collection = section.settings.featured_collection
+  assign collection = collections[section.settings.collection] | default: collections.all
   assign products_limit = section.settings.products_limit | default: 8
-  assign show_view_all = section.settings.show_view_all | default: true
-  assign view_all_url = section.settings.view_all_url | default: '/collections/all'
-
-  # Get featured products from collection or all products
-  if featured_collection != blank
-    assign all_products = collections[featured_collection].products
-  else
-    assign all_products = collections.all.products
-  endif
 %}
 
-{% capture featured_products_props %}
-{
-  "title": "{{ title | escape }}",
-  "subtitle": "{{ subtitle | escape }}",
-  "showViewAll": {{ show_view_all }},
-  "viewAllUrl": "{{ view_all_url }}",
-  "products": [
-    {% assign product_count = 0 %}
-    {% for product in all_products %}
-      {% if product_count < products_limit %}
-        {% assign product_count = product_count | plus: 1 %}
-        {
-          "id": "{{ product.id }}",
-          "title": "{{ product.title | escape }}",
-          "image": "{{ product.featured_image | image_url: width: 600, height: 600 }}",
-          "url": "{{ product.url }}",
-          "price": "{{ product.price | money }}",
-          {% if product.compare_at_price > product.price %}
-          "compareAtPrice": "{{ product.compare_at_price | money }}",
-          {% endif %}
-          {% if product.vendor %}
-          "vendor": "{{ product.vendor | escape }}",
-          {% endif %}
-          {% comment %} Add product tags for additional info {% endcomment %}
-          "tags": [
-            {% assign tag_count = 0 %}
-            {% for tag in product.tags %}
-              {% if tag_count < 3 %}
-                {% assign tag_count = tag_count | plus: 1 %}
-                "{{ tag | escape }}"{% unless tag_count == 3 or forloop.last %},{% endunless %}
-              {% endif %}
-            {% endfor %}
-          ]
-          {% comment %} You can add rating and review count if you have a review app {% endcomment %}
-          {% comment %}
-          "rating": 4.5,
-          "reviewCount": 25
-          {% endcomment %}
-        }{% unless product_count == products_limit or forloop.last %},{% endunless %}
-      {% endif %}
-    {% endfor %}
-  ]
-}
-{% endcapture %}
-
-{% render 'react-component', component: 'FeaturedProducts', props: featured_products_props %}
+<section class="py-16 bg-white">
+  <div class="container">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ title }}</h2>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for product in collection.products limit: products_limit %}
+        <div class="card-product group">
+          <a href="{{ product.url }}" class="block">
+            {% if product.featured_image %}
+              <div class="aspect-product overflow-hidden rounded-lg mb-4">
+                <img 
+                  src="{{ product.featured_image | image_url: width: 400, height: 500 }}" 
+                  alt="{{ product.featured_image.alt | escape }}"
+                  class="card-product-image w-full h-full object-cover"
+                  loading="lazy"
+                >
+              </div>
+            {% endif %}
+            
+            <div class="space-y-2">
+              <h3 class="font-medium text-gray-900 group-hover:text-primary transition-colors">
+                {{ product.title }}
+              </h3>
+              <p class="text-lg font-semibold text-primary">
+                {{ product.price | money }}
+                {% if product.compare_at_price > product.price %}
+                  <span class="text-sm text-gray-500 line-through ml-2">
+                    {{ product.compare_at_price | money }}
+                  </span>
+                {% endif %}
+              </p>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+    
+    {% if section.settings.show_view_all %}
+      <div class="text-center mt-12">
+        <a href="{{ section.settings.view_all_url | default: '/collections/all' }}" class="btn btn-outline">
+          View All Products
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
 
 {% schema %}
 {
   "name": "Featured Products",
   "tag": "section",
-  "class": "featured-products-section",
+  "class": "featured-products",
   "settings": [
-    {
-      "type": "header",
-      "content": "Content"
-    },
     {
       "type": "text",
       "id": "title",
@@ -83,44 +70,30 @@
       "default": "Featured Products"
     },
     {
-      "type": "text",
-      "id": "subtitle",
-      "label": "Section Subtitle",
-      "default": "Discover our most popular items"
-    },
-    {
-      "type": "header",
-      "content": "Products"
-    },
-    {
       "type": "collection",
-      "id": "featured_collection",
-      "label": "Featured Collection",
-      "info": "Select a collection to showcase products. If none selected, will show latest products."
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select a collection to display products from"
     },
     {
       "type": "range",
       "id": "products_limit",
-      "label": "Number of Products",
+      "label": "Number of products",
       "min": 4,
       "max": 12,
-      "step": 1,
+      "step": 4,
       "default": 8
-    },
-    {
-      "type": "header",
-      "content": "View All Button"
     },
     {
       "type": "checkbox",
       "id": "show_view_all",
-      "label": "Show View All Button",
+      "label": "Show 'View All' button",
       "default": true
     },
     {
       "type": "url",
       "id": "view_all_url",
-      "label": "View All URL",
+      "label": "'View All' button URL",
       "default": "/collections/all"
     }
   ],

@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import { LucideIcon } from 'lucide-react'
 
 interface AnimatedButtonProps {
   children: React.ReactNode
@@ -10,6 +11,7 @@ interface AnimatedButtonProps {
   className?: string
   href?: string
   type?: 'button' | 'submit' | 'reset'
+  icon?: LucideIcon
 }
 
 export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -21,6 +23,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
   className = '',
   href,
   type = 'button',
+  icon: Icon,
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
   
@@ -52,10 +55,11 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         {...motionProps}
       >
         {children}
+        {Icon && <Icon className="ml-2" size={20} />}
       </motion.a>
     )
   }
-  
+
   return (
     <motion.button
       type={type}
@@ -65,6 +69,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       {...motionProps}
     >
       {children}
+      {Icon && <Icon className="ml-2" size={20} />}
     </motion.button>
   )
 }
