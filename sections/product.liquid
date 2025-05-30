@@ -1,9 +1,25 @@
 {% comment %}
-  Simple Product Page Section
+  Product Page Section - Enhanced with breadcrumbs and better functionality
 {% endcomment %}
 
-<section class="py-16 bg-white">
+<section class="py-8 bg-white min-h-screen">
   <div class="container">
+    <!-- Breadcrumbs -->
+    {% if section.settings.show_breadcrumbs %}
+      <nav class="mb-8" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+          <li><a href="{{ routes.root_url }}" class="hover:text-primary">Home</a></li>
+          <li><span class="mx-2">/</span></li>
+          {% if collection %}
+            <li><a href="{{ routes.collections_url }}" class="hover:text-primary">Collections</a></li>
+            <li><span class="mx-2">/</span></li>
+            <li><a href="{{ collection.url }}" class="hover:text-primary">{{ collection.title }}</a></li>
+            <li><span class="mx-2">/</span></li>
+          {% endif %}
+          <li class="text-gray-900 font-medium">{{ product.title }}</li>
+        </ol>
+      </nav>
+    {% endif %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
       <!-- Product Images -->
       <div class="space-y-4">
@@ -52,6 +68,30 @@
               <span class="bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
                 Save {{ product.compare_at_price | minus: product.price | money }}
               </span>
+            {% endif %}
+          </div>
+
+          <!-- Stock Status -->
+          {% assign current_variant = product.selected_or_first_available_variant %}
+          <div class="flex items-center space-x-4">
+            {% if current_variant.available %}
+              <span class="flex items-center text-green-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                In Stock
+              </span>
+            {% else %}
+              <span class="flex items-center text-red-600">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                Out of Stock
+              </span>
+            {% endif %}
+
+            {% if section.settings.show_vendor and product.vendor != blank %}
+              <span class="text-gray-500">by <strong>{{ product.vendor }}</strong></span>
             {% endif %}
           </div>
 
@@ -109,13 +149,26 @@
           </div>
 
           <div class="flex flex-col sm:flex-row gap-4">
-            {% assign add_to_cart_props = '{"children": "Add to Cart", "variant": "primary", "size": "lg", "type": "submit"}' %}
+            {% capture add_to_cart_props %}
+            {
+              "children": "Add to Cart",
+              "variant": "primary",
+              "size": "lg",
+              "type": "submit"
+            }
+            {% endcapture %}
             <div class="flex-1">
               {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props %}
             </div>
 
             <div class="flex items-center justify-center">
-              {% assign wishlist_props = '{"icon": "Heart", "variant": "outline", "aria-label": "Add to wishlist"}' %}
+              {% capture wishlist_props %}
+              {
+                "icon": "Heart",
+                "variant": "outline",
+                "aria-label": "Add to wishlist"
+              }
+              {% endcapture %}
               {% render 'react-component', component: 'IconButton', props: wishlist_props %}
             </div>
           </div>
@@ -124,15 +177,115 @@
         {% endform %}
       </div>
     </div>
+
+    <!-- Related Products -->
+    {% if section.settings.show_related_products %}
+      {% liquid
+        assign related_collection = collections[product.collections.first.handle] | default: collections.all
+        assign related_products = related_collection.products | where: 'id', '!=', product.id
+      %}
+
+      {% if related_products.size > 0 %}
+        <div class="mt-20 pt-16 border-t border-gray-200">
+          <div class="text-center mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              {% if product.collections.first %}
+                More from {{ product.collections.first.title }}
+              {% else %}
+                Related Products
+              {% endif %}
+            </h2>
+            <p class="text-gray-600">You might also like these products</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% liquid
+              assign related_limit = section.settings.related_products_limit | default: 4
+            %}
+            {% for related_product in related_products limit: related_limit %}
+              {% liquid
+                assign product_image = related_product.featured_image
+                assign image_url = ''
+                if product_image
+                  assign image_url = product_image | image_url: width: 400, height: 500
+                endif
+              %}
+              {% capture product_card_props %}
+              {
+                "title": {{ related_product.title | json }},
+                "price": {{ related_product.price | money | json }},
+                {% if related_product.compare_at_price > related_product.price %}
+                "compareAtPrice": {{ related_product.compare_at_price | money | json }},
+                {% endif %}
+                {% if image_url != blank %}
+                "imageUrl": {{ image_url | json }},
+                "imageAlt": {{ product_image.alt | default: related_product.title | json }},
+                {% else %}
+                "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
+                "imageAlt": {{ related_product.title | json }},
+                {% endif %}
+                "productUrl": {{ related_product.url | json }}
+              }
+              {% endcapture %}
+              {% render 'react-component', component: 'ProductCard', props: product_card_props %}
+            {% endfor %}
+          </div>
+
+          {% if related_products.size > related_limit %}
+            <div class="text-center mt-8">
+              <a href="{{ product.collections.first.url | default: routes.all_products_collection_url }}" class="btn btn-outline">
+                View All {% if product.collections.first %}{{ product.collections.first.title }}{% else %}Products{% endif %}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
   </div>
 </section>
 
 {% schema %}
 {
   "name": "Product",
-  "settings": [],
+  "tag": "section",
+  "class": "product-page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related_products",
+      "label": "Show related products",
+      "default": true,
+      "info": "Shows products from the same collection"
+    },
+    {
+      "type": "range",
+      "id": "related_products_limit",
+      "label": "Number of related products",
+      "min": 2,
+      "max": 8,
+      "step": 2,
+      "default": 4
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
-  }
+  },
+  "presets": [
+    {
+      "name": "Product"
+    }
+  ]
 }
 {% endschema %}
