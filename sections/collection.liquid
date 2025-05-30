@@ -6,19 +6,26 @@
   <div class="container">
     <!-- Breadcrumbs -->
     {% if section.settings.show_breadcrumbs %}
-      <nav class="mb-8" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-2 text-sm text-gray-500">
-          <li><a href="{{ routes.root_url }}" class="hover:text-primary">Home</a></li>
-          <li><span class="mx-2">/</span></li>
-          {% unless collection.handle == 'all' %}
-            <li><a href="{{ routes.collections_url }}" class="hover:text-primary">Collections</a></li>
-            <li><span class="mx-2">/</span></li>
-          {% endunless %}
-          <li class="text-gray-900 font-medium">
-            {% if collection.handle == 'all' %}All Products{% else %}{{ collection.title }}{% endif %}
-          </li>
-        </ol>
-      </nav>
+      {% liquid
+        assign breadcrumb_items = ''
+        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
+
+        unless collection.handle == 'all'
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Collections", "url": "' | append: routes.collections_url | append: '"}'
+        endunless
+
+        if collection.handle == 'all'
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "All Products", "isActive": true}'
+        else
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: collection.title | append: '", "isActive": true}'
+        endif
+      %}
+      {% capture breadcrumbs_props %}
+      {
+        "items": [{{ breadcrumb_items }}]
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
     {% endif %}
 
     <!-- Collection Header -->

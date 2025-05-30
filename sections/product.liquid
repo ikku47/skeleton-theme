@@ -1,179 +1,151 @@
 {% comment %}
-  Product Page Section - Enhanced with breadcrumbs and better functionality
+  Product Page Section - Enhanced with React components
 {% endcomment %}
 
 <section class="py-8 bg-white min-h-screen">
   <div class="container">
     <!-- Breadcrumbs -->
     {% if section.settings.show_breadcrumbs %}
-      <nav class="mb-8" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-2 text-sm text-gray-500">
-          <li><a href="{{ routes.root_url }}" class="hover:text-primary">Home</a></li>
-          <li><span class="mx-2">/</span></li>
-          {% if collection %}
-            <li><a href="{{ routes.collections_url }}" class="hover:text-primary">Collections</a></li>
-            <li><span class="mx-2">/</span></li>
-            <li><a href="{{ collection.url }}" class="hover:text-primary">{{ collection.title }}</a></li>
-            <li><span class="mx-2">/</span></li>
-          {% endif %}
-          <li class="text-gray-900 font-medium">{{ product.title }}</li>
-        </ol>
-      </nav>
+      {% liquid
+        assign breadcrumb_items = ''
+        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
+
+        if collection
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Collections", "url": "' | append: routes.collections_url | append: '"}'
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: collection.title | append: '", "url": "' | append: collection.url | append: '"}'
+        endif
+
+        assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: product.title | append: '", "isActive": true}'
+      %}
+      {% capture breadcrumbs_props %}
+      {
+        "items": [{{ breadcrumb_items }}]
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
     {% endif %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
       <!-- Product Images -->
-      <div class="space-y-4">
-        {% if product.featured_image %}
-          <!-- Main Image -->
-          <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
-            <img
-              src="{{ product.featured_image | image_url: width: 800, height: 800 }}"
-              alt="{{ product.featured_image.alt | escape }}"
-              class="w-full h-full object-cover"
-            >
-          </div>
-
-          {% if product.images.size > 1 %}
-            <!-- Thumbnail Images -->
-            <div class="grid grid-cols-4 gap-2">
-              {% for image in product.images limit: 4 %}
-                <div class="aspect-square overflow-hidden rounded-md bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity">
-                  <img
-                    src="{{ image | image_url: width: 200, height: 200 }}"
-                    alt="{{ image.alt | escape }}"
-                    class="w-full h-full object-cover"
-                  >
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% else %}
-          <!-- Placeholder if no image -->
-          <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-            <span class="text-gray-500">No image available</span>
-          </div>
-        {% endif %}
-      </div>
+      {% liquid
+        assign product_images = ''
+        for image in product.images
+          assign image_url = image | image_url: width: 800, height: 800
+          assign image_alt = image.alt | escape | default: product.title
+          if forloop.first
+            assign product_images = product_images | append: '{"url": "' | append: image_url | append: '", "alt": "' | append: image_alt | append: '"}'
+          else
+            assign product_images = product_images | append: ', {"url": "' | append: image_url | append: '", "alt": "' | append: image_alt | append: '"}'
+          endif
+        endfor
+      %}
+      {% capture image_gallery_props %}
+      {
+        "images": [{{ product_images }}],
+        "productTitle": {{ product.title | json }}
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductImageGallery', props: image_gallery_props %}
 
       <!-- Product Content -->
       <div class="space-y-6">
         <!-- Product Info -->
-        <div class="space-y-4">
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ product.title }}</h1>
-
-          <div class="flex items-center space-x-4">
-            <span class="text-3xl font-bold text-primary">{{ product.price | money }}</span>
-            {% if product.compare_at_price > product.price %}
-              <span class="text-xl text-gray-500 line-through">{{ product.compare_at_price | money }}</span>
-              <span class="bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
-                Save {{ product.compare_at_price | minus: product.price | money }}
-              </span>
-            {% endif %}
-          </div>
-
-          <!-- Stock Status -->
-          {% assign current_variant = product.selected_or_first_available_variant %}
-          <div class="flex items-center space-x-4">
-            {% if current_variant.available %}
-              <span class="flex items-center text-green-600">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                In Stock
-              </span>
-            {% else %}
-              <span class="flex items-center text-red-600">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg>
-                Out of Stock
-              </span>
-            {% endif %}
-
-            {% if section.settings.show_vendor and product.vendor != blank %}
-              <span class="text-gray-500">by <strong>{{ product.vendor }}</strong></span>
-            {% endif %}
-          </div>
-
-          {% if product.description != blank %}
-            <div class="prose prose-gray max-w-none">
-              {{ product.description }}
-            </div>
+        {% assign current_variant = product.selected_or_first_available_variant %}
+        {% capture product_info_props %}
+        {
+          "title": {{ product.title | json }},
+          "price": {{ product.price | money | json }},
+          {% if product.compare_at_price > product.price %}
+          "compareAtPrice": {{ product.compare_at_price | money | json }},
           {% endif %}
-        </div>
+          {% if product.vendor != blank %}
+          "vendor": {{ product.vendor | json }},
+          {% endif %}
+          {% if product.description != blank %}
+          "description": {{ product.description | json }},
+          {% endif %}
+          "isAvailable": {{ current_variant.available | json }},
+          "showVendor": {{ section.settings.show_vendor | json }},
+          "showTrustBadges": {{ section.settings.show_trust_badges | json }},
+          "trustBadges": [
+            {
+              "text": {{ section.settings.trust_badge_1_text | default: "Free shipping on orders over $50" | json }},
+              "show": {{ section.settings.show_trust_badge_1 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_2_text | default: "30-day return policy" | json }},
+              "show": {{ section.settings.show_trust_badge_2 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_3_text | default: "Secure payment" | json }},
+              "show": {{ section.settings.show_trust_badge_3 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_4_text | default: "Customer support" | json }},
+              "show": {{ section.settings.show_trust_badge_4 | json }}
+            }
+          ]
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'ProductInfo', props: product_info_props %}
 
         <!-- Product Form -->
         {% form 'product', product, class: 'space-y-6' %}
           {% assign current_variant = product.selected_or_first_available_variant %}
 
+          <!-- Variant Selector -->
           {% if product.variants.size > 1 %}
-            <div class="space-y-2">
-              <label for="variant-select" class="block text-sm font-medium text-gray-700">
-                Variant
-              </label>
-              <select
-                name="id"
-                id="variant-select"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              >
-                {% for variant in product.variants %}
-                  <option
-                    value="{{ variant.id }}"
-                    {% if variant == current_variant %}selected="selected"{% endif %}
-                    {% unless variant.available %}disabled{% endunless %}
-                  >
-                    {{ variant.title }} - {{ variant.price | money }}
-                    {% unless variant.available %} (Sold out){% endunless %}
-                  </option>
-                {% endfor %}
-              </select>
-            </div>
+            {% liquid
+              assign variants_json = ''
+              for variant in product.variants
+                assign variant_title = variant.title | json
+                assign variant_price = variant.price | money | json
+                assign variant_data = '{"id": "' | append: variant.id | append: '", "title": ' | append: variant_title | append: ', "price": ' | append: variant_price | append: ', "available": ' | append: variant.available | append: '}'
+                if forloop.first
+                  assign variants_json = variants_json | append: variant_data
+                else
+                  assign variants_json = variants_json | append: ', ' | append: variant_data
+                endif
+              endfor
+            %}
+            {% capture variant_selector_props %}
+            {
+              "variants": [{{ variants_json }}],
+              "selectedVariantId": "{{ current_variant.id }}"
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductVariantSelector', props: variant_selector_props %}
           {% else %}
             <input type="hidden" name="id" value="{{ current_variant.id }}">
           {% endif %}
 
-          <div class="flex items-center space-x-4">
-            <div class="space-y-2">
-              <label for="quantity" class="block text-sm font-medium text-gray-700">
-                Quantity
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                id="quantity"
-                min="1"
-                value="1"
-                class="w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-              >
-            </div>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-4">
-            {% capture add_to_cart_props %}
+          <!-- Quantity Selector and Product Actions -->
+          <div class="space-y-6">
+            <!-- Quantity Selector -->
+            {% capture quantity_selector_props %}
             {
-              "children": "Add to Cart",
-              "variant": "primary",
-              "size": "lg",
-              "type": "submit"
+              "initialQuantity": 1,
+              "minQuantity": 1,
+              "maxQuantity": 99,
+              "disabled": {% unless current_variant.available %}true{% else %}false{% endunless %}
             }
             {% endcapture %}
-            <div class="flex-1">
-              {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props %}
-            </div>
+            {% render 'react-component', component: 'ProductQuantitySelector', props: quantity_selector_props %}
 
-            <div class="flex items-center justify-center">
-              {% capture wishlist_props %}
-              {
-                "icon": "Heart",
-                "variant": "outline",
-                "aria-label": "Add to wishlist"
-              }
-              {% endcapture %}
-              {% render 'react-component', component: 'IconButton', props: wishlist_props %}
-            </div>
+            <!-- Product Actions -->
+            {% capture product_actions_props %}
+            {
+              "isAvailable": {{ current_variant.available | json }},
+              "variantId": "{{ current_variant.id }}",
+              "quantity": 1,
+              "addToCartText": "Add to Cart",
+              "buyNowText": "Buy Now",
+              "showBuyNow": true,
+              "showWishlist": true,
+              "showShare": true
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductActions', props: product_actions_props %}
           </div>
-
-          {{ form | payment_button }}
         {% endform %}
       </div>
     </div>
@@ -183,63 +155,87 @@
       {% liquid
         assign related_collection = collections[product.collections.first.handle] | default: collections.all
         assign related_products = related_collection.products | where: 'id', '!=', product.id
+        assign related_limit = section.settings.related_products_limit | default: 4
       %}
 
       {% if related_products.size > 0 %}
-        <div class="mt-20 pt-16 border-t border-gray-200">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              {% if product.collections.first %}
-                More from {{ product.collections.first.title }}
-              {% else %}
-                Related Products
-              {% endif %}
-            </h2>
-            <p class="text-gray-600">You might also like these products</p>
-          </div>
+        {% liquid
+          assign related_products_json = ''
+          for related_product in related_products limit: related_limit
+            assign product_image = related_product.featured_image
+            assign image_url = ''
+            if product_image
+              assign image_url = product_image | image_url: width: 400, height: 500
+            else
+              assign image_url = 'product-placeholder.svg' | asset_url
+            endif
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {% liquid
-              assign related_limit = section.settings.related_products_limit | default: 4
-            %}
-            {% for related_product in related_products limit: related_limit %}
-              {% liquid
-                assign product_image = related_product.featured_image
-                assign image_url = ''
-                if product_image
-                  assign image_url = product_image | image_url: width: 400, height: 500
-                endif
-              %}
-              {% capture product_card_props %}
-              {
-                "title": {{ related_product.title | json }},
-                "price": {{ related_product.price | money | json }},
-                {% if related_product.compare_at_price > related_product.price %}
-                "compareAtPrice": {{ related_product.compare_at_price | money | json }},
-                {% endif %}
-                {% if image_url != blank %}
-                "imageUrl": {{ image_url | json }},
-                "imageAlt": {{ product_image.alt | default: related_product.title | json }},
-                {% else %}
-                "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
-                "imageAlt": {{ related_product.title | json }},
-                {% endif %}
-                "productUrl": {{ related_product.url | json }}
-              }
-              {% endcapture %}
-              {% render 'react-component', component: 'ProductCard', props: product_card_props %}
-            {% endfor %}
-          </div>
+            assign product_title = related_product.title | json
+            assign product_price = related_product.price | money | json
+            assign product_image_alt = product_image.alt | default: related_product.title | json
+            assign product_url = related_product.url | json
 
+            assign product_data = '{"id": "' | append: related_product.id | append: '", "title": ' | append: product_title | append: ', "price": ' | append: product_price | append: ', "imageUrl": "' | append: image_url | append: '", "imageAlt": ' | append: product_image_alt | append: ', "productUrl": ' | append: product_url | append: '"'
+
+            if related_product.compare_at_price > related_product.price
+              assign compare_price = related_product.compare_at_price | money | json
+              assign product_data = product_data | append: ', "compareAtPrice": ' | append: compare_price
+            endif
+
+            assign product_data = product_data | append: '}'
+
+            if forloop.first
+              assign related_products_json = related_products_json | append: product_data
+            else
+              assign related_products_json = related_products_json | append: ', ' | append: product_data
+            endif
+          endfor
+        %}
+
+        {% capture related_products_props %}
+        {
+          "products": [{{ related_products_json }}],
+          "title": "{% if product.collections.first %}More from {{ product.collections.first.title }}{% else %}Related Products{% endif %}",
+          "subtitle": "You might also like these products",
           {% if related_products.size > related_limit %}
-            <div class="text-center mt-8">
-              <a href="{{ product.collections.first.url | default: routes.all_products_collection_url }}" class="btn btn-outline">
-                View All {% if product.collections.first %}{{ product.collections.first.title }}{% else %}Products{% endif %}
-              </a>
-            </div>
+          "viewAllUrl": "{{ product.collections.first.url | default: routes.all_products_collection_url }}",
+          "viewAllText": "View All {% if product.collections.first %}{{ product.collections.first.title }}{% else %}Products{% endif %}",
           {% endif %}
-        </div>
+          "limit": {{ related_limit }}
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'RelatedProducts', props: related_products_props %}
       {% endif %}
+    {% endif %}
+
+    <!-- Product Reviews -->
+    {% comment %}
+      Reviews section is available but disabled by default to avoid showing fake data.
+      To enable reviews, integrate with a Shopify review app like:
+      - Shopify Product Reviews
+      - Judge.me
+      - Yotpo
+      - Loox
+      - Stamped.io
+
+      Then uncomment and modify the code below to use actual review data from your chosen app.
+    {% endcomment %}
+    {% if section.settings.show_reviews and false %}
+      {% comment %}
+        Example implementation for when you have real review data:
+
+        {% capture reviews_props %}
+        {
+          "reviews": [
+            // Real review data from your review app API
+          ],
+          "averageRating": {{ product.metafields.reviews.rating | default: 0 }},
+          "totalReviews": {{ product.metafields.reviews.count | default: 0 }},
+          "ratingDistribution": {{ product.metafields.reviews.distribution | default: '{}' }}
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'ProductReviews', props: reviews_props %}
+      {% endcomment %}
     {% endif %}
   </div>
 </section>
@@ -277,6 +273,72 @@
       "max": 8,
       "step": 2,
       "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show product reviews",
+      "default": false,
+      "info": "Shows customer reviews and ratings (requires review app integration)"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": false,
+      "info": "Display trust badges below product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_1",
+      "label": "Show trust badge 1",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_1_text",
+      "label": "Trust badge 1 text",
+      "default": "Free shipping on orders over $50"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_2",
+      "label": "Show trust badge 2",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_2_text",
+      "label": "Trust badge 2 text",
+      "default": "30-day return policy"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_3",
+      "label": "Show trust badge 3",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_3_text",
+      "label": "Trust badge 3 text",
+      "default": "Secure payment"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_4",
+      "label": "Show trust badge 4",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_4_text",
+      "label": "Trust badge 4 text",
+      "default": "Customer support"
     }
   ],
   "disabled_on": {

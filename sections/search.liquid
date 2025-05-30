@@ -1,54 +1,181 @@
 {% comment %}
-  This section is used in the search template to render search results for
-  products, articles, and pages.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/search
+  Enhanced Search Page Section with React components
 {% endcomment %}
 
-<h1>{{ 'search.title' | t }}</h1>
+<section class="py-8 bg-white min-h-screen">
+  <div class="container">
+    <!-- Breadcrumbs -->
+    {% if section.settings.show_breadcrumbs %}
+      {% liquid
+        assign breadcrumb_items = ''
+        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
+        assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Search", "isActive": true}'
+      %}
+      {% capture breadcrumbs_props %}
+      {
+        "items": [{{ breadcrumb_items }}]
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
+    {% endif %}
 
-<form action="{{ routes.search_url }}" method="get" role="search">
-  <input
-    type="search"
-    size="50"
-    name="q"
-    value="{{ search.terms | escape }}"
-    placeholder="{{ 'search.placeholder' | t }}"
-  >
-  <button type="submit">{{ 'search.submit' | t }}</button>
-</form>
-
-{% if search.performed %}
-  {% if search.results_count == 0 %}
-    <p>{{ 'search.no_results_html' | t: terms: search.terms }}</p>
-  {% else %}
-    <p>{{ 'search.results_for_html' | t: terms: search.terms, count: search.results_count }}</p>
-
-    <div class="search-results">
-      {% paginate search.results by 20 %}
-        {% # Search result items may be an article, a page, or a product. %}
-        {% for result in search.results %}
-          <div class="search-result">
-            {% assign featured_image = result.featured_image | default: result.image %}
-            {% if featured_image %}
-              {% render 'image', class: 'search-result__image', image: featured_image, url: result.url, width: 400 %}
-            {% endif %}
-            <div class="search-result__content">
-              <p>
-                {{ result.title | link_to: result.url }}
-                {% if result.price %}
-                  {{ result.price | money_with_currency }}
-                {% endif %}
-              </p>
-            </div>
-          </div>
-        {% endfor %}
-
-        {{ paginate | default_pagination }}
-      {% endpaginate %}
+    <!-- Search Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Search</h1>
+      {% if search.performed and search.terms != blank %}
+        <p class="text-lg text-gray-600">
+          {% if search.results_count == 0 %}
+            No results found for "{{ search.terms }}"
+          {% else %}
+            {{ search.results_count }} result{% if search.results_count != 1 %}s{% endif %} for "{{ search.terms }}"
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="text-lg text-gray-600">Find what you're looking for</p>
+      {% endif %}
     </div>
-  {% endif %}
-{% endif %}
+
+    <!-- Search Form -->
+    <div class="max-w-2xl mx-auto mb-12">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="relative">
+        <input
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="Search products, articles, and pages..."
+          class="w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary pr-16"
+          autocomplete="off"
+        >
+        <button
+          type="submit"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Search
+        </button>
+      </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if search.performed %}
+      {% if search.results_count == 0 %}
+        <!-- No Results -->
+        <div class="text-center py-16">
+          <div class="max-w-md mx-auto">
+            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
+            <p class="text-gray-500 mb-6">Try adjusting your search terms or browse our collections.</p>
+            <a href="{{ routes.collections_url }}" class="btn btn-primary">
+              Browse Collections
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <!-- Search Results Grid -->
+        {% paginate search.results by 20 %}
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+            {% for result in search.results %}
+              {% if result.object_type == 'product' %}
+                <!-- Product Result -->
+                {% liquid
+                  assign product_image = result.featured_image
+                  assign image_url = ''
+                  if product_image
+                    assign image_url = product_image | image_url: width: 400, height: 500
+                  endif
+                %}
+                {% capture product_card_props %}
+                {
+                  "title": {{ result.title | json }},
+                  "price": {{ result.price | money | json }},
+                  {% if result.compare_at_price > result.price %}
+                  "compareAtPrice": {{ result.compare_at_price | money | json }},
+                  {% endif %}
+                  {% if image_url != blank %}
+                  "imageUrl": {{ image_url | json }},
+                  "imageAlt": {{ product_image.alt | default: result.title | json }},
+                  {% else %}
+                  "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
+                  "imageAlt": {{ result.title | json }},
+                  {% endif %}
+                  "productUrl": {{ result.url | json }}
+                }
+                {% endcapture %}
+                {% render 'react-component', component: 'ProductCard', props: product_card_props %}
+              {% else %}
+                <!-- Article/Page Result -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                  {% if result.image %}
+                    <div class="aspect-video mb-4 overflow-hidden rounded-lg bg-gray-100">
+                      <img
+                        src="{{ result.image | image_url: width: 400, height: 225 }}"
+                        alt="{{ result.image.alt | default: result.title }}"
+                        class="w-full h-full object-cover"
+                      >
+                    </div>
+                  {% endif %}
+                  <div class="mb-2">
+                    <span class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+                      {% if result.object_type == 'article' %}Article{% else %}Page{% endif %}
+                    </span>
+                  </div>
+                  <h3 class="font-medium text-gray-900 mb-2">
+                    <a href="{{ result.url }}" class="hover:text-primary transition-colors">
+                      {{ result.title }}
+                    </a>
+                  </h3>
+                  {% if result.summary %}
+                    <p class="text-sm text-gray-600 line-clamp-3">{{ result.summary | strip_html | truncate: 120 }}</p>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <!-- Pagination -->
+          {% if paginate.pages > 1 %}
+            <div class="flex justify-center mt-12">
+              <nav class="flex items-center space-x-2" aria-label="Pagination">
+                {% if paginate.previous %}
+                  <a href="{{ paginate.previous.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                    Previous
+                  </a>
+                {% endif %}
+
+                {% for part in paginate.parts %}
+                  {% if part.is_link %}
+                    <a href="{{ part.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                      {{ part.title }}
+                    </a>
+                  {% else %}
+                    {% if part.title == paginate.current_page %}
+                      <span class="px-3 py-2 text-sm font-medium text-white bg-primary border border-primary rounded-md">
+                        {{ part.title }}
+                      </span>
+                    {% else %}
+                      <span class="px-3 py-2 text-sm font-medium text-gray-400">
+                        {{ part.title }}
+                      </span>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                {% if paginate.next %}
+                  <a href="{{ paginate.next.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                    Next
+                  </a>
+                {% endif %}
+              </nav>
+            </div>
+          {% endif %}
+        {% endpaginate %}
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
 
 {% stylesheet %}
   .search-results {
@@ -64,7 +191,16 @@
 
 {% schema %}
 {
-  "name": "t:general.search",
-  "settings": []
+  "name": "Search",
+  "tag": "section",
+  "class": "search-page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    }
+  ]
 }
 {% endschema %}
