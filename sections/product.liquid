@@ -1,141 +1,135 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+  Simple Product Page Section
 {% endcomment %}
 
-<div class="product-container">
-  <div class="product-images">
-  {% if product.images.size > 1 %}
-    <!-- Use React Image Gallery for multiple images -->
-    {% capture gallery_props %}
-    {
-      "images": [
-        {% for image in product.images %}
-          {
-            "id": "{{ image.id }}",
-            "src": "{{ image | img_url: '800x800' }}",
-            "alt": "{{ image.alt | escape }}",
-            "thumbnail": "{{ image | img_url: '100x100' }}"
-          }{% unless forloop.last %},{% endunless %}
-        {% endfor %}
-      ],
-      "className": "product-gallery"
-    }
-    {% endcapture %}
-    {% render 'react-component', component: 'ImageGallery', props: gallery_props %}
-  {% elsif product.featured_image %}
-    <!-- Single image fallback -->
-    {% render 'image', class: 'product-image', image: product.featured_image %}
-  {% endif %}
-  </div>
+<section class="py-16 bg-white">
+  <div class="container">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <!-- Product Images -->
+      <div class="space-y-4">
+        {% if product.featured_image %}
+          <!-- Main Image -->
+          <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+            <img
+              src="{{ product.featured_image | image_url: width: 800, height: 800 }}"
+              alt="{{ product.featured_image.alt | escape }}"
+              class="w-full h-full object-cover"
+            >
+          </div>
 
-  <div class="product-content">
-    <div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
-
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
-
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
+          {% if product.images.size > 1 %}
+            <!-- Thumbnail Images -->
+            <div class="grid grid-cols-4 gap-2">
+              {% for image in product.images limit: 4 %}
+                <div class="aspect-square overflow-hidden rounded-md bg-gray-100 cursor-pointer hover:opacity-75 transition-opacity">
+                  <img
+                    src="{{ image | image_url: width: 200, height: 200 }}"
+                    alt="{{ image.alt | escape }}"
+                    class="w-full h-full object-cover"
+                  >
+                </div>
+              {% endfor %}
+            </div>
           {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+        {% else %}
+          <!-- Placeholder if no image -->
+          <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+            <span class="text-gray-500">No image available</span>
+          </div>
+        {% endif %}
+      </div>
 
-    <div class="product-quantity">
-      <label for="quantity">Quantity:</label>
-      <input type="number" name="quantity" id="quantity" min="1" value="1" class="quantity-input">
+      <!-- Product Content -->
+      <div class="space-y-6">
+        <!-- Product Info -->
+        <div class="space-y-4">
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ product.title }}</h1>
+
+          <div class="flex items-center space-x-4">
+            <span class="text-3xl font-bold text-primary">{{ product.price | money }}</span>
+            {% if product.compare_at_price > product.price %}
+              <span class="text-xl text-gray-500 line-through">{{ product.compare_at_price | money }}</span>
+              <span class="bg-red-500 text-white px-2 py-1 rounded text-sm font-medium">
+                Save {{ product.compare_at_price | minus: product.price | money }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if product.description != blank %}
+            <div class="prose prose-gray max-w-none">
+              {{ product.description }}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Product Form -->
+        {% form 'product', product, class: 'space-y-6' %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+
+          {% if product.variants.size > 1 %}
+            <div class="space-y-2">
+              <label for="variant-select" class="block text-sm font-medium text-gray-700">
+                Variant
+              </label>
+              <select
+                name="id"
+                id="variant-select"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                {% for variant in product.variants %}
+                  <option
+                    value="{{ variant.id }}"
+                    {% if variant == current_variant %}selected="selected"{% endif %}
+                    {% unless variant.available %}disabled{% endunless %}
+                  >
+                    {{ variant.title }} - {{ variant.price | money }}
+                    {% unless variant.available %} (Sold out){% endunless %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% else %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}">
+          {% endif %}
+
+          <div class="flex items-center space-x-4">
+            <div class="space-y-2">
+              <label for="quantity" class="block text-sm font-medium text-gray-700">
+                Quantity
+              </label>
+              <input
+                type="number"
+                name="quantity"
+                id="quantity"
+                min="1"
+                value="1"
+                class="w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            {% assign add_to_cart_props = '{"children": "Add to Cart", "variant": "primary", "size": "lg", "type": "submit"}' %}
+            <div class="flex-1">
+              {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props %}
+            </div>
+
+            <div class="flex items-center justify-center">
+              {% assign wishlist_props = '{"icon": "Heart", "variant": "outline", "aria-label": "Add to wishlist"}' %}
+              {% render 'react-component', component: 'IconButton', props: wishlist_props %}
+            </div>
+          </div>
+
+          {{ form | payment_button }}
+        {% endform %}
+      </div>
     </div>
-
-    <!-- Animated Add to Cart Button -->
-    {% assign add_to_cart_props = '{"children": "Add to Cart", "variant": "primary", "size": "lg", "type": "submit"}' %}
-    {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props, class: 'product-add-to-cart' %}
-
-    <!-- Wishlist Button -->
-    <div class="product-wishlist">
-      {% assign wishlist_props = '{"icon": "Heart", "variant": "outline", "aria-label": "Add to wishlist"}' %}
-      {% render 'react-component', component: 'IconButton', props: wishlist_props %}
-    </div>
-
-    {{ form | payment_button }}
-  {% endform %}
   </div>
-</div>
-
-{% stylesheet %}
-  .product-images {
-    margin-bottom: 2rem;
-  }
-
-  .product-gallery {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .product-info {
-    margin-bottom: 2rem;
-  }
-
-  .product-info h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-
-  .product-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 400px;
-  }
-
-  .product-quantity {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .quantity-input {
-    width: 80px;
-    padding: 0.5rem;
-    border: 1px solid var(--color-muted);
-    text-align: center;
-  }
-
-  .product-add-to-cart {
-    width: 100%;
-  }
-
-  .product-wishlist {
-    align-self: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .product-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-  }
-{% endstylesheet %}
+</section>
 
 {% schema %}
 {
-  "name": "t:general.product",
+  "name": "Product",
   "settings": [],
   "disabled_on": {
     "groups": ["header", "footer"]

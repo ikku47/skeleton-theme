@@ -1,74 +1,56 @@
 {% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+  Simple Collection Page Section
 {% endcomment %}
 
-<h1>{{ collection.title }}</h1>
+<section class="py-16 bg-white">
+  <div class="container">
+    <!-- Collection Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ collection.title }}</h1>
+      {% if collection.description != blank %}
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ collection.description }}</p>
+      {% endif %}
+    </div>
 
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      {% capture product_card_props %}
-      {
-        "title": "{{ product.title | escape }}",
-        "price": "{{ product.price | money }}",
-        {% if product.compare_at_price > product.price %}
-        "compareAtPrice": "{{ product.compare_at_price | money }}",
-        {% endif %}
-        "imageUrl": "{{ product.featured_image | img_url: '400x400' }}",
-        "imageAlt": "{{ product.featured_image.alt | escape }}",
-        "productUrl": "{{ product.url }}",
-        "className": "collection-product-card"
-      }
-      {% endcapture %}
-      {% render 'react-component', component: 'ProductCard', props: product_card_props %}
-    {% endfor %}
+    <!-- Products Grid -->
+    {% paginate collection.products by 20 %}
+      {% if collection.products.size > 0 %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {% for product in collection.products %}
+            {% capture product_card_props %}
+            {
+              "title": "{{ product.title | escape }}",
+              "price": "{{ product.price | money }}",
+              {% if product.compare_at_price > product.price %}
+              "compareAtPrice": "{{ product.compare_at_price | money }}",
+              {% endif %}
+              "imageUrl": "{{ product.featured_image | img_url: '400x400' }}",
+              "imageAlt": "{{ product.featured_image.alt | escape }}",
+              "productUrl": "{{ product.url }}"
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductCard', props: product_card_props %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-12">
+          <p class="text-gray-500 text-lg">No products found in this collection.</p>
+        </div>
+      {% endif %}
 
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
-</div>
-
-{% stylesheet %}
-  .collection-products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    padding: 2rem 0;
-  }
-
-  .collection-product-card {
-    width: 100%;
-    height: 100%;
-  }
-
-  h1 {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-    color: var(--color-foreground);
-  }
-
-  @media (min-width: 768px) {
-    .collection-products {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .collection-products {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-  }
-{% endstylesheet %}
+      <!-- Pagination -->
+      {% if paginate.pages > 1 %}
+        <div class="flex justify-center">
+          {{ paginate | default_pagination }}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "t:general.collection",
+  "name": "Collection",
   "settings": []
 }
 {% endschema %}

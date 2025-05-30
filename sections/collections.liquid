@@ -1,83 +1,84 @@
 {% comment %}
-  This section is used in the list-collections template to render a list of
-  collections.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+  Simple Collections List Page Section
 {% endcomment %}
 
-<h1>{{ 'collections.title' | t }}</h1>
+<section class="py-16 bg-white">
+  <div class="container">
+    <!-- Collections Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {{ 'collections.title' | t | default: 'All Collections' }}
+      </h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Browse our curated collections and find exactly what you're looking for.
+      </p>
+    </div>
 
-<div
-  class="collections {{ section.settings.grid_item_width }}"
-  style="--grid-gap: {{ section.settings.grid_gap }}px"
->
-  {% for collection in collections %}
-    <a class="collection-card" href="{{ collection.url }}">
-      {% if collection.featured_image %}
-        {% render 'image',
-          class: 'collection-card__image',
-          image: collection.featured_image,
-          width: 600,
-          height: 600,
-          crop: 'center'
-        %}
-      {% endif %}
+    <!-- Collections Grid -->
+    {% if collections.size > 0 %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for collection in collections %}
+          {% unless collection.handle == 'frontpage' %}
+            <a href="{{ collection.url }}" class="group block">
+              <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+                <!-- Collection Image -->
+                {% if collection.featured_image %}
+                  <div class="aspect-square overflow-hidden">
+                    <img
+                      src="{{ collection.featured_image | img_url: width: 600, height: 600 }}"
+                      alt="{{ collection.featured_image.alt | escape }}"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    >
+                  </div>
+                {% else %}
+                  <div class="aspect-square bg-gray-100 flex items-center justify-center">
+                    <span class="text-gray-400">{{ collection.title | slice: 0, 1 | upcase }}</span>
+                  </div>
+                {% endif %}
 
-      <div class="collection-card__content">
-        <p>{{ collection.title }}</p>
+                <!-- Collection Content -->
+                <div class="p-6">
+                  <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                    {{ collection.title }}
+                  </h3>
 
-        {% if collection.description %}
-          <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-        {% endif %}
+                  {% if collection.description != blank %}
+                    <p class="text-gray-600 text-sm mb-3">
+                      {{ collection.description | strip_html | truncatewords: 15 }}
+                    </p>
+                  {% endif %}
+
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">
+                      {{ collection.products_count }}
+                      {% if collection.products_count == 1 %}product{% else %}products{% endif %}
+                    </span>
+                    <span class="text-primary font-medium text-sm group-hover:underline">
+                      View Collection →
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endunless %}
+        {% endfor %}
       </div>
-    </a>
-  {% endfor %}
-</div>
-
-{% stylesheet %}
-  .collections {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(var(--collection-card-size), 100%), 1fr));
-    gap: var(--grid-gap);
-  }
-  .collections--compact {
-    --collection-card-size: 160px;
-  }
-  .collections--full {
-    --collection-card-size: 280px;
-  }
-  .collection-card {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-{% endstylesheet %}
+    {% else %}
+      <div class="text-center py-16">
+        <p class="text-gray-500 text-lg">No collections found.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "t:general.collections_grid",
-  "settings": [
+  "name": "Collections List",
+  "settings": [],
+  "presets": [
     {
-      "type": "select",
-      "id": "grid_item_width",
-      "label": "t:labels.grid_item_width",
-      "options": [
-        { "value": "collections--compact", "label": "t:options.size.small" },
-        { "value": "collections--full", "label": "t:options.size.large" }
-      ],
-      "default": "collections--full"
-    },
-    {
-      "type": "range",
-      "id": "grid_gap",
-      "label": "t:labels.grid_gap",
-      "min": 0,
-      "max": 50,
-      "step": 5,
-      "unit": "px",
-      "default": 10
+      "name": "Collections List"
     }
-  ],
-  "presets": [{ "name": "t:general.collections_grid" }]
+  ]
 }
 {% endschema %}

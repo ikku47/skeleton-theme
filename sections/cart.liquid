@@ -1,215 +1,116 @@
 {% comment %}
-  This section is used in the cart template to render /cart page with React components.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
+  Simple Cart Page Section
 {% endcomment %}
 
-<div class="cart-page">
-  <h1 class="cart-title">{{ 'cart.title' | t }}</h1>
+<section class="py-16 bg-white">
+  <div class="container">
+    <!-- Cart Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ 'cart.title' | t | default: 'Your Cart' }}</h1>
+    </div>
 
-  {% if cart.item_count > 0 %}
-    <!-- Enhanced Cart with React Components -->
-    <div class="cart-items">
-      {% for item in cart.items %}
-        <div class="cart-item" data-item-key="{{ item.key }}">
-          <div class="cart-item-image">
-            {% render 'image', image: item.image, width: 100, height: 100 %}
-          </div>
-
-          <div class="cart-item-details">
-            <h3>{{ item.product.title }}</h3>
-            <p class="cart-item-variant">{{ item.variant.title }}</p>
-            <p class="cart-item-price">{{ item.price | money }}</p>
-          </div>
-
-          <div class="cart-item-quantity">
-            <form action="{{ routes.cart_url }}" method="post" class="cart-quantity-form">
-              <input type="hidden" name="id" value="{{ item.key }}">
-              <div class="quantity-controls">
-                {% assign minus_props = '{"icon": "Minus", "variant": "outline", "size": 16}' %}
-                <button type="button" onclick="updateQuantity(this, -1)">
-                  {% render 'react-component', component: 'IconButton', props: minus_props %}
-                </button>
-
-                <input type="number" name="quantity" value="{{ item.quantity }}" min="0" class="quantity-input">
-
-                {% assign plus_props = '{"icon": "Plus", "variant": "outline", "size": 16}' %}
-                <button type="button" onclick="updateQuantity(this, 1)">
-                  {% render 'react-component', component: 'IconButton', props: plus_props %}
-                </button>
+    {% if cart.item_count > 0 %}
+      <!-- Cart Items -->
+      <div class="space-y-4 mb-8">
+        {% for item in cart.items %}
+          <div class="bg-white border border-gray-200 rounded-lg p-6" data-item-key="{{ item.key }}">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+              <!-- Product Image -->
+              <div class="flex justify-center md:justify-start">
+                {% if item.image %}
+                  <img
+                    src="{{ item.image | img_url: '150x150' }}"
+                    alt="{{ item.image.alt | escape }}"
+                    class="w-20 h-20 object-cover rounded-md"
+                  >
+                {% else %}
+                  <div class="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
+                    <span class="text-gray-400 text-xs">No image</span>
+                  </div>
+                {% endif %}
               </div>
-            </form>
-          </div>
 
-          <div class="cart-item-remove">
-            {% assign remove_props = '{"icon": "Trash2", "variant": "ghost", "aria-label": "Remove item"}' %}
-            <a href="{{ item.url_to_remove }}">
-              {% render 'react-component', component: 'IconButton', props: remove_props %}
-            </a>
+              <!-- Product Details -->
+              <div class="text-center md:text-left">
+                <h3 class="font-semibold text-gray-900 mb-1">{{ item.product.title }}</h3>
+                {% if item.variant.title != 'Default Title' %}
+                  <p class="text-sm text-gray-500 mb-2">{{ item.variant.title }}</p>
+                {% endif %}
+                <p class="text-lg font-bold text-primary">{{ item.price | money }}</p>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="flex justify-center">
+                <form action="{{ routes.cart_url }}" method="post" class="flex items-center space-x-2">
+                  <input type="hidden" name="id" value="{{ item.key }}">
+
+                  <button type="button" onclick="updateQuantity(this, -1)" class="p-1 hover:bg-gray-100 rounded">
+                    {% render 'react-component', component: 'IconButton', props: '{"icon": "Minus", "variant": "outline"}' %}
+                  </button>
+
+                  <input
+                    type="number"
+                    name="quantity"
+                    value="{{ item.quantity }}"
+                    min="0"
+                    class="w-16 px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  >
+
+                  <button type="button" onclick="updateQuantity(this, 1)" class="p-1 hover:bg-gray-100 rounded">
+                    {% render 'react-component', component: 'IconButton', props: '{"icon": "Plus", "variant": "outline"}' %}
+                  </button>
+                </form>
+              </div>
+
+              <!-- Remove Button -->
+              <div class="flex justify-center">
+                <a href="{{ item.url_to_remove }}" class="text-red-500 hover:text-red-700 transition-colors">
+                  {% render 'react-component', component: 'IconButton', props: '{"icon": "Trash2", "variant": "ghost", "aria-label": "Remove item"}' %}
+                </a>
+              </div>
+            </div>
           </div>
+        {% endfor %}
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="bg-gray-50 rounded-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-lg font-semibold text-gray-900">Total:</span>
+          <span class="text-2xl font-bold text-primary">{{ cart.total_price | money }}</span>
         </div>
-      {% endfor %}
-    </div>
 
-    <!-- Cart Summary -->
-    <div class="cart-summary">
-      <div class="cart-total">
-        <h3>Total: {{ cart.total_price | money }}</h3>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <form action="{{ routes.cart_url }}" method="post" class="flex-1">
+            <input type="hidden" name="checkout" value="1">
+            {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Checkout", "variant": "primary", "size": "lg", "type": "submit"}' %}
+          </form>
+
+          {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Continue Shopping", "variant": "outline", "size": "lg", "href": "/collections/all"}' %}
+        </div>
       </div>
 
-      <div class="cart-actions">
-        {% assign checkout_props = '{"children": "Checkout", "variant": "primary", "size": "lg"}' %}
-        <form action="{{ routes.cart_url }}" method="post">
-          <input type="hidden" name="checkout" value="1">
-          {% render 'react-component', component: 'AnimatedButton', props: checkout_props, class: 'checkout-button' %}
-        </form>
+    {% else %}
+      <!-- Empty Cart State -->
+      <div class="text-center py-16">
+        <div class="mb-6">
+          {% render 'react-component', component: 'IconButton', props: '{"icon": "ShoppingBag", "variant": "ghost"}' %}
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">Looks like you haven't added anything to your cart yet. Start shopping to fill it up!</p>
 
-        {% assign continue_shopping_props = '{"children": "Continue Shopping", "variant": "outline", "href": "/collections/all"}' %}
-        {% render 'react-component', component: 'AnimatedButton', props: continue_shopping_props %}
+        {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Start Shopping", "variant": "primary", "size": "lg", "href": "/collections/all"}' %}
       </div>
-    </div>
+    {% endif %}
+  </div>
+</section>
 
-  {% else %}
-    <!-- Empty Cart State -->
-    <div class="cart-empty">
-      <div class="empty-cart-icon">
-        {% assign empty_cart_icon_props = '{"icon": "ShoppingBag", "size": 64}' %}
-        {% render 'react-component', component: 'IconButton', props: empty_cart_icon_props, class: 'empty-cart-icon-button' %}
-      </div>
-      <h2>Your cart is empty</h2>
-      <p>Looks like you haven't added anything to your cart yet.</p>
 
-      {% assign shop_now_props = '{"children": "Start Shopping", "variant": "primary", "size": "lg", "href": "/collections/all"}' %}
-      {% render 'react-component', component: 'AnimatedButton', props: shop_now_props %}
-    </div>
-  {% endif %}
-</div>
-
-{% stylesheet %}
-  .cart-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  .cart-title {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-  }
-
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .cart-item {
-    display: grid;
-    grid-template-columns: 100px 1fr auto auto;
-    gap: 1rem;
-    align-items: center;
-    padding: 1rem;
-    border: 1px solid var(--color-muted);
-    background: white;
-  }
-
-  .cart-item-details h3 {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-
-  .cart-item-variant {
-    color: var(--color-muted);
-    font-size: 0.9rem;
-  }
-
-  .cart-item-price {
-    font-weight: bold;
-    color: var(--color-primary);
-  }
-
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .quantity-input {
-    width: 60px;
-    text-align: center;
-    padding: 0.25rem;
-    border: 1px solid var(--color-muted);
-  }
-
-  .cart-summary {
-    border-top: 2px solid var(--color-muted);
-    padding-top: 2rem;
-    text-align: center;
-  }
-
-  .cart-total h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .cart-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .cart-empty {
-    text-align: center;
-    padding: 4rem 2rem;
-  }
-
-  .empty-cart-icon {
-    margin-bottom: 2rem;
-  }
-
-  .empty-cart-icon-button {
-    pointer-events: none;
-    opacity: 0.5;
-  }
-
-  .cart-empty h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-
-  .cart-empty p {
-    color: var(--color-muted);
-    margin-bottom: 2rem;
-  }
-
-  @media (max-width: 768px) {
-    .cart-item {
-      grid-template-columns: 80px 1fr;
-      grid-template-rows: auto auto;
-      gap: 0.5rem;
-    }
-
-    .cart-item-quantity,
-    .cart-item-remove {
-      grid-column: 2;
-      justify-self: end;
-    }
-
-    .cart-actions {
-      flex-direction: column;
-      align-items: center;
-    }
-  }
-{% endstylesheet %}
 
 <script>
   function updateQuantity(button, change) {
-    const form = button.closest('.cart-quantity-form');
-    const input = form.querySelector('.quantity-input');
+    const form = button.closest('form');
+    const input = form.querySelector('input[name="quantity"]');
     const currentValue = parseInt(input.value);
     const newValue = Math.max(0, currentValue + change);
 
@@ -218,7 +119,8 @@
     // Auto-submit the form to update the cart
     if (newValue === 0) {
       // Remove item if quantity is 0
-      const removeLink = button.closest('.cart-item').querySelector('.cart-item-remove a');
+      const cartItem = button.closest('[data-item-key]');
+      const removeLink = cartItem.querySelector('a[href*="url_to_remove"]');
       if (removeLink) {
         window.location.href = removeLink.href;
       }
@@ -231,7 +133,7 @@
 
 {% schema %}
 {
-  "name": "t:general.cart",
+  "name": "Cart",
   "settings": []
 }
 {% endschema %}
