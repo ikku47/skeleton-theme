@@ -1,160 +1,167 @@
 {% comment %}
-  Enhanced Search Page Section with VersaCommerce components
+  Enhanced Search Page Section with filtering and view options
 {% endcomment %}
 
-<section class="py-8 bg-white">
+<section class="bg-white min-h-screen">
   <div class="container">
-    <!-- Search Form -->
-    <script type="application/json" id="search-form-data">
-      {
-        "initialQuery": {{ search.terms | default: '' | json }},
-        "placeholder": "Search products, articles, and pages...",
-        "className": "mb-12"
-      }
-    </script>
 
-    <div
-      data-react-component="VersaSearchForm"
-      data-props-script="search-form-data"
-    ></div>
 
-    <!-- Search Results -->
+{% liquid
+  assign results_per_page = section.settings.results_per_page | default: 20
+%}
+{% paginate search.results by results_per_page %}
+  {% comment %} Build search results array for VersaSearchPage {% endcomment %}
+  {% capture search_results_json %}
+  [
     {% if search.performed %}
-      {% paginate search.results by 20 %}
-        <!-- Search Results Data Script -->
-        <script type="application/json" id="search-results-data">
-          {
-            "results": [
-              {% for result in search.results %}
-                {% liquid
-                  assign result_type = result.object_type | default: 'page'
+      {% for result in search.results %}
+        {% liquid
+          assign result_type = result.object_type | default: 'page'
 
-                  if result_type == 'product'
-                    assign result_title = result.title | default: 'Untitled Product'
-                    assign result_url = result.url | default: '#'
-                    assign result_image = result.featured_image
-                    assign result_price = result.price | money | default: ''
-                    assign result_excerpt = result.description | strip_html | truncate: 150 | default: ''
-                    assign result_published = ''
+          if result_type == 'product'
+            assign result_title = result.title | default: 'Untitled Product'
+            assign result_url = result.url | default: '#'
+            assign result_image = result.featured_image
+            assign result_price = result.price | money | default: ''
+            assign result_excerpt = result.description | strip_html | truncate: 150 | default: ''
+            assign result_published = ''
 
-                    # Get the first available variant - search results use selected_or_first_available_variant
-                    assign first_variant = result.selected_or_first_available_variant
-                    assign variant_id = first_variant.id | default: result.variants.first.id | default: result.id
-                    assign variant_available = first_variant.available | default: result.available | default: true
+            # Get the first available variant - search results use selected_or_first_available_variant
+            assign first_variant = result.selected_or_first_available_variant
+            assign variant_id = first_variant.id | default: result.variants.first.id | default: result.id
+            assign variant_available = first_variant.available | default: result.available | default: true
 
-                    if result_image
-                      assign image_url = result_image | image_url: width: 300, height: 300
-                    else
-                      assign image_url = ''
-                    endif
-                  elsif result_type == 'article'
-                    assign result_title = result.title | default: 'Untitled Article'
-                    assign result_url = result.url | default: '#'
-                    assign result_image = result.image
-                    assign result_price = ''
-                    assign result_excerpt = result.summary | strip_html | truncate: 150 | default: ''
-                    assign result_published = result.published_at | date: '%Y-%m-%d'
+            if result_image
+              assign image_url = result_image | image_url: width: 400, height: 500
+            else
+              assign image_url = 'product-placeholder.svg' | asset_url
+            endif
+          elsif result_type == 'article'
+            assign result_title = result.title | default: 'Untitled Article'
+            assign result_url = result.url | default: '#'
+            assign result_image = result.image
+            assign result_price = ''
+            assign result_excerpt = result.summary | strip_html | truncate: 150 | default: ''
+            assign result_published = result.published_at | date: '%Y-%m-%d'
 
-                    if result_image
-                      assign image_url = result_image | image_url: width: 300, height: 200
-                    else
-                      assign image_url = ''
-                    endif
-                  else
-                    assign result_title = result.title | default: 'Untitled Page'
-                    assign result_url = result.url | default: '#'
-                    assign result_image = ''
-                    assign result_price = ''
-                    assign result_excerpt = result.content | strip_html | truncate: 150 | default: ''
-                    assign result_published = ''
-                    assign image_url = ''
-                  endif
-                %}
-                {
-                  "id": {{ result.id | default: forloop.index | json }},
-                  "title": {{ result_title | json }},
-                  "url": {{ result_url | json }},
-                  "type": {{ result_type | json }}{% if image_url != blank %},
-                  "image": {{ image_url | json }}{% endif %}{% if result_price != blank %},
-                  "price": {{ result_price | json }}{% endif %}{% if result_excerpt != blank %},
-                  "excerpt": {{ result_excerpt | json }}{% endif %}{% if result_published != blank %},
-                  "published_at": {{ result_published | json }}{% endif %}{% if result_type == 'product' %},
-                  "variantId": {{ variant_id | json }},
-                  "available": {{ variant_available | json }}{% endif %}
-                }{% unless forloop.last %},{% endunless %}
-              {% endfor %}
-            ],
-            "query": {{ search.terms | default: '' | json }},
-            "totalResults": {{ search.results_count | default: 0 }}
-          }
-        </script>
-
-        <!-- Search Results Component Container -->
-        <div
-          data-react-component="VersaSearchResults"
-          data-props-script="search-results-data"
-        ></div>
-
-        <!-- Pagination -->
-        {% if paginate.pages > 1 %}
-          <div class="flex justify-center mt-12">
-            <nav class="flex items-center space-x-2" aria-label="Pagination">
-              {% if paginate.previous %}
-                <a href="{{ paginate.previous.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
-                  Previous
-                </a>
-              {% endif %}
-
-              {% for part in paginate.parts %}
-                {% if part.is_link %}
-                  <a href="{{ part.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
-                    {{ part.title }}
-                  </a>
-                {% else %}
-                  {% if part.title == paginate.current_page %}
-                    <span class="px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-xl">
-                      {{ part.title }}
-                    </span>
-                  {% else %}
-                    <span class="px-4 py-2 text-sm font-medium text-neutral/40">
-                      {{ part.title }}
-                    </span>
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-
-              {% if paginate.next %}
-                <a href="{{ paginate.next.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
-                  Next
-                </a>
-              {% endif %}
-            </nav>
-          </div>
-        {% endif %}
-      {% endpaginate %}
-    {% else %}
-      <!-- No search performed yet -->
-      <script type="application/json" id="search-results-empty">
+            if result_image
+              assign image_url = result_image | image_url: width: 300, height: 200
+            else
+              assign image_url = ''
+            endif
+          else
+            assign result_title = result.title | default: 'Untitled Page'
+            assign result_url = result.url | default: '#'
+            assign result_image = ''
+            assign result_price = ''
+            assign result_excerpt = result.content | strip_html | truncate: 150 | default: ''
+            assign result_published = ''
+            assign image_url = ''
+          endif
+        %}
         {
-          "results": [],
-          "query": "",
-          "totalResults": 0
-        }
-      </script>
-
-      <div
-        data-react-component="VersaSearchResults"
-        data-props-script="search-results-empty"
-      ></div>
+          "id": {{ result.id | default: forloop.index | json }},
+          "title": {{ result_title | json }},
+          "url": {{ result_url | json }},
+          "type": {{ result_type | json }}{% if image_url != blank %},
+          "image": {{ image_url | json }}{% endif %}{% if result_price != blank %},
+          "price": {{ result_price | json }}{% endif %}{% if result_excerpt != blank %},
+          "excerpt": {{ result_excerpt | json }}{% endif %}{% if result_published != blank %},
+          "published_at": {{ result_published | json }}{% endif %}{% if result_type == 'product' %},
+          "variantId": {{ variant_id | json }},
+          "available": {{ variant_available | json }},
+          "tags": {{ result.tags | json }},
+          "vendor": {{ result.vendor | json }},
+          "productType": {{ result.type | json }}{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
     {% endif %}
-  </div>
+  ]
+  {% endcapture %}
+
+  {% capture search_page_props %}
+  {
+    "results": {{ search_results_json | strip }},
+    "query": {{ search.terms | default: '' | json }},
+    "totalResults": {{ search.results_count | default: 0 }},
+    "searchFormProps": {
+      "initialQuery": {{ search.terms | default: '' | json }},
+      "placeholder": {{ section.settings.search_placeholder | default: 'Search products, articles, and pages...' | json }}
+    }
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'VersaSearchPage', props: search_page_props %}
+{% endpaginate %}
+ </div>
 </section>
 
 {% schema %}
 {
-  "name": "Search",
+  "name": "Enhanced Search",
   "tag": "section",
   "class": "search-page",
-  "settings": []
+  "settings": [
+    {
+      "type": "header",
+      "content": "Search Settings"
+    },
+    {
+      "type": "range",
+      "id": "results_per_page",
+      "label": "Results per page",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "default": 20,
+      "info": "Number of search results to show per page"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder text",
+      "default": "Search products, articles, and pages...",
+      "info": "Placeholder text shown in the search input"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_filters",
+      "label": "Show product filters",
+      "default": true,
+      "info": "Display filter sidebar for product search results"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_toggle",
+      "label": "Show grid/list view toggle",
+      "default": true,
+      "info": "Allow customers to switch between grid and list views for products"
+    },
+    {
+      "type": "select",
+      "id": "default_view",
+      "label": "Default view mode",
+      "options": [
+        { "value": "grid", "label": "Grid View" },
+        { "value": "list", "label": "List View" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "default_grid_columns",
+      "label": "Default grid columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "info": "Number of columns in grid view for product results"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Search"
+    }
+  ]
 }
 {% endschema %}

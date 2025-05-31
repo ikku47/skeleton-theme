@@ -28,6 +28,8 @@ interface VersaProductGridProps {
   showViewAll?: boolean
   viewAllUrl?: string
   className?: string
+  layout?: 'grid' | 'list'
+  columns?: 2 | 3 | 4 | 5
 }
 
 export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
@@ -37,6 +39,8 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
   showViewAll = false,
   viewAllUrl = '/collections/all',
   className = '',
+  layout = 'grid',
+  columns = 4,
 }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,6 +63,21 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
         ease: 'easeOut',
       },
     },
+  }
+
+  const getGridClasses = () => {
+    if (layout === 'list') {
+      return 'space-y-4'
+    }
+
+    const columnClasses = {
+      2: 'grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6',
+      3: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6',
+      4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6',
+      5: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6'
+    }
+
+    return columnClasses[columns] || columnClasses[4]
   }
 
   return (
@@ -88,14 +107,19 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
 
         {/* Product Grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+          className={getGridClasses()}
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
         >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} animationVariants={itemVariants} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              animationVariants={itemVariants}
+              layout={layout}
+            />
           ))}
         </motion.div>
 
@@ -124,7 +148,11 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
 }
 
 // Individual Product Card Component
-const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ product, animationVariants }) => {
+const ProductCard: React.FC<{
+  product: Product;
+  animationVariants: any;
+  layout?: 'grid' | 'list';
+}> = ({ product, animationVariants, layout = 'grid' }) => {
   // Get the first available variant from product data
   const firstVariant = product.variants?.find((v: any) => v.available) || product.variants?.[0]
 
@@ -138,6 +166,104 @@ const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ p
     e.preventDefault()
     // Quick view logic here
     console.log('Quick view:', product.id)
+  }
+
+  if (layout === 'list') {
+    return (
+      <motion.div
+        className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex gap-4 p-4"
+        variants={animationVariants}
+        whileHover={{ y: -2 }}
+      >
+        {/* Product Image */}
+        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg">
+          <motion.img
+            src={product.imageUrl}
+            alt={product.imageAlt || product.title}
+            className="w-full h-full object-scale-down group-hover:scale-105 transition-transform duration-500"
+          />
+
+          {/* Badges */}
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            {product.isNew && (
+              <span className="px-1.5 py-0.5 bg-accent text-primary text-xs font-semibold rounded">
+                NEW
+              </span>
+            )}
+            {product.isOnSale && (
+              <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-semibold rounded">
+                SALE
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Product Info */}
+        <div className="flex-grow flex flex-col justify-between">
+          <div>
+            <h3 className="font-heading font-medium text-primary mb-2 line-clamp-2 hover:text-secondary transition-colors">
+              <a href={product.productUrl}>
+                {product.title}
+              </a>
+            </h3>
+
+            {/* Rating */}
+            {product.rating && (
+              <div className="flex items-center gap-1 mb-2">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-3 h-3 ${
+                        i < Math.floor(product.rating!)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                {product.reviewCount && (
+                  <span className="text-xs text-neutral">({product.reviewCount})</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Price and Actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-lg text-primary">{product.price}</span>
+              {product.compareAtPrice && (
+                <span className="text-sm text-neutral line-through">{product.compareAtPrice}</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <motion.button
+                onClick={handleToggleWishlist}
+                className="p-2 text-neutral hover:text-red-500 transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Heart className="w-4 h-4" />
+              </motion.button>
+
+              <AddToCartButton
+                variantId={firstVariant?.id}
+                available={firstVariant?.available}
+                variant="primary"
+                size="sm"
+                className="rounded-cta"
+                loadingText="Adding..."
+                successText="Added!"
+              >
+                Add to Cart
+              </AddToCartButton>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )
   }
 
   return (
@@ -180,7 +306,7 @@ const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ p
             >
               <Heart className="w-4 h-4" />
             </motion.button>
-            
+
             <motion.button
               onClick={handleQuickView}
               className="p-2 bg-white text-neutral hover:text-primary rounded-full shadow-md hover:shadow-lg transition-all duration-200"

@@ -1,129 +1,175 @@
 {% comment %}
-  Collection Page Section - Shows products within a specific collection
+  Collection Page Section - Enhanced collection page with filters and view options
 {% endcomment %}
-
-<section class="pt-8 pb-8 bg-white min-h-screen">
+<section class="bg-white min-h-screen">
   <div class="container">
 
+{% liquid
+  assign products_per_page = section.settings.products_per_page | default: 48
+%}
+{% paginate collection.products by products_per_page %}
+  {% if collection.products.size > 0 %}
+    {% comment %} Build products array for VersaCollectionPage {% endcomment %}
+    {% capture products_json %}
+    [
+      {% for product in collection.products %}
+        {% liquid
+          assign product_image = product.featured_image
+          assign image_url = ''
+          if product_image
+            assign image_url = product_image | image_url: width: 400, height: 500
+          else
+            assign image_url = 'product-placeholder.svg' | asset_url
+          endif
+        %}
+        {
+          "id": {{ product.id | json }},
+          "title": {{ product.title | json }},
+          "price": {{ product.price | money | json }},
+          {% if product.compare_at_price > product.price %}
+          "compareAtPrice": {{ product.compare_at_price | money | json }},
+          {% endif %}
+          "imageUrl": {{ image_url | json }},
+          "imageAlt": {{ product_image.alt | default: product.title | escape | json }},
+          "productUrl": {{ product.url | json }},
+          "isNew": {% if product.tags contains 'new' %}true{% else %}false{% endif %},
+          "isOnSale": {% if product.compare_at_price > product.price %}true{% else %}false{% endif %},
+          "tags": {{ product.tags | json }},
+          "vendor": {{ product.vendor | json }},
+          "type": {{ product.type | json }},
+          "variants": [
+            {% for variant in product.variants limit: 3 %}
+              {
+                "id": {{ variant.id | json }},
+                "available": {{ variant.available | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+    {% endcapture %}
 
-
-
-    <!-- Products Grid -->
+    {% comment %} Build filter groups {% endcomment %}
     {% liquid
-      assign products_per_page = section.settings.products_per_page | default: 48
+      assign max_filter_options = section.settings.max_filter_options | default: 10
+      assign price_filter_max = section.settings.price_filter_max | default: 500
     %}
-    {% paginate collection.products by products_per_page %}
-      {% if collection.products.size > 0 %}
-        {% comment %} Build products array for VersaProductGrid {% endcomment %}
-        {% capture products_json %}
-        [
-          {% for product in collection.products %}
-            {% liquid
-              assign product_image = product.featured_image
-              assign image_url = ''
-              if product_image
-                assign image_url = product_image | image_url: width: 400, height: 500
-              else
-                assign image_url = 'product-placeholder.svg' | asset_url
-              endif
-            %}
+    {% capture filter_groups_json %}
+    [
+      {
+        "id": "price",
+        "title": "Price",
+        "type": "range",
+        "min": 0,
+        "max": {{ price_filter_max }},
+        "step": 10
+      },
+      {
+        "id": "availability",
+        "title": "Availability",
+        "type": "radio",
+        "options": [
+          { "value": "all", "label": "All Products" },
+          { "value": "in-stock", "label": "In Stock" }
+        ]
+      },
+      {% if collection.all_tags.size > 0 %}
+      {
+        "id": "tags",
+        "title": "Tags",
+        "type": "checkbox",
+        "options": [
+          {% for tag in collection.all_tags limit: max_filter_options %}
             {
-              "id": {{ product.id | json }},
-              "title": {{ product.title | json }},
-              "price": {{ product.price | money | json }},
-              {% if product.compare_at_price > product.price %}
-              "compareAtPrice": {{ product.compare_at_price | money | json }},
-              {% endif %}
-              "imageUrl": {{ image_url | json }},
-              "imageAlt": {{ product_image.alt | default: product.title | escape | json }},
-              "productUrl": {{ product.url | json }},
-              "isNew": {% if product.tags contains 'new' %}true{% else %}false{% endif %},
-              "isOnSale": {% if product.compare_at_price > product.price %}true{% else %}false{% endif %},
-              "variants": [
-                {% for variant in product.variants limit: 3 %}
-                  {
-                    "id": {{ variant.id | json }},
-                    "available": {{ variant.available | json }}
-                  }{% unless forloop.last %},{% endunless %}
-                {% endfor %}
-              ]
+              "value": {{ tag | json }},
+              "label": {{ tag | capitalize | json }},
+              "count": {{ collection.products | where: 'tags', tag | size }}
             }{% unless forloop.last %},{% endunless %}
           {% endfor %}
         ]
-        {% endcapture %}
+      },
+      {% endif %}
+      {% assign vendors = collection.products | map: 'vendor' | uniq %}
+      {% if vendors.size > 1 %}
+      {
+        "id": "vendor",
+        "title": "Brand",
+        "type": "checkbox",
+        "options": [
+          {% for vendor in vendors limit: max_filter_options %}
+            {
+              "value": {{ vendor | json }},
+              "label": {{ vendor | json }},
+              "count": {{ collection.products | where: 'vendor', vendor | size }}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ]
+      },
+      {% endif %}
+      {% assign types = collection.products | map: 'type' | uniq %}
+      {% if types.size > 1 %}
+      {
+        "id": "type",
+        "title": "Product Type",
+        "type": "checkbox",
+        "options": [
+          {% for type in types limit: max_filter_options %}
+            {
+              "value": {{ type | json }},
+              "label": {{ type | json }},
+              "count": {{ collection.products | where: 'type', type | size }}
+            }{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ]
+      }
+      {% endif %}
+    ]
+    {% endcapture %}
 
-        {% capture product_grid_props %}
-        {
-          "products": {{ products_json | strip }},
-          "showViewAll": false,
-          "className": "mb-12"
-        }
-        {% endcapture %}
+    {% capture collection_page_props %}
+    {
+      "products": {{ products_json | strip }},
+      "filterGroups": {{ filter_groups_json | strip }},
+      {% if collection.title != blank %}"collectionTitle": {{ collection.title | json }},{% endif %}
+      {% if collection.description != blank %}"collectionDescription": {{ collection.description | json }},{% endif %}
+      "totalProducts": {{ collection.products_count }}
+    }
+    {% endcapture %}
 
-        {% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
-      {% else %}
-        <div class="text-center py-16">
-          <div class="max-w-md mx-auto">
-            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-            <p class="text-gray-500 mb-6">This collection doesn't have any products yet.</p>
-            <a href="{{ routes.collections_url }}" class="btn btn-primary">
-              Browse Other Collections
-            </a>
+    {% render 'react-component', component: 'VersaCollectionPage', props: collection_page_props %}
+  {% else %}
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div class="text-center py-16">
+        <div class="max-w-md mx-auto">
+          <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+          <p class="text-gray-500 mb-6">This collection doesn't have any products yet.</p>
+          <a href="{{ routes.collections_url }}" class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-secondary transition-colors">
+            Browse Other Collections
+          </a>
         </div>
-      {% endif %}
-
-      <!-- Pagination -->
-      {% if paginate.pages > 1 %}
-        <div class="flex justify-center mt-12">
-          <nav class="flex items-center space-x-2" aria-label="Pagination">
-            {% if paginate.previous %}
-              <a href="{{ paginate.previous.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
-                Previous
-              </a>
-            {% endif %}
-
-            {% for part in paginate.parts %}
-              {% if part.is_link %}
-                <a href="{{ part.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
-                  {{ part.title }}
-                </a>
-              {% else %}
-                {% if part.title == paginate.current_page %}
-                  <span class="px-3 py-2 text-sm font-medium text-white bg-primary border border-primary rounded-md">
-                    {{ part.title }}
-                  </span>
-                {% else %}
-                  <span class="px-3 py-2 text-sm font-medium text-gray-400">
-                    {{ part.title }}
-                  </span>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-
-            {% if paginate.next %}
-              <a href="{{ paginate.next.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
-                Next
-              </a>
-            {% endif %}
-          </nav>
-        </div>
-      {% endif %}
-    {% endpaginate %}
-  </div>
+      </div>
+    </div>
+  {% endif %}
+{% endpaginate %}
+ </div>
 </section>
 
 {% schema %}
 {
-  "name": "Collection",
+  "name": "Enhanced Collection",
   "tag": "section",
   "class": "collection-page",
   "settings": [
+    {
+      "type": "header",
+      "content": "Collection Display"
+    },
     {
       "type": "range",
       "id": "products_per_page",
@@ -136,22 +182,66 @@
     },
     {
       "type": "checkbox",
-      "id": "show_product_count",
-      "label": "Show product count",
-      "default": true
+      "id": "show_filters",
+      "label": "Show product filters",
+      "default": true,
+      "info": "Display filter sidebar for price, tags, brands, etc."
     },
-
     {
       "type": "checkbox",
-      "id": "show_debug_info",
-      "label": "Show debug information (theme editor only)",
-      "default": false,
-      "info": "Shows collection debug info when editing the theme"
+      "id": "show_view_toggle",
+      "label": "Show grid/list view toggle",
+      "default": true,
+      "info": "Allow customers to switch between grid and list views"
+    },
+    {
+      "type": "select",
+      "id": "default_view",
+      "label": "Default view mode",
+      "options": [
+        { "value": "grid", "label": "Grid View" },
+        { "value": "list", "label": "List View" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "default_grid_columns",
+      "label": "Default grid columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "info": "Number of columns in grid view"
+    },
+    {
+      "type": "header",
+      "content": "Filter Settings"
+    },
+    {
+      "type": "range",
+      "id": "price_filter_max",
+      "label": "Price filter maximum",
+      "min": 100,
+      "max": 2000,
+      "step": 50,
+      "default": 500,
+      "info": "Maximum price for the price range filter"
+    },
+    {
+      "type": "range",
+      "id": "max_filter_options",
+      "label": "Maximum filter options",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "info": "Maximum number of options to show per filter group"
     }
   ],
   "presets": [
     {
-      "name": "Collection"
+      "name": "Enhanced Collection"
     }
   ]
 }

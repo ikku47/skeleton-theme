@@ -27,6 +27,9 @@ import { VersaBlogGrid } from '../versa/VersaBlogGrid'
 import { VersaCartDrawer } from '../versa/VersaCartDrawer'
 import { VersaFooter } from '../versa/VersaFooter'
 import { VersaSearchForm } from '../versa/VersaSearchForm'
+import { VersaProductFilter } from '../versa/VersaProductFilter'
+import { VersaCollectionPage } from '../versa/VersaCollectionPage'
+import { VersaSearchPage } from '../versa/VersaSearchPage'
 import { VersaSearchResults } from '../versa/VersaSearchResults'
 import { VersaCartItem } from '../versa/VersaCartItem'
 import { VersaCartSummary } from '../versa/VersaCartSummary'
@@ -84,6 +87,9 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   VersaFooter,
   VersaSearchForm,
   VersaSearchResults,
+  VersaProductFilter,
+  VersaCollectionPage,
+  VersaSearchPage,
   VersaCartItem,
   VersaCartSummary,
   VersaCartManager,
