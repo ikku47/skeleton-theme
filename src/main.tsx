@@ -174,8 +174,8 @@ function validateComponentProps(componentName: string, props: any): any {
 
 // Initialize components
 function initializeComponents() {
-  // Find all elements with data-component attribute
-  const componentElements = document.querySelectorAll('[data-component]')
+  // Find all elements with data-component or data-react-component attribute
+  const componentElements = document.querySelectorAll('[data-component], [data-react-component]')
 
   componentElements.forEach((element) => {
     // Skip if already initialized
@@ -183,9 +183,9 @@ function initializeComponents() {
       return
     }
 
-    const componentName = element.getAttribute('data-component')
+    const componentName = element.getAttribute('data-component') || element.getAttribute('data-react-component')
     const propsData = element.getAttribute('data-props')
-    const propsId = element.getAttribute('data-props-id')
+    const propsId = element.getAttribute('data-props-id') || element.getAttribute('data-props-script')
 
     if (componentName && ComponentRegistry[componentName]) {
       try {
@@ -287,7 +287,8 @@ const observer = new MutationObserver((mutations) => {
     mutation.addedNodes.forEach((node) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const element = node as Element
-        if (element.hasAttribute('data-component') || element.querySelector('[data-component]')) {
+        if (element.hasAttribute('data-component') || element.hasAttribute('data-react-component') ||
+            element.querySelector('[data-component]') || element.querySelector('[data-react-component]')) {
           shouldReinitialize = true
         }
       }

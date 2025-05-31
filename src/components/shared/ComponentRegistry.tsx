@@ -6,6 +6,7 @@ import { IconButton } from './IconButton'
 import { AddToCartButton } from './AddToCartButton'
 import { ProductCard } from './ProductCard'
 import { CollectionCard } from './CollectionCard'
+import { ContentCard } from './ContentCard'
 import { FeatureCallouts } from './FeatureCallouts'
 import { FeaturedProductShowcase } from './FeaturedProductShowcase'
 import { AccessoriesCarousel } from './AccessoriesCarousel'
@@ -25,6 +26,12 @@ import { VersaCollectionGrid } from '../versa/VersaCollectionGrid'
 import { VersaBlogGrid } from '../versa/VersaBlogGrid'
 import { VersaCartDrawer } from '../versa/VersaCartDrawer'
 import { VersaFooter } from '../versa/VersaFooter'
+import { VersaSearchForm } from '../versa/VersaSearchForm'
+import { VersaSearchResults } from '../versa/VersaSearchResults'
+import { VersaCartItem } from '../versa/VersaCartItem'
+import { VersaCartSummary } from '../versa/VersaCartSummary'
+import { VersaCartManager } from '../versa/VersaCartManager'
+import { VersaEmptyCart } from '../versa/VersaEmptyCart'
 
 // Import legacy components
 import { HeroSection } from '../legacy/HeroSection'
@@ -49,6 +56,7 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   AddToCartButton,
   ProductCard,
   CollectionCard,
+  ContentCard,
   ProductImageGallery,
   ProductInfo,
   ProductVariantSelector,
@@ -74,6 +82,12 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   VersaBlogGrid,
   VersaCartDrawer,
   VersaFooter,
+  VersaSearchForm,
+  VersaSearchResults,
+  VersaCartItem,
+  VersaCartSummary,
+  VersaCartManager,
+  VersaEmptyCart,
   EnhancedProductGallery,
   EnhancedProductDetails,
   EnhancedVariantSelector,

@@ -1,240 +1,160 @@
 {% comment %}
-  Enhanced Search Page Section with React components
+  Enhanced Search Page Section with VersaCommerce components
 {% endcomment %}
 
-<section class="py-8 bg-white min-h-screen">
+<section class="py-8 bg-white">
   <div class="container">
-    <!-- Breadcrumbs -->
-    {% if section.settings.show_breadcrumbs %}
-      {% liquid
-        assign breadcrumb_items = ''
-        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
-        assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Search", "isActive": true}'
-      %}
-      {% capture breadcrumbs_props %}
-      {
-        "items": [{{ breadcrumb_items }}]
-      }
-      {% endcapture %}
-      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
-    {% endif %}
-
-    <!-- Search Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Search</h1>
-      {% if search.performed and search.terms != blank %}
-        <p class="text-lg text-gray-600">
-          {% if search.results_count == 0 %}
-            No results found for "{{ search.terms }}"
-          {% else %}
-            {{ search.results_count }} result{% if search.results_count != 1 %}s{% endif %} for "{{ search.terms }}"
-          {% endif %}
-        </p>
-      {% else %}
-        <p class="text-lg text-gray-600">Find what you're looking for</p>
-      {% endif %}
-    </div>
-
     <!-- Search Form -->
-    <div class="max-w-2xl mx-auto mb-12">
-      <form action="{{ routes.search_url }}" method="get" role="search" class="relative">
-        <input
-          type="search"
-          name="q"
-          value="{{ search.terms | escape }}"
-          placeholder="Search products, articles, and pages..."
-          class="w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary pr-16"
-          autocomplete="off"
-        >
-        <button
-          type="submit"
-          class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Search
-        </button>
-      </form>
-    </div>
+    <script type="application/json" id="search-form-data">
+      {
+        "initialQuery": {{ search.terms | default: '' | json }},
+        "placeholder": "Search products, articles, and pages...",
+        "className": "mb-12"
+      }
+    </script>
+
+    <div
+      data-react-component="VersaSearchForm"
+      data-props-script="search-form-data"
+    ></div>
 
     <!-- Search Results -->
     {% if search.performed %}
-      {% if search.results_count == 0 %}
-        <!-- No Results -->
-        <div class="text-center py-16">
-          <div class="max-w-md mx-auto">
-            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
-            <p class="text-gray-500 mb-6">Try adjusting your search terms or browse our collections.</p>
-            <a href="{{ routes.collections_url }}" class="btn btn-primary">
-              Browse Collections
-            </a>
-          </div>
-        </div>
-      {% else %}
-        <!-- Search Results Grid -->
-        {% paginate search.results by 20 %}
-          {% comment %} Separate products from other results {% endcomment %}
-          {% assign product_results = search.results | where: 'object_type', 'product' %}
-          {% assign other_results = search.results | where: 'object_type', 'article' %}
-          {% assign page_results = search.results | where: 'object_type', 'page' %}
-          {% assign all_other_results = other_results | concat: page_results %}
+      {% paginate search.results by 20 %}
+        <!-- Search Results Data Script -->
+        <script type="application/json" id="search-results-data">
+          {
+            "results": [
+              {% for result in search.results %}
+                {% liquid
+                  assign result_type = result.object_type | default: 'page'
 
-          {% if product_results.size > 0 %}
-            {% comment %} Build products array for VersaProductGrid with null checks {% endcomment %}
-            {% capture products_json %}[{% for product in product_results %}{% liquid
-              # Safely handle product data with fallbacks
-              assign product_title = product.title | default: 'Untitled Product' | strip | truncate: 100
-              assign product_price = product.price | default: 0
-              assign product_compare_price = product.compare_at_price | default: 0
-              assign product_url = product.url | default: '#'
+                  if result_type == 'product'
+                    assign result_title = result.title | default: 'Untitled Product'
+                    assign result_url = result.url | default: '#'
+                    assign result_image = result.featured_image
+                    assign result_price = result.price | money | default: ''
+                    assign result_excerpt = result.description | strip_html | truncate: 150 | default: ''
+                    assign result_published = ''
 
-              # Handle image safely
-              assign product_image = product.featured_image
-              assign image_url = ''
-              assign image_alt = product_title
-              if product_image
-                assign image_url = product_image | image_url: width: 400, height: 500
-                assign image_alt = product_image.alt | default: product_title | strip | truncate: 100
-              else
-                assign image_url = 'product-placeholder.svg' | asset_url
-              endif
+                    # Get the first available variant - search results use selected_or_first_available_variant
+                    assign first_variant = result.selected_or_first_available_variant
+                    assign variant_id = first_variant.id | default: result.variants.first.id | default: result.id
+                    assign variant_available = first_variant.available | default: result.available | default: true
 
-              # Check for new and sale status
-              assign is_new = false
-              if product.tags contains 'new'
-                assign is_new = true
-              endif
+                    if result_image
+                      assign image_url = result_image | image_url: width: 300, height: 300
+                    else
+                      assign image_url = ''
+                    endif
+                  elsif result_type == 'article'
+                    assign result_title = result.title | default: 'Untitled Article'
+                    assign result_url = result.url | default: '#'
+                    assign result_image = result.image
+                    assign result_price = ''
+                    assign result_excerpt = result.summary | strip_html | truncate: 150 | default: ''
+                    assign result_published = result.published_at | date: '%Y-%m-%d'
 
-              assign is_on_sale = false
-              if product_compare_price > product_price and product_compare_price > 0
-                assign is_on_sale = true
-              endif
-            %}{
-              "id": {{ product.id | default: 0 | json }},
-              "title": {{ product_title | json }},
-              "price": {{ product_price | money | json }},{% if is_on_sale %}
-              "compareAtPrice": {{ product_compare_price | money | json }},{% endif %}
-              "imageUrl": {{ image_url | json }},
-              "imageAlt": {{ image_alt | json }},
-              "productUrl": {{ product_url | json }},
-              "isNew": {{ is_new | json }},
-              "isOnSale": {{ is_on_sale | json }}
-            }{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}
-
-            {% capture product_grid_props %}
-            {
-              "products": {{ products_json | strip }},
-              "showViewAll": false,
-              "className": "mb-8"
-            }
-            {% endcapture %}
-
-            {% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
-          {% endif %}
-
-          {% comment %} Display other results (articles/pages) in traditional grid {% endcomment %}
-          {% if all_other_results.size > 0 %}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {% for result in all_other_results %}
-                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                  {% if result.image %}
-                    <div class="aspect-video mb-4 overflow-hidden rounded-lg bg-gray-100">
-                      <img
-                        src="{{ result.image | image_url: width: 400, height: 225 }}"
-                        alt="{{ result.image.alt | default: result.title }}"
-                        class="w-full h-full object-cover"
-                        width="400"
-                        height="225"
-                      >
-                    </div>
-                  {% endif %}
-                  <div class="mb-2">
-                    <span class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
-                      {% if result.object_type == 'article' %}Article{% else %}Page{% endif %}
-                    </span>
-                  </div>
-                  <h3 class="font-medium text-gray-900 mb-2">
-                    <a href="{{ result.url }}" class="hover:text-primary transition-colors">
-                      {{ result.title }}
-                    </a>
-                  </h3>
-                  {% if result.summary %}
-                    <p class="text-sm text-gray-600 line-clamp-3">{{ result.summary | strip_html | truncate: 120 }}</p>
-                  {% endif %}
-                </div>
+                    if result_image
+                      assign image_url = result_image | image_url: width: 300, height: 200
+                    else
+                      assign image_url = ''
+                    endif
+                  else
+                    assign result_title = result.title | default: 'Untitled Page'
+                    assign result_url = result.url | default: '#'
+                    assign result_image = ''
+                    assign result_price = ''
+                    assign result_excerpt = result.content | strip_html | truncate: 150 | default: ''
+                    assign result_published = ''
+                    assign image_url = ''
+                  endif
+                %}
+                {
+                  "id": {{ result.id | default: forloop.index | json }},
+                  "title": {{ result_title | json }},
+                  "url": {{ result_url | json }},
+                  "type": {{ result_type | json }}{% if image_url != blank %},
+                  "image": {{ image_url | json }}{% endif %}{% if result_price != blank %},
+                  "price": {{ result_price | json }}{% endif %}{% if result_excerpt != blank %},
+                  "excerpt": {{ result_excerpt | json }}{% endif %}{% if result_published != blank %},
+                  "published_at": {{ result_published | json }}{% endif %}{% if result_type == 'product' %},
+                  "variantId": {{ variant_id | json }},
+                  "available": {{ variant_available | json }}{% endif %}
+                }{% unless forloop.last %},{% endunless %}
               {% endfor %}
-            </div>
-          {% endif %}
+            ],
+            "query": {{ search.terms | default: '' | json }},
+            "totalResults": {{ search.results_count | default: 0 }}
+          }
+        </script>
 
-          <!-- Pagination -->
-          {% if paginate.pages > 1 %}
-            <div class="flex justify-center mt-12">
-              <nav class="flex items-center space-x-2" aria-label="Pagination">
-                {% if paginate.previous %}
-                  <a href="{{ paginate.previous.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
-                    Previous
+        <!-- Search Results Component Container -->
+        <div
+          data-react-component="VersaSearchResults"
+          data-props-script="search-results-data"
+        ></div>
+
+        <!-- Pagination -->
+        {% if paginate.pages > 1 %}
+          <div class="flex justify-center mt-12">
+            <nav class="flex items-center space-x-2" aria-label="Pagination">
+              {% if paginate.previous %}
+                <a href="{{ paginate.previous.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+                  Previous
+                </a>
+              {% endif %}
+
+              {% for part in paginate.parts %}
+                {% if part.is_link %}
+                  <a href="{{ part.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+                    {{ part.title }}
                   </a>
-                {% endif %}
-
-                {% for part in paginate.parts %}
-                  {% if part.is_link %}
-                    <a href="{{ part.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
+                {% else %}
+                  {% if part.title == paginate.current_page %}
+                    <span class="px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-xl">
                       {{ part.title }}
-                    </a>
+                    </span>
                   {% else %}
-                    {% if part.title == paginate.current_page %}
-                      <span class="px-3 py-2 text-sm font-medium text-white bg-primary border border-primary rounded-md">
-                        {{ part.title }}
-                      </span>
-                    {% else %}
-                      <span class="px-3 py-2 text-sm font-medium text-gray-400">
-                        {{ part.title }}
-                      </span>
-                    {% endif %}
+                    <span class="px-4 py-2 text-sm font-medium text-neutral/40">
+                      {{ part.title }}
+                    </span>
                   {% endif %}
-                {% endfor %}
-
-                {% if paginate.next %}
-                  <a href="{{ paginate.next.url }}" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700">
-                    Next
-                  </a>
                 {% endif %}
-              </nav>
-            </div>
-          {% endif %}
-        {% endpaginate %}
-      {% endif %}
+              {% endfor %}
+
+              {% if paginate.next %}
+                <a href="{{ paginate.next.url }}" class="px-4 py-2 text-sm font-medium text-neutral bg-white border-2 border-border rounded-xl hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+                  Next
+                </a>
+              {% endif %}
+            </nav>
+          </div>
+        {% endif %}
+      {% endpaginate %}
+    {% else %}
+      <!-- No search performed yet -->
+      <script type="application/json" id="search-results-empty">
+        {
+          "results": [],
+          "query": "",
+          "totalResults": 0
+        }
+      </script>
+
+      <div
+        data-react-component="VersaSearchResults"
+        data-props-script="search-results-empty"
+      ></div>
     {% endif %}
   </div>
 </section>
-
-{% stylesheet %}
-  .search-results {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-  .search-results .prev,
-  .search-results .page,
-  .search-results .next {
-    grid-column: 1 / -1;
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
   "name": "Search",
   "tag": "section",
   "class": "search-page",
-  "settings": [
-    {
-      "type": "checkbox",
-      "id": "show_breadcrumbs",
-      "label": "Show breadcrumbs",
-      "default": true
-    }
-  ]
+  "settings": []
 }
 {% endschema %}

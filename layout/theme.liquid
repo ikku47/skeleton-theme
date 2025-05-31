@@ -29,6 +29,19 @@
     <div id="cart-notifications"></div>
     {% render 'react-component', component: 'NotificationContainer', props: '{}' %}
 
+    {% # Global currency data for React components %}
+    <script>
+      window.shopCurrency = {
+        code: {{ shop.currency | json }},
+        format: {{ shop.money_format | json }}
+      };
+      window.cartCurrency = {
+        code: {{ cart.currency.iso_code | json }},
+        symbol: {{ cart.currency.symbol | json }},
+        name: {{ cart.currency.name | json }}
+      };
+    </script>
+
     {% # Load React components %}
     <script src="{{ 'application.js' | asset_url }}" defer></script>
   </body>

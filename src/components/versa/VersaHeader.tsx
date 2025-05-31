@@ -174,14 +174,14 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
-            <motion.button
+            <motion.a
+              href="/search"
               className="p-2 text-neutral hover:text-primary transition-colors duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.openSearchModal?.()}
             >
               <Search className="w-5 h-5" />
-            </motion.button>
+            </motion.a>
 
             <motion.button
               className="relative p-2 text-neutral hover:text-primary transition-colors duration-200"
@@ -284,13 +284,14 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
               {/* Mobile Actions */}
               <div className="flex items-center justify-center space-x-6 pt-4 border-t border-border">
-                <button
+                <a
+                  href="/search"
                   className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
-                  onClick={() => window.openSearchModal?.()}
+                  onClick={toggleMobileMenu}
                 >
                   <Search className="w-5 h-5" />
                   <span>Search</span>
-                </button>
+                </a>
 
                 <button
                   className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"

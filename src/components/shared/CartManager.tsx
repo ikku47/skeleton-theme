@@ -130,12 +130,24 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return updateQuantity(itemKey, 0)
   }
 
-  // Format price helper
+  // Format price helper - get currency from cart data
   const formatPrice = (priceInCents: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(priceInCents / 100)
+    // Try to get currency from window.shopCurrency or fallback to USD
+    const shopCurrency = (window as any).shopCurrency
+    const currencyCode = shopCurrency?.code || 'USD'
+
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+      }).format(priceInCents / 100)
+    } catch (error) {
+      console.warn(`Invalid currency code: ${currencyCode}, falling back to USD`)
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(priceInCents / 100)
+    }
   }
 
   // Load cart on mount
@@ -177,13 +189,22 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 export const cartUtils = {
   addToCart: async (variantId: string, quantity: number = 1): Promise<boolean> => {
     try {
+      // Ensure variantId is a number for Shopify API
+      const numericVariantId = parseInt(variantId, 10)
+
+      if (isNaN(numericVariantId)) {
+        throw new Error('Invalid variant ID')
+      }
+
+      console.log('Adding to cart:', { variantId: numericVariantId, quantity })
+
       const response = await fetch('/cart/add.js', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: variantId,
+          id: numericVariantId,
           quantity: quantity,
         }),
       })
@@ -193,7 +214,8 @@ export const cartUtils = {
         return true
       } else {
         const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to add to cart')
+        console.error('Cart API error:', errorData)
+        throw new Error(errorData.message || errorData.description || 'Failed to add to cart')
       }
     } catch (error) {
       console.error('Failed to add to cart:', error)

@@ -1,5 +1,13 @@
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "title": "Shopping Cart",
+        "subtitle": "Review your items and proceed to checkout",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "cart",
       "settings": {}
@@ -48,6 +56,7 @@
     }
   },
   "order": [
+    "page_header",
     "main",
     "cart_upsells",
     "trust_signals"

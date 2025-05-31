@@ -1,137 +1,73 @@
 {% comment %}
-  Simple Cart Page Section
+  VersaCommerce Cart Page Section
 {% endcomment %}
 
-<section class="py-16 bg-white">
+<section class="py-8 bg-light-bg ">
   <div class="container">
-    <!-- Cart Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ 'cart.title' | t | default: 'Your Cart' }}</h1>
-    </div>
-
     {% if cart.item_count > 0 %}
-      <!-- Cart Items -->
-      <div class="space-y-4 mb-8">
-        {% for item in cart.items %}
-          <div class="bg-white border border-gray-200 rounded-lg p-6" data-item-key="{{ item.key }}">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-              <!-- Product Image -->
-              <div class="flex justify-center md:justify-start">
-                {% if item.image %}
-                  <img
-                    src="{{ item.image | image_url: width: 150, height: 150 }}"
-                    alt="{{ item.image.alt | escape }}"
-                    class="w-20 h-20 object-cover rounded-md"
-                    width="150"
-                    height="150"
-                  >
-                {% else %}
-                  <div class="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">
-                    <span class="text-gray-400 text-xs">No image</span>
-                  </div>
-                {% endif %}
-              </div>
+      <!-- Cart Manager Data Script -->
+      <script type="application/json" id="cart-manager-data">
+        {
+          "initialItems": [
+            {% for item in cart.items %}
+              {
+                "id": {{ item.key | json }},
+                "title": {{ item.product.title | json }},
+                "variant": {% if item.variant.title != 'Default Title' %}{{ item.variant.title | json }}{% else %}""{% endif %},
+                "price": {{ item.price | money | json }},
+                "priceRaw": {{ item.price }},
+                "quantity": {{ item.quantity }},
+                "linePrice": {{ item.line_price | money | json }},
+                "linePriceRaw": {{ item.line_price }},
+                {% if item.image %}"imageUrl": {{ item.image | image_url: width: 200, height: 200 | json }},{% endif %}
+                "productUrl": {{ item.url | json }},
+                "removeUrl": {{ item.url_to_remove | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ],
+          "initialSubtotal": {{ cart.total_price | money | json }},
+          "initialTotal": {{ cart.total_price | money | json }},
+          "initialItemCount": {{ cart.item_count }},
+          "freeShippingThreshold": 50,
+          "currentSubtotal": {{ cart.total_price | divided_by: 100.0 }},
+          "currency": {
+            "code": {{ cart.currency.iso_code | json }},
+            "symbol": {{ cart.currency.symbol | json }},
+            "name": {{ cart.currency.name | json }}
+          },
+          "shopCurrency": {
+            "code": {{ shop.currency | json }},
+            "format": {{ shop.money_format | json }}
+          }
+        }
+      </script>
 
-              <!-- Product Details -->
-              <div class="text-center md:text-left">
-                <h3 class="font-semibold text-gray-900 mb-1">{{ item.product.title }}</h3>
-                {% if item.variant.title != 'Default Title' %}
-                  <p class="text-sm text-gray-500 mb-2">{{ item.variant.title }}</p>
-                {% endif %}
-                <p class="text-lg font-bold text-primary">{{ item.price | money }}</p>
-              </div>
+      <!-- Make currency data available globally -->
+      <script>
+        window.shopCurrency = {
+          code: {{ shop.currency | json }},
+          format: {{ shop.money_format | json }}
+        };
+        window.cartCurrency = {
+          code: {{ cart.currency.iso_code | json }},
+          symbol: {{ cart.currency.symbol | json }},
+          name: {{ cart.currency.name | json }}
+        };
+      </script>
 
-              <!-- Quantity Controls -->
-              <div class="flex justify-center">
-                <form action="{{ routes.cart_url }}" method="post" class="flex items-center space-x-2">
-                  <input type="hidden" name="id" value="{{ item.key }}">
-
-                  <button type="button" onclick="updateQuantity(this, -1)" class="p-1 hover:bg-gray-100 rounded">
-                    {% render 'react-component', component: 'IconButton', props: '{"icon": "Minus", "variant": "outline"}' %}
-                  </button>
-
-                  <input
-                    type="number"
-                    name="quantity"
-                    value="{{ item.quantity }}"
-                    min="0"
-                    class="w-16 px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                  >
-
-                  <button type="button" onclick="updateQuantity(this, 1)" class="p-1 hover:bg-gray-100 rounded">
-                    {% render 'react-component', component: 'IconButton', props: '{"icon": "Plus", "variant": "outline"}' %}
-                  </button>
-                </form>
-              </div>
-
-              <!-- Remove Button -->
-              <div class="flex justify-center">
-                <a href="{{ item.url_to_remove }}" class="text-red-500 hover:text-red-700 transition-colors">
-                  {% render 'react-component', component: 'IconButton', props: '{"icon": "Trash2", "variant": "ghost", "aria-label": "Remove item"}' %}
-                </a>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- Cart Summary -->
-      <div class="bg-gray-50 rounded-lg p-6">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-lg font-semibold text-gray-900">Total:</span>
-          <span class="text-2xl font-bold text-primary">{{ cart.total_price | money }}</span>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-4">
-          <form action="{{ routes.cart_url }}" method="post" class="flex-1">
-            <input type="hidden" name="checkout" value="1">
-            {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Checkout", "variant": "primary", "size": "lg", "type": "submit"}' %}
-          </form>
-
-          {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Continue Shopping", "variant": "outline", "size": "lg", "href": "/collections/all"}' %}
-        </div>
-      </div>
+      <div
+        data-react-component="VersaCartManager"
+        data-props-script="cart-manager-data"
+      ></div>
 
     {% else %}
       <!-- Empty Cart State -->
-      <div class="text-center py-16">
-        <div class="mb-6">
-          {% render 'react-component', component: 'IconButton', props: '{"icon": "ShoppingBag", "variant": "ghost"}' %}
-        </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-        <p class="text-gray-600 mb-8 max-w-md mx-auto">Looks like you haven't added anything to your cart yet. Start shopping to fill it up!</p>
-
-        {% render 'react-component', component: 'AnimatedButton', props: '{"children": "Start Shopping", "variant": "primary", "size": "lg", "href": "/collections/all"}' %}
-      </div>
+      <div
+        data-react-component="VersaEmptyCart"
+      ></div>
     {% endif %}
   </div>
 </section>
-
-
-
-<script>
-  function updateQuantity(button, change) {
-    const form = button.closest('form');
-    const input = form.querySelector('input[name="quantity"]');
-    const currentValue = parseInt(input.value);
-    const newValue = Math.max(0, currentValue + change);
-
-    input.value = newValue;
-
-    // Auto-submit the form to update the cart
-    if (newValue === 0) {
-      // Remove item if quantity is 0
-      const cartItem = button.closest('[data-item-key]');
-      const removeLink = cartItem.querySelector('a[href*="url_to_remove"]');
-      if (removeLink) {
-        window.location.href = removeLink.href;
-      }
-    } else {
-      // Update quantity
-      form.submit();
-    }
-  }
-</script>
 
 {% schema %}
 {
