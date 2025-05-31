@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
+import { cartUtils } from './CartManager'
+import { notificationManager } from './CartNotification'
 
 interface AccessoryProduct {
   id: string
@@ -8,6 +10,8 @@ interface AccessoryProduct {
   price: string
   imageUrl: string
   productUrl: string
+  variantId?: string
+  available?: boolean
 }
 
 interface AccessoriesCarouselProps {
@@ -183,9 +187,33 @@ export const AccessoriesCarousel: React.FC<AccessoriesCarouselProps> = ({
 
 // Individual Accessory Card Component
 const AccessoryCard: React.FC<{ product: AccessoryProduct }> = ({ product }) => {
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
-    console.log('Add accessory to cart:', product.id)
+
+    // Check if we have a variant ID
+    if (!product.variantId) {
+      notificationManager.error('Product variant not available')
+      return
+    }
+
+    // Check if product is available
+    if (product.available === false) {
+      notificationManager.error('This product is currently out of stock')
+      return
+    }
+
+    try {
+      const success = await cartUtils.addToCart(product.variantId, 1)
+
+      if (success) {
+        // Success notification is handled by CartManager
+      } else {
+        throw new Error('Failed to add to cart')
+      }
+    } catch (error) {
+      console.error('Failed to add accessory to cart:', error)
+      notificationManager.error('Failed to add item to cart. Please try again.')
+    }
   }
 
   return (

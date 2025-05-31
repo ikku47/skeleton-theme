@@ -34,12 +34,23 @@
     else
       assign image_url = 'product-placeholder.svg' | asset_url
     endif
+
+    # Get first available variant for Quick Add functionality
+    assign first_variant = product.variants.first
+    assign variant_id = ''
+    assign variant_available = false
+    if first_variant
+      assign variant_id = first_variant.id
+      assign variant_available = first_variant.available
+    endif
   %}{
     "id": {{ product.id | default: 0 | json }},
     "title": {{ product_title | json }},
     "price": {{ product_price | money | json }},
     "imageUrl": {{ image_url | json }},
-    "productUrl": {{ product_url | json }}
+    "productUrl": {{ product_url | json }},
+    "variantId": {{ variant_id | json }},
+    "available": {{ variant_available | json }}
   }{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}
 
   {% capture carousel_props %}

@@ -16,6 +16,10 @@ interface Product {
   reviewCount?: number
   isNew?: boolean
   isOnSale?: boolean
+  variants?: Array<{
+    id: string
+    available: boolean
+  }>
 }
 
 interface VersaProductGridProps {
@@ -92,7 +96,7 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
           viewport={{ once: true, margin: '-100px' }}
         >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} variants={itemVariants} />
+            <ProductCard key={product.id} product={product} animationVariants={itemVariants} />
           ))}
         </motion.div>
 
@@ -121,12 +125,12 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
 }
 
 // Individual Product Card Component
-const ProductCard: React.FC<{ product: Product; variants: any }> = ({ product, variants }) => {
+const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ product, animationVariants }) => {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // Get the first available variant
-    const firstVariant = variants?.find((v: any) => v.available) || variants?.[0]
+    // Get the first available variant from product data
+    const firstVariant = product.variants?.find((v: any) => v.available) || product.variants?.[0]
     if (!firstVariant) {
       notificationManager.error('No variants available for this product')
       return
@@ -161,7 +165,7 @@ const ProductCard: React.FC<{ product: Product; variants: any }> = ({ product, v
   return (
     <motion.div
       className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col"
-      variants={variants}
+      variants={animationVariants}
       whileHover={{ y: -5 }}
     >
       {/* Product Image */}
