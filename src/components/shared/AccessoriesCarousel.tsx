@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
-import { cartUtils } from './CartManager'
-import { notificationManager } from './CartNotification'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { AddToCartButton } from './AddToCartButton'
 
 interface AccessoryProduct {
   id: string
@@ -187,34 +186,6 @@ export const AccessoriesCarousel: React.FC<AccessoriesCarouselProps> = ({
 
 // Individual Accessory Card Component
 const AccessoryCard: React.FC<{ product: AccessoryProduct }> = ({ product }) => {
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault()
-
-    // Check if we have a variant ID
-    if (!product.variantId) {
-      notificationManager.error('Product variant not available')
-      return
-    }
-
-    // Check if product is available
-    if (product.available === false) {
-      notificationManager.error('This product is currently out of stock')
-      return
-    }
-
-    try {
-      const success = await cartUtils.addToCart(product.variantId, 1)
-
-      if (success) {
-        // Success notification is handled by CartManager
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Failed to add accessory to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    }
-  }
 
   return (
     <motion.div
@@ -232,15 +203,18 @@ const AccessoryCard: React.FC<{ product: AccessoryProduct }> = ({ product }) => 
         {/* Quick Add Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300">
           <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <motion.button
-              onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-accent text-primary font-semibold text-sm rounded hover:bg-yellow-400 transition-colors duration-200"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <AddToCartButton
+              variantId={product.variantId}
+              available={product.available}
+              variant="accent"
+              size="sm"
+              fullWidth
+              className="text-sm rounded"
+              loadingText="Adding..."
+              successText="Added!"
             >
-              <ShoppingCart className="w-3 h-3" />
               Add
-            </motion.button>
+            </AddToCartButton>
           </div>
         </div>
       </div>

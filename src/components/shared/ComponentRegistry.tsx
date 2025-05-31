@@ -3,6 +3,7 @@ import React from 'react'
 // Import shared components
 import { AnimatedButton } from './AnimatedButton'
 import { IconButton } from './IconButton'
+import { AddToCartButton } from './AddToCartButton'
 import { ProductCard } from './ProductCard'
 import { CollectionCard } from './CollectionCard'
 import { FeatureCallouts } from './FeatureCallouts'
@@ -45,6 +46,7 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   HeroSection,
   AnimatedButton,
   IconButton,
+  AddToCartButton,
   ProductCard,
   CollectionCard,
   ProductImageGallery,

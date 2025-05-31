@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, ShoppingCart, Zap, Share2 } from 'lucide-react'
-import { cartUtils } from '../shared/CartManager'
-import { notificationManager } from '../shared/CartNotification'
+import { Heart, Zap, Share2 } from 'lucide-react'
+import { AddToCartButton } from '../shared/AddToCartButton'
 
 interface ProductActionsProps {
   isAvailable: boolean
@@ -29,8 +28,6 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
   buyNowText = 'Buy Now',
   className = '',
 }) => {
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const [isAddedToCart, setIsAddedToCart] = useState(false)
   const [wishlistState, setWishlistState] = useState(isInWishlist)
   const [currentQuantity, setCurrentQuantity] = useState(quantity)
 
@@ -55,27 +52,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     }
   }, [])
 
-  const handleAddToCart = async () => {
-    if (!isAvailable || isAddingToCart || !variantId) return
 
-    setIsAddingToCart(true)
-
-    try {
-      const success = await cartUtils.addToCart(variantId, currentQuantity)
-
-      if (success) {
-        setIsAddedToCart(true)
-        setTimeout(() => setIsAddedToCart(false), 2000)
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    } finally {
-      setIsAddingToCart(false)
-    }
-  }
 
   const handleBuyNow = async () => {
     if (!isAvailable || !variantId) return
@@ -140,47 +117,19 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
       {/* Main Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Add to Cart Button */}
-        <motion.button
-          type="submit"
-          onClick={handleAddToCart}
-          disabled={!isAvailable || isAddingToCart}
-          className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
-            !isAvailable
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : isAddedToCart
-              ? 'bg-green-500 text-white'
-              : 'bg-primary text-white hover:bg-blue-700 focus:ring-2 focus:ring-primary focus:ring-offset-2'
-          }`}
-          whileHover={isAvailable && !isAddingToCart ? { scale: 1.02 } : {}}
-          whileTap={isAvailable && !isAddingToCart ? { scale: 0.98 } : {}}
+        <AddToCartButton
+          variantId={variantId}
+          quantity={currentQuantity}
+          available={isAvailable}
+          variant="primary"
+          size="lg"
+          className="flex-1 rounded-lg"
+          loadingText="Adding..."
+          successText="Added to Cart!"
+          unavailableText="Out of Stock"
         >
-          {isAddingToCart ? (
-            <>
-              <motion.div
-                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              />
-              Adding...
-            </>
-          ) : isAddedToCart ? (
-            <>
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="w-4 h-4 text-white"
-              >
-                ✓
-              </motion.div>
-              Added to Cart!
-            </>
-          ) : (
-            <>
-              <ShoppingCart size={18} />
-              {addToCartText}
-            </>
-          )}
-        </motion.button>
+          {addToCartText}
+        </AddToCartButton>
 
         {/* Secondary Actions */}
         <div className="flex gap-2">

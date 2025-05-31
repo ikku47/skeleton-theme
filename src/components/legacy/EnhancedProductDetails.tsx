@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, AlertCircle } from 'lucide-react'
+import { Star, Heart, Share2, Plus, Minus, Truck, Shield, RotateCcw, AlertCircle, Check } from 'lucide-react'
 import { EnhancedVariantSelector } from './EnhancedVariantSelector'
-import { cartUtils } from '../shared/CartManager'
-import { notificationManager } from '../shared/CartNotification'
+import { AddToCartButton } from '../shared/AddToCartButton'
 
 interface ProductVariant {
   id: string
@@ -59,8 +58,6 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const [addToCartSuccess, setAddToCartSuccess] = useState(false)
 
   useEffect(() => {
     // Initialize selected options with first available variant's actual options
@@ -176,27 +173,7 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
     setIsWishlisted(!isWishlisted)
   }
 
-  const handleAddToCart = async () => {
-    if (!selectedVariant.available || isAddingToCart || !selectedVariant.id) return
 
-    setIsAddingToCart(true)
-
-    try {
-      const success = await cartUtils.addToCart(selectedVariant.id, quantity)
-
-      if (success) {
-        setAddToCartSuccess(true)
-        setTimeout(() => setAddToCartSuccess(false), 3000)
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Failed to add to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    } finally {
-      setIsAddingToCart(false)
-    }
-  }
 
   const handleShare = () => {
     if (navigator.share) {
@@ -365,38 +342,20 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
         className="space-y-4"
       >
         {/* Add to Cart */}
-        <motion.button
-          onClick={handleAddToCart}
-          disabled={!selectedVariant.available || isAddingToCart}
-          className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-            selectedVariant.available
-              ? addToCartSuccess
-                ? 'bg-green-600 text-white'
-                : 'bg-yellow-400 hover:bg-yellow-500 text-black'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-          whileHover={selectedVariant.available ? { scale: 1.02 } : {}}
-          whileTap={selectedVariant.available ? { scale: 0.98 } : {}}
+        <AddToCartButton
+          variantId={selectedVariant.id}
+          quantity={quantity}
+          available={selectedVariant.available}
+          variant="accent"
+          size="lg"
+          fullWidth
+          className="rounded-lg"
+          loadingText="Adding to Cart..."
+          successText="Added to Cart!"
+          unavailableText="Out of Stock"
         >
-          <div className="flex items-center justify-center gap-2">
-            {isAddingToCart ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
-                Adding to Cart...
-              </>
-            ) : addToCartSuccess ? (
-              <>
-                <Check className="w-5 h-5" />
-                Added to Cart!
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-5 h-5" />
-                Add to Cart
-              </>
-            )}
-          </div>
-        </motion.button>
+          Add to Cart
+        </AddToCartButton>
 
         {/* Secondary Actions */}
         <div className="flex gap-3">

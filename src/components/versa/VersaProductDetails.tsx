@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw } from 'lucide-react'
-import { cartUtils } from '../shared/CartManager'
-import { notificationManager } from '../shared/CartNotification'
+import { Star, Heart, Share2, Plus, Minus, Truck, Shield, RotateCcw } from 'lucide-react'
+import { AddToCartButton } from '../shared/AddToCartButton'
 
 interface ProductVariant {
   id: string
@@ -62,22 +61,7 @@ export const VersaProductDetails: React.FC<VersaProductDetailsProps> = ({
     setQuantity(Math.max(1, quantity + change))
   }
 
-  const handleAddToCart = async () => {
-    if (!selectedVariant.available || !selectedVariant.id) return
 
-    try {
-      const success = await cartUtils.addToCart(selectedVariant.id, quantity)
-
-      if (success) {
-        // Success notification is handled by CartManager
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Failed to add to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    }
-  }
 
   const toggleWishlist = () => {
     setIsWishlisted(!isWishlisted)
@@ -242,16 +226,19 @@ export const VersaProductDetails: React.FC<VersaProductDetailsProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <motion.button
-            onClick={handleAddToCart}
-            disabled={!selectedVariant.available}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-accent text-primary font-heading font-semibold text-lg rounded-cta hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            whileHover={selectedVariant.available ? { scale: 1.02 } : {}}
-            whileTap={selectedVariant.available ? { scale: 0.98 } : {}}
+          <AddToCartButton
+            variantId={selectedVariant.id}
+            quantity={quantity}
+            available={selectedVariant.available}
+            variant="accent"
+            size="lg"
+            className="flex-1 font-heading rounded-cta"
+            loadingText="Adding to Cart..."
+            successText="Added to Cart!"
+            unavailableText="Out of Stock"
           >
-            <ShoppingCart className="w-5 h-5" />
-            {selectedVariant.available ? 'Add to Cart' : 'Out of Stock'}
-          </motion.button>
+            Add to Cart
+          </AddToCartButton>
 
           <div className="flex gap-2">
             <motion.button

@@ -1,8 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Heart, ShoppingCart } from 'lucide-react'
-import { cartUtils } from './CartManager'
-import { notificationManager } from './CartNotification'
+import { Heart } from 'lucide-react'
+import { AddToCartButton } from './AddToCartButton'
 
 interface ProductCardProps {
   title: string
@@ -33,37 +32,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   variantId,
   available = true,
 }) => {
-  const handleAddToCart = async () => {
-    // Use custom onAddToCart if provided
-    if (onAddToCart) {
-      onAddToCart()
-      return
-    }
-
-    // Otherwise use built-in cart functionality
-    if (!variantId) {
-      notificationManager.error('Product variant not available')
-      return
-    }
-
-    if (!available) {
-      notificationManager.error('This product is currently out of stock')
-      return
-    }
-
-    try {
-      const success = await cartUtils.addToCart(variantId, 1)
-
-      if (success) {
-        // Success notification is handled by CartManager
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Failed to add to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    }
-  }
   return (
     <motion.div
       className={`card-product group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 ${className}`}
@@ -99,20 +67,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           {(onAddToCart || variantId) && (
             <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <motion.button
-                onClick={handleAddToCart}
-                disabled={!available}
-                className={`w-full py-2 px-4 rounded flex items-center justify-center gap-2 transition-colors ${
-                  available
-                    ? 'bg-primary text-white hover:bg-blue-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                whileHover={available ? { scale: 1.02 } : {}}
-                whileTap={available ? { scale: 0.98 } : {}}
+              <AddToCartButton
+                variantId={variantId}
+                available={available}
+                onAddToCart={onAddToCart}
+                variant="primary"
+                size="md"
+                fullWidth
+                loadingText="Adding..."
+                successText="Added!"
               >
-                <ShoppingCart size={16} />
-                {available ? 'Add to Cart' : 'Out of Stock'}
-              </motion.button>
+                Add to Cart
+              </AddToCartButton>
             </div>
           )}
         </div>

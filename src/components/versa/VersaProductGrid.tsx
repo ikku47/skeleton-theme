@@ -1,8 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Heart, ShoppingCart, Eye, Star } from 'lucide-react'
-import { cartUtils } from '../shared/CartManager'
-import { notificationManager } from '../shared/CartNotification'
+import { Heart, Eye, Star } from 'lucide-react'
+import { AddToCartButton } from '../shared/AddToCartButton'
 
 interface Product {
   id: string
@@ -126,29 +125,8 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
 
 // Individual Product Card Component
 const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ product, animationVariants }) => {
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault()
-
-    // Get the first available variant from product data
-    const firstVariant = product.variants?.find((v: any) => v.available) || product.variants?.[0]
-    if (!firstVariant) {
-      notificationManager.error('No variants available for this product')
-      return
-    }
-
-    try {
-      const success = await cartUtils.addToCart(firstVariant.id, 1)
-
-      if (success) {
-        // Success notification is handled by CartManager
-      } else {
-        throw new Error('Failed to add to cart')
-      }
-    } catch (error) {
-      console.error('Failed to add to cart:', error)
-      notificationManager.error('Failed to add item to cart. Please try again.')
-    }
-  }
+  // Get the first available variant from product data
+  const firstVariant = product.variants?.find((v: any) => v.available) || product.variants?.[0]
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -215,15 +193,18 @@ const ProductCard: React.FC<{ product: Product; animationVariants: any }> = ({ p
 
           {/* Quick Add to Cart */}
           <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <motion.button
-              onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-accent text-primary font-semibold rounded-cta hover:bg-yellow-400 transition-colors duration-200"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <AddToCartButton
+              variantId={firstVariant?.id}
+              available={firstVariant?.available}
+              variant="accent"
+              size="md"
+              fullWidth
+              className="rounded-cta"
+              loadingText="Adding..."
+              successText="Added!"
             >
-              <ShoppingCart className="w-4 h-4" />
               Quick Add
-            </motion.button>
+            </AddToCartButton>
           </div>
         </div>
       </div>
