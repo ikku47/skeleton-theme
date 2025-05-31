@@ -232,103 +232,181 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Enhanced Full-Screen Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            className="lg:hidden bg-white border-t border-border"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="container py-4">
-              {/* Mobile Navigation */}
-              <nav className="space-y-2 mb-8">
-                {menuItems.map((item, index) => (
-                  <motion.div
-                    key={item.title}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <motion.a
-                      href={item.url}
-                      className="block font-heading font-semibold text-lg text-primary hover:text-accent transition-colors duration-200 py-3 border-b border-border"
-                      whileHover={{ x: 4 }}
-                      onClick={toggleMobileMenu}
-                    >
-                      {item.title}
-                    </motion.a>
-                    {item.children && (
-                      <div className="ml-4 mt-2 space-y-2 pb-2">
-                        {item.children.map((child, childIndex) => (
-                          <motion.a
-                            key={child.title}
-                            href={child.url}
-                            className="block text-neutral hover:text-primary transition-colors duration-200 py-2 font-body"
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.2, delay: (index * 0.1) + (childIndex * 0.05) }}
-                            whileHover={{ x: 4 }}
-                            onClick={toggleMobileMenu}
-                          >
-                            {child.title}
-                          </motion.a>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </nav>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/50 z-[9998] lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={toggleMobileMenu}
+            />
 
-              {/* Mobile Actions */}
-              <div className="flex items-center justify-center space-x-6 pt-4 border-t border-border">
-                <a
-                  href="/search"
-                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
+            {/* Full-Screen Menu */}
+            <motion.div
+              className="fixed inset-0 bg-white z-[9999] lg:hidden overflow-y-auto"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              style={{ height: '100vh', height: '100dvh' }}
+            >
+              {/* Mobile Menu Header */}
+              <div className="flex items-center justify-between p-6 border-b border-border">
+                <div className="flex items-center gap-3">
+                  {logo ? (
+                    <img src={logo} alt={logoText} className="h-8 w-auto" />
+                  ) : (
+                    <span className="font-heading text-xl font-bold text-primary">{logoText}</span>
+                  )}
+                </div>
+                <motion.button
                   onClick={toggleMobileMenu}
+                  className="p-2 text-primary hover:text-accent transition-colors"
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Search className="w-5 h-5" />
-                  <span>Search</span>
-                </a>
-
-                <button
-                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
-                  onClick={handleWishlistClick}
-                >
-                  <Heart className="w-5 h-5" />
-                  <span>Wishlist</span>
-                  {wishlistCount > 0 && (
-                    <span className="w-5 h-5 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
-                  onClick={handleCartClick}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>Cart</span>
-                  {cartCount > 0 && (
-                    <span className="w-5 h-5 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
-                  onClick={handleAccountClick}
-                >
-                  <User className="w-5 h-5" />
-                  <span>Account</span>
-                </button>
+                  <X className="w-6 h-6" />
+                </motion.button>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Mobile Search */}
+              <div className="p-6 border-b border-border">
+                <motion.div
+                  className="relative"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral" />
+                  <input
+                    type="search"
+                    placeholder="Search products..."
+                    className="w-full pl-12 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all duration-200"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const query = (e.target as HTMLInputElement).value.trim()
+                        if (query) {
+                          window.location.href = `/search?q=${encodeURIComponent(query)}`
+                        }
+                      }
+                    }}
+                  />
+                </motion.div>
+              </div>
+
+              {/* Mobile Navigation */}
+              <div className="flex-1 p-6 min-h-0 overflow-y-auto">
+                <nav className="space-y-1">
+                  {menuItems.map((item, index) => (
+                    <motion.div
+                      key={item.title}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.1 + (index * 0.05) }}
+                    >
+                      <motion.a
+                        href={item.url}
+                        className="flex items-center justify-between py-3 font-heading text-lg font-semibold text-primary hover:text-accent transition-colors duration-200 border-b border-border/50"
+                        whileHover={{ x: 8 }}
+                        onClick={toggleMobileMenu}
+                      >
+                        <span>{item.title}</span>
+                        {item.children && item.children.length > 0 && (
+                          <motion.div
+                            className="w-5 h-5 rounded-full bg-light-bg flex items-center justify-center"
+                            whileHover={{ scale: 1.1 }}
+                          >
+                            <span className="text-xs font-bold text-neutral">{item.children.length}</span>
+                          </motion.div>
+                        )}
+                      </motion.a>
+
+                      {item.children && (
+                        <div className="ml-4 space-y-1 py-2">
+                          {item.children.map((child, childIndex) => (
+                            <motion.a
+                              key={child.title}
+                              href={child.url}
+                              className="block py-2 text-base text-neutral hover:text-primary transition-colors duration-200 font-body"
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: 0.2 + (index * 0.05) + (childIndex * 0.03) }}
+                              whileHover={{ x: 6 }}
+                              onClick={toggleMobileMenu}
+                            >
+                              {child.title}
+                            </motion.a>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Mobile Actions Footer */}
+              <div className="p-4 border-t border-border bg-light-bg flex-shrink-0">
+                <div className="grid grid-cols-3 gap-3">
+                  <motion.button
+                    className="flex flex-col items-center gap-1 p-3 bg-white rounded-lg border border-border hover:border-primary transition-all duration-200"
+                    onClick={handleWishlistClick}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                  >
+                    <div className="relative">
+                      <Heart className="w-5 h-5 text-primary" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
+                          {wishlistCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-primary">Wishlist</span>
+                  </motion.button>
+
+                  <motion.button
+                    className="flex flex-col items-center gap-1 p-3 bg-white rounded-lg border border-border hover:border-primary transition-all duration-200"
+                    onClick={handleCartClick}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.35 }}
+                  >
+                    <div className="relative">
+                      <ShoppingCart className="w-5 h-5 text-primary" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
+                          {cartCount}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-primary">Cart</span>
+                  </motion.button>
+
+                  <motion.button
+                    className="flex flex-col items-center gap-1 p-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200"
+                    onClick={handleAccountClick}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="text-xs font-medium">Account</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

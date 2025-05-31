@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Facebook, 
@@ -52,17 +52,38 @@ interface VersaFooterProps {
 export const VersaFooter: React.FC<VersaFooterProps> = ({
   logo,
   logoText = 'VersaCommerce',
-  description = 'Discover premium quality products designed for the modern lifestyle. Experience excellence in every purchase.',
+  description = 'Discover premium quality products designed for the modern lifestyle. Experience excellence in every purchase with our curated collection.',
   sections,
   socialLinks,
   contactInfo,
   newsletterTitle = 'Stay Connected',
-  newsletterDescription = 'Get the latest updates on new products and exclusive offers.',
+  newsletterDescription = 'Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.',
   showPaymentIcons = true,
   showTrustBadges = true,
   className = '',
 }) => {
   const currentYear = new Date().getFullYear()
+  const [email, setEmail] = useState('')
+  const [isSubscribing, setIsSubscribing] = useState(false)
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle')
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email.trim()) return
+
+    setIsSubscribing(true)
+    try {
+      // Simulate newsletter subscription
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setSubscribeStatus('success')
+      setEmail('')
+    } catch (error) {
+      setSubscribeStatus('error')
+    } finally {
+      setIsSubscribing(false)
+      setTimeout(() => setSubscribeStatus('idle'), 4000)
+    }
+  }
 
   // Helper function to convert icon strings to React components
   const getIconComponent = (icon: string | React.ReactNode): React.ReactNode => {
@@ -185,23 +206,49 @@ export const VersaFooter: React.FC<VersaFooterProps> = ({
               {newsletterDescription}
             </p>
 
-            {/* Newsletter Signup */}
-            <div className="mb-8">
+            {/* Enhanced Newsletter Signup */}
+            <form onSubmit={handleNewsletterSubmit} className="mb-8">
               <div className="flex">
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-secondary text-white placeholder-gray-400 border border-secondary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+                  className="flex-1 px-4 py-3 bg-secondary text-white placeholder-gray-400 border border-secondary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200"
+                  required
                 />
                 <motion.button
-                  className="px-6 py-3 bg-accent text-primary font-semibold rounded-r-lg hover:bg-yellow-400 transition-colors duration-200"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={isSubscribing || !email.trim()}
+                  className="px-6 py-3 bg-accent text-primary font-semibold rounded-r-lg hover:bg-yellow-400 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[60px]"
+                  whileHover={{ scale: isSubscribing ? 1 : 1.02 }}
+                  whileTap={{ scale: isSubscribing ? 1 : 0.98 }}
                 >
-                  <ArrowRight className="w-5 h-5" />
+                  {isSubscribing ? (
+                    <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  ) : (
+                    <ArrowRight className="w-5 h-5" />
+                  )}
                 </motion.button>
               </div>
-            </div>
+
+              {/* Subscription Status */}
+              {subscribeStatus !== 'idle' && (
+                <motion.div
+                  className={`mt-3 text-sm ${
+                    subscribeStatus === 'success' ? 'text-green-400' : 'text-red-400'
+                  }`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  {subscribeStatus === 'success'
+                    ? '✓ Thank you for subscribing!'
+                    : '✗ Something went wrong. Please try again.'
+                  }
+                </motion.div>
+              )}
+            </form>
 
             {/* Contact Info */}
             {(contactInfo.email || contactInfo.phone || contactInfo.address) && (

@@ -10,9 +10,9 @@
   assign newsletter_title = section.settings.newsletter_title | default: 'Stay Connected'
   assign newsletter_description = section.settings.newsletter_description | default: 'Get the latest updates on new products and exclusive offers.'
   
-  assign contact_email = section.settings.contact_email
-  assign contact_phone = section.settings.contact_phone
-  assign contact_address = section.settings.contact_address
+  assign contact_email = section.settings.contact_email | default: 'hello@versacommerce.com'
+  assign contact_phone = section.settings.contact_phone | default: '+1 (555) 123-4567'
+  assign contact_address = section.settings.contact_address | default: '123 Commerce Street, San Francisco, CA 94102'
 %}
 
 {% comment %} Build navigation sections {% endcomment %}
@@ -51,42 +51,49 @@
 ]
 {% endcapture %}
 
-{% comment %} Build social links {% endcomment %}
+{% comment %} Build social links with fallback defaults {% endcomment %}
+{% liquid
+  assign facebook_url = section.settings.social_facebook | default: 'https://facebook.com/versacommerce'
+  assign instagram_url = section.settings.social_instagram | default: 'https://instagram.com/versacommerce'
+  assign twitter_url = section.settings.social_twitter | default: 'https://twitter.com/versacommerce'
+  assign youtube_url = section.settings.social_youtube | default: 'https://youtube.com/@versacommerce'
+%}
+
 {% capture social_links_json %}
 [
   {% assign first_social = true %}
-  {% if section.settings.social_facebook != blank %}
+  {% if facebook_url != blank %}
     {% unless first_social %},{% endunless %}
     {
       "platform": "Facebook",
-      "url": {{ section.settings.social_facebook | json }},
+      "url": {{ facebook_url | json }},
       "icon": "Facebook"
     }
     {% assign first_social = false %}
   {% endif %}
-  {% if section.settings.social_instagram != blank %}
+  {% if instagram_url != blank %}
     {% unless first_social %},{% endunless %}
     {
       "platform": "Instagram",
-      "url": {{ section.settings.social_instagram | json }},
+      "url": {{ instagram_url | json }},
       "icon": "Instagram"
     }
     {% assign first_social = false %}
   {% endif %}
-  {% if section.settings.social_twitter != blank %}
+  {% if twitter_url != blank %}
     {% unless first_social %},{% endunless %}
     {
       "platform": "Twitter",
-      "url": {{ section.settings.social_twitter | json }},
+      "url": {{ twitter_url | json }},
       "icon": "Twitter"
     }
     {% assign first_social = false %}
   {% endif %}
-  {% if section.settings.social_youtube != blank %}
+  {% if youtube_url != blank %}
     {% unless first_social %},{% endunless %}
     {
       "platform": "YouTube",
-      "url": {{ section.settings.social_youtube | json }},
+      "url": {{ youtube_url | json }},
       "icon": "Youtube"
     }
     {% assign first_social = false %}
@@ -186,17 +193,23 @@
     {
       "type": "text",
       "id": "contact_email",
-      "label": "Email Address"
+      "label": "Email Address",
+      "default": "hello@versacommerce.com",
+      "info": "Main contact email address"
     },
     {
       "type": "text",
       "id": "contact_phone",
-      "label": "Phone Number"
+      "label": "Phone Number",
+      "default": "+1 (555) 123-4567",
+      "info": "Main contact phone number"
     },
     {
       "type": "textarea",
       "id": "contact_address",
-      "label": "Address"
+      "label": "Address",
+      "default": "123 Commerce Street\nSan Francisco, CA 94102\nUnited States",
+      "info": "Full business address"
     },
     {
       "type": "header",
@@ -205,22 +218,26 @@
     {
       "type": "url",
       "id": "social_facebook",
-      "label": "Facebook URL"
+      "label": "Facebook URL",
+      "info": "Your Facebook page URL"
     },
     {
       "type": "url",
       "id": "social_instagram",
-      "label": "Instagram URL"
+      "label": "Instagram URL",
+      "info": "Your Instagram profile URL"
     },
     {
       "type": "url",
       "id": "social_twitter",
-      "label": "Twitter URL"
+      "label": "Twitter URL",
+      "info": "Your Twitter profile URL"
     },
     {
       "type": "url",
       "id": "social_youtube",
-      "label": "YouTube URL"
+      "label": "YouTube URL",
+      "info": "Your YouTube channel URL"
     },
     {
       "type": "header",

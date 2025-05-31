@@ -31,6 +31,7 @@ import { VersaProductFilter } from '../versa/VersaProductFilter'
 import { VersaCollectionPage } from '../versa/VersaCollectionPage'
 import { VersaSearchPage } from '../versa/VersaSearchPage'
 import { VersaSearchResults } from '../versa/VersaSearchResults'
+import { VersaContactPage } from '../versa/VersaContactPage'
 import { VersaCartItem } from '../versa/VersaCartItem'
 import { VersaCartSummary } from '../versa/VersaCartSummary'
 import { VersaCartManager } from '../versa/VersaCartManager'
@@ -90,6 +91,7 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   VersaProductFilter,
   VersaCollectionPage,
   VersaSearchPage,
+  VersaContactPage,
   VersaCartItem,
   VersaCartSummary,
   VersaCartManager,

@@ -1,0 +1,106 @@
+{% comment %}
+  VersaCommerce Contact Page - Comprehensive contact form and information
+{% endcomment %}
+
+{% liquid
+  assign contact_email = section.settings.contact_email | default: shop.email
+  assign contact_phone = section.settings.contact_phone | default: shop.phone
+  assign contact_address = section.settings.contact_address
+  assign weekday_hours = section.settings.weekday_hours | default: '9:00 AM - 6:00 PM'
+  assign weekend_hours = section.settings.weekend_hours | default: '10:00 AM - 4:00 PM'
+%}
+
+{% capture contact_info_json %}
+{
+  "email": {{ contact_email | json }},
+  "phone": {{ contact_phone | json }},
+  "address": {{ contact_address | json }},
+  "hours": {
+    "weekdays": {{ weekday_hours | json }},
+    "weekends": {{ weekend_hours | json }}
+  }
+}
+{% endcapture %}
+
+{% capture contact_props %}
+{
+  "contactInfo": {{ contact_info_json | strip }}
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaContactPage', props: contact_props %}
+
+{% schema %}
+{
+  "name": "Contact Page",
+  "tag": "section",
+  "class": "contact-page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "hello@example.com",
+      "info": "Main contact email address"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "default": "+1 (555) 123-4567",
+      "info": "Main contact phone number"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_address",
+      "label": "Business Address",
+      "default": "123 Business Street\nCity, State 12345\nUnited States",
+      "info": "Full business address"
+    },
+    {
+      "type": "header",
+      "content": "Business Hours"
+    },
+    {
+      "type": "text",
+      "id": "weekday_hours",
+      "label": "Weekday Hours",
+      "default": "9:00 AM - 6:00 PM",
+      "info": "Monday through Friday hours"
+    },
+    {
+      "type": "text",
+      "id": "weekend_hours",
+      "label": "Weekend Hours",
+      "default": "10:00 AM - 4:00 PM",
+      "info": "Saturday and Sunday hours"
+    },
+    {
+      "type": "header",
+      "content": "Form Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_form_notifications",
+      "label": "Enable form notifications",
+      "default": true,
+      "info": "Send email notifications when contact form is submitted"
+    },
+    {
+      "type": "text",
+      "id": "notification_email",
+      "label": "Notification Email",
+      "info": "Email address to receive form submissions (leave blank to use contact email)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Page"
+    }
+  ]
+}
+{% endschema %}

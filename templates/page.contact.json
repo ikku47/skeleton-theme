@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "center",
+        "show_breadcrumbs": true
+      }
+    },
+    "main": {
+      "type": "versa-contact",
+      "settings": {
+        "contact_email": "hello@versacommerce.com",
+        "contact_phone": "+1 (555) 123-4567",
+        "contact_address": "123 Commerce Street\nSan Francisco, CA 94102\nUnited States",
+        "weekday_hours": "9:00 AM - 6:00 PM",
+        "weekend_hours": "10:00 AM - 4:00 PM",
+        "enable_form_notifications": true
+      }
+    }
+  },
+  "order": [
+    "page_header",
+    "main"
+  ]
+}
