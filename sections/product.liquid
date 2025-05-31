@@ -1,144 +1,353 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+  Product Page Section - Enhanced with React components
 {% endcomment %}
 
-<div class="product-container">
-  <div class="product-images">
-  {% if product.images.size > 1 %}
-    <!-- Use React Image Gallery for multiple images -->
-    {% capture gallery_props %}
-    {
-      "images": [
-        {% for image in product.images %}
-          {
-            "id": "{{ image.id }}",
-            "src": "{{ image | img_url: '800x800' }}",
-            "alt": "{{ image.alt | escape }}",
-            "thumbnail": "{{ image | img_url: '100x100' }}"
-          }{% unless forloop.last %},{% endunless %}
-        {% endfor %}
-      ],
-      "className": "product-gallery"
-    }
-    {% endcapture %}
-    {% render 'react-component', component: 'ImageGallery', props: gallery_props %}
-  {% elsif product.featured_image %}
-    <!-- Single image fallback -->
-    {% render 'image', class: 'product-image', image: product.featured_image %}
-  {% endif %}
-  </div>
+<section class="py-8 bg-white min-h-screen">
+  <div class="container">
+    <!-- Breadcrumbs -->
+    {% if section.settings.show_breadcrumbs %}
+      {% liquid
+        assign breadcrumb_items = ''
+        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
 
-  <div class="product-content">
-    <div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+        if collection
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Collections", "url": "' | append: routes.collections_url | append: '"}'
+          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: collection.title | append: '", "url": "' | append: collection.url | append: '"}'
+        endif
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+        assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: product.title | append: '", "isActive": true}'
+      %}
+      {% capture breadcrumbs_props %}
+      {
+        "items": [{{ breadcrumb_items }}]
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
+    {% endif %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <!-- Product Images -->
+      {% liquid
+        assign product_images = ''
+        for image in product.images
+          assign image_url = image | image_url: width: 800, height: 800
+          assign image_alt = image.alt | escape | default: product.title
+          if forloop.first
+            assign product_images = product_images | append: '{"url": "' | append: image_url | append: '", "alt": "' | append: image_alt | append: '"}'
+          else
+            assign product_images = product_images | append: ', {"url": "' | append: image_url | append: '", "alt": "' | append: image_alt | append: '"}'
+          endif
+        endfor
+      %}
+      {% capture image_gallery_props %}
+      {
+        "images": [{{ product_images }}],
+        "productTitle": {{ product.title | json }}
+      }
+      {% endcapture %}
+      {% render 'react-component', component: 'ProductImageGallery', props: image_gallery_props %}
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
+      <!-- Product Content -->
+      <div class="space-y-6">
+        <!-- Product Info -->
+        {% assign current_variant = product.selected_or_first_available_variant %}
+        {% capture product_info_props %}
+        {
+          "title": {{ product.title | json }},
+          "price": {{ product.price | money | json }},
+          {% if product.compare_at_price > product.price %}
+          "compareAtPrice": {{ product.compare_at_price | money | json }},
           {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+          {% if product.vendor != blank %}
+          "vendor": {{ product.vendor | json }},
+          {% endif %}
+          {% if product.description != blank %}
+          "description": {{ product.description | json }},
+          {% endif %}
+          "isAvailable": {{ current_variant.available | json }},
+          "showVendor": {{ section.settings.show_vendor | json }},
+          "showTrustBadges": {{ section.settings.show_trust_badges | json }},
+          "trustBadges": [
+            {
+              "text": {{ section.settings.trust_badge_1_text | default: "Free shipping on orders over $50" | json }},
+              "show": {{ section.settings.show_trust_badge_1 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_2_text | default: "30-day return policy" | json }},
+              "show": {{ section.settings.show_trust_badge_2 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_3_text | default: "Secure payment" | json }},
+              "show": {{ section.settings.show_trust_badge_3 | json }}
+            },
+            {
+              "text": {{ section.settings.trust_badge_4_text | default: "Customer support" | json }},
+              "show": {{ section.settings.show_trust_badge_4 | json }}
+            }
+          ]
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'ProductInfo', props: product_info_props %}
 
-    <div class="product-quantity">
-      <label for="quantity">Quantity:</label>
-      <input type="number" name="quantity" id="quantity" min="1" value="1" class="quantity-input">
+        <!-- Product Form -->
+        {% form 'product', product, class: 'space-y-6' %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+
+          <!-- Variant Selector -->
+          {% if product.variants.size > 1 %}
+            {% liquid
+              assign variants_json = ''
+              for variant in product.variants
+                assign variant_title = variant.title | json
+                assign variant_price = variant.price | money | json
+                assign variant_data = '{"id": "' | append: variant.id | append: '", "title": ' | append: variant_title | append: ', "price": ' | append: variant_price | append: ', "available": ' | append: variant.available | append: '}'
+                if forloop.first
+                  assign variants_json = variants_json | append: variant_data
+                else
+                  assign variants_json = variants_json | append: ', ' | append: variant_data
+                endif
+              endfor
+            %}
+            {% capture variant_selector_props %}
+            {
+              "variants": [{{ variants_json }}],
+              "selectedVariantId": "{{ current_variant.id }}"
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductVariantSelector', props: variant_selector_props %}
+          {% else %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}">
+          {% endif %}
+
+          <!-- Quantity Selector and Product Actions -->
+          <div class="space-y-6">
+            <!-- Quantity Selector -->
+            {% capture quantity_selector_props %}
+            {
+              "initialQuantity": 1,
+              "minQuantity": 1,
+              "maxQuantity": 99,
+              "disabled": {% unless current_variant.available %}true{% else %}false{% endunless %}
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductQuantitySelector', props: quantity_selector_props %}
+
+            <!-- Product Actions -->
+            {% capture product_actions_props %}
+            {
+              "isAvailable": {{ current_variant.available | json }},
+              "variantId": "{{ current_variant.id }}",
+              "quantity": 1,
+              "addToCartText": "Add to Cart",
+              "buyNowText": "Buy Now",
+              "showBuyNow": true,
+              "showWishlist": true,
+              "showShare": true
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'ProductActions', props: product_actions_props %}
+          </div>
+        {% endform %}
+      </div>
     </div>
 
-    <!-- Animated Add to Cart Button -->
-    {% assign add_to_cart_props = '{"children": "Add to Cart", "variant": "primary", "size": "lg", "type": "submit"}' %}
-    {% render 'react-component', component: 'AnimatedButton', props: add_to_cart_props, class: 'product-add-to-cart' %}
+    <!-- Related Products -->
+    {% if section.settings.show_related_products %}
+      {% liquid
+        assign related_collection = collections[product.collections.first.handle] | default: collections.all
+        assign related_products = related_collection.products | where: 'id', '!=', product.id
+        assign related_limit = section.settings.related_products_limit | default: 4
+      %}
 
-    <!-- Wishlist Button -->
-    <div class="product-wishlist">
-      {% assign wishlist_props = '{"icon": "Heart", "variant": "outline", "aria-label": "Add to wishlist"}' %}
-      {% render 'react-component', component: 'IconButton', props: wishlist_props %}
-    </div>
+      {% if related_products.size > 0 %}
+        {% liquid
+          assign related_products_json = ''
+          for related_product in related_products limit: related_limit
+            assign product_image = related_product.featured_image
+            assign image_url = ''
+            if product_image
+              assign image_url = product_image | image_url: width: 400, height: 500
+            else
+              assign image_url = 'product-placeholder.svg' | asset_url
+            endif
 
-    {{ form | payment_button }}
-  {% endform %}
+            assign product_title = related_product.title | json
+            assign product_price = related_product.price | money | json
+            assign product_image_alt = product_image.alt | default: related_product.title | json
+            assign product_url = related_product.url | json
+
+            assign product_data = '{"id": "' | append: related_product.id | append: '", "title": ' | append: product_title | append: ', "price": ' | append: product_price | append: ', "imageUrl": "' | append: image_url | append: '", "imageAlt": ' | append: product_image_alt | append: ', "productUrl": ' | append: product_url | append: '"'
+
+            if related_product.compare_at_price > related_product.price
+              assign compare_price = related_product.compare_at_price | money | json
+              assign product_data = product_data | append: ', "compareAtPrice": ' | append: compare_price
+            endif
+
+            assign product_data = product_data | append: '}'
+
+            if forloop.first
+              assign related_products_json = related_products_json | append: product_data
+            else
+              assign related_products_json = related_products_json | append: ', ' | append: product_data
+            endif
+          endfor
+        %}
+
+        {% capture related_products_props %}
+        {
+          "products": [{{ related_products_json }}],
+          "title": "{% if product.collections.first %}More from {{ product.collections.first.title }}{% else %}Related Products{% endif %}",
+          "subtitle": "You might also like these products",
+          {% if related_products.size > related_limit %}
+          "viewAllUrl": "{{ product.collections.first.url | default: routes.all_products_collection_url }}",
+          "viewAllText": "View All {% if product.collections.first %}{{ product.collections.first.title }}{% else %}Products{% endif %}",
+          {% endif %}
+          "limit": {{ related_limit }}
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'RelatedProducts', props: related_products_props %}
+      {% endif %}
+    {% endif %}
+
+    <!-- Product Reviews -->
+    {% comment %}
+      Reviews section is available but disabled by default to avoid showing fake data.
+      To enable reviews, integrate with a Shopify review app like:
+      - Shopify Product Reviews
+      - Judge.me
+      - Yotpo
+      - Loox
+      - Stamped.io
+
+      Then uncomment and modify the code below to use actual review data from your chosen app.
+    {% endcomment %}
+    {% if section.settings.show_reviews and false %}
+      {% comment %}
+        Example implementation for when you have real review data:
+
+        {% capture reviews_props %}
+        {
+          "reviews": [
+            // Real review data from your review app API
+          ],
+          "averageRating": {{ product.metafields.reviews.rating | default: 0 }},
+          "totalReviews": {{ product.metafields.reviews.count | default: 0 }},
+          "ratingDistribution": {{ product.metafields.reviews.distribution | default: '{}' }}
+        }
+        {% endcapture %}
+        {% render 'react-component', component: 'ProductReviews', props: reviews_props %}
+      {% endcomment %}
+    {% endif %}
   </div>
-</div>
-
-{% stylesheet %}
-  .product-images {
-    margin-bottom: 2rem;
-  }
-
-  .product-gallery {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .product-info {
-    margin-bottom: 2rem;
-  }
-
-  .product-info h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-
-  .product-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 400px;
-  }
-
-  .product-quantity {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .quantity-input {
-    width: 80px;
-    padding: 0.5rem;
-    border: 1px solid var(--color-muted);
-    text-align: center;
-  }
-
-  .product-add-to-cart {
-    width: 100%;
-  }
-
-  .product-wishlist {
-    align-self: flex-start;
-  }
-
-  @media (min-width: 768px) {
-    .product-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-  }
-{% endstylesheet %}
+</section>
 
 {% schema %}
 {
-  "name": "t:general.product",
-  "settings": [],
+  "name": "Product",
+  "tag": "section",
+  "class": "product-page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related_products",
+      "label": "Show related products",
+      "default": true,
+      "info": "Shows products from the same collection"
+    },
+    {
+      "type": "range",
+      "id": "related_products_limit",
+      "label": "Number of related products",
+      "min": 2,
+      "max": 8,
+      "step": 2,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show product reviews",
+      "default": false,
+      "info": "Shows customer reviews and ratings (requires review app integration)"
+    },
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": false,
+      "info": "Display trust badges below product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_1",
+      "label": "Show trust badge 1",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_1_text",
+      "label": "Trust badge 1 text",
+      "default": "Free shipping on orders over $50"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_2",
+      "label": "Show trust badge 2",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_2_text",
+      "label": "Trust badge 2 text",
+      "default": "30-day return policy"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_3",
+      "label": "Show trust badge 3",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_3_text",
+      "label": "Trust badge 3 text",
+      "default": "Secure payment"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_4",
+      "label": "Show trust badge 4",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_4_text",
+      "label": "Trust badge 4 text",
+      "default": "Customer support"
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
-  }
+  },
+  "presets": [
+    {
+      "name": "Product"
+    }
+  ]
 }
 {% endschema %}

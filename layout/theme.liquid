@@ -16,10 +16,12 @@
     {{ content_for_header }}
   </head>
 
-  <body>
+  <body class="min-h-screen flex flex-col">
     {% sections 'header-group' %}
 
-    {{ content_for_layout }}
+    <main class="flex-1">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
 

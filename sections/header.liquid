@@ -1,180 +1,60 @@
-<header>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="container">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-xl font-bold text-gray-900">
+          {{ shop.name | link_to: routes.root_url, class: 'hover:text-primary transition-colors' }}
+        </h1>
+      </div>
 
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+      <!-- Navigation -->
+      <nav class="hidden md:flex space-x-8">
+        {% for link in section.settings.menu.links %}
+          <a href="{{ link.url }}" class="text-gray-700 hover:text-primary transition-colors font-medium">
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </nav>
 
-  <div class="header__icons">
-    <!-- Search Icon Button -->
-    {% assign search_icon_props = '{"icon": "Search", "variant": "ghost", "aria-label": "Search products"}' %}
-    <div onclick="openSearchModal()">
-      {% render 'react-component', component: 'IconButton', props: search_icon_props %}
-    </div>
+      <!-- Icons -->
+      <div class="flex items-center space-x-4">
+        <!-- Search -->
+        <a href="{{ routes.search_url }}" class="text-gray-700 hover:text-primary transition-colors" aria-label="Search">
+          {% render 'react-component', component: 'IconButton', props: '{"icon": "Search", "variant": "ghost"}' %}
+        </a>
 
-    {% if shop.customer_accounts_enabled %}
-      <!-- Account Icon Button -->
-      {% assign account_icon_props = '{"icon": "User", "variant": "ghost", "aria-label": "My account"}' %}
-      {% render 'react-component', component: 'IconButton', props: account_icon_props, class: 'header__account' %}
-    {% endif %}
+        {% if shop.customer_accounts_enabled %}
+          <!-- Account -->
+          <a href="{{ routes.account_url }}" class="text-gray-700 hover:text-primary transition-colors" aria-label="Account">
+            {% render 'react-component', component: 'IconButton', props: '{"icon": "User", "variant": "ghost"}' %}
+          </a>
+        {% endif %}
 
-    <!-- Cart Icon Button -->
-    <div onclick="openCartDrawer()" class="header__cart">
-      {% assign cart_icon_props = '{"icon": "ShoppingBag", "variant": "ghost", "aria-label": "Shopping cart"}' %}
-      {% render 'react-component', component: 'IconButton', props: cart_icon_props %}
-      {% if cart.item_count > 0 %}
-        <span class="header__cart-count">{{ cart.item_count }}</span>
-      {% endif %}
+        <!-- Cart -->
+        <a href="{{ routes.cart_url }}" class="relative text-gray-700 hover:text-primary transition-colors" aria-label="Cart">
+          {% render 'react-component', component: 'IconButton', props: '{"icon": "ShoppingBag", "variant": "ghost"}' %}
+          {% if cart.item_count > 0 %}
+            <span class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {{ cart.item_count }}
+            </span>
+          {% endif %}
+        </a>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- Search Modal -->
-{% capture search_modal_props %}
-{
-  "isOpen": false,
-  "popularSearches": ["{{ section.settings.popular_search_1 | default: 'Shirts' }}", "{{ section.settings.popular_search_2 | default: 'Jeans' }}", "{{ section.settings.popular_search_3 | default: 'Sneakers' }}", "{{ section.settings.popular_search_4 | default: 'Accessories' }}"]
-}
-{% endcapture %}
-{% render 'react-component', component: 'SearchModal', props: search_modal_props, id: 'header-search-modal' %}
 
-<!-- Cart Drawer -->
-{% capture cart_drawer_props %}
-{
-  "isOpen": false,
-  "items": [
-    {% for item in cart.items %}
-      {
-        "id": "{{ item.key }}",
-        "title": "{{ item.product.title | escape }}",
-        "price": "{{ item.price | money }}",
-        "quantity": {{ item.quantity }},
-        "imageUrl": "{{ item.image | img_url: '100x100' }}",
-        "variant": "{{ item.variant.title | escape }}"
-      }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ]
-}
-{% endcapture %}
-{% render 'react-component', component: 'CartDrawer', props: cart_drawer_props, id: 'header-cart-drawer' %}
-
-{% stylesheet %}
-  header {
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header a {
-    position: relative;
-    text-decoration: none;
-    color: var(--color-foreground);
-  }
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
-  }
-  header svg {
-    width: 2rem;
-  }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .header__cart {
-    position: relative;
-    cursor: pointer;
-  }
-
-  .header__cart-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--color-primary);
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-  }
-
-  .header__account {
-    cursor: pointer;
-  }
-{% endstylesheet %}
-
-<script>
-  // Global functions for header interactions
-  window.openSearchModal = function() {
-    // This will be handled by React component state management
-    const searchModal = document.getElementById('header-search-modal');
-    if (searchModal) {
-      // Trigger React component to open
-      const event = new CustomEvent('openSearchModal');
-      document.dispatchEvent(event);
-    }
-  };
-
-  window.openCartDrawer = function() {
-    // This will be handled by React component state management
-    const cartDrawer = document.getElementById('header-cart-drawer');
-    if (cartDrawer) {
-      // Trigger React component to open
-      const event = new CustomEvent('openCartDrawer');
-      document.dispatchEvent(event);
-    }
-  };
-</script>
 
 {% schema %}
 {
-  "name": "t:general.header",
+  "name": "Header",
   "settings": [
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
-    },
-    {
-      "type": "header",
-      "content": "Search Settings"
-    },
-    {
-      "type": "text",
-      "id": "popular_search_1",
-      "label": "Popular Search 1",
-      "default": "Shirts"
-    },
-    {
-      "type": "text",
-      "id": "popular_search_2",
-      "label": "Popular Search 2",
-      "default": "Jeans"
-    },
-    {
-      "type": "text",
-      "id": "popular_search_3",
-      "label": "Popular Search 3",
-      "default": "Sneakers"
-    },
-    {
-      "type": "text",
-      "id": "popular_search_4",
-      "label": "Popular Search 4",
-      "default": "Accessories"
+      "label": "Navigation Menu"
     }
   ]
 }

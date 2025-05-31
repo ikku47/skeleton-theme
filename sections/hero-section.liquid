@@ -1,56 +1,28 @@
 {% comment %}
-  Expressive Hero Section with React component integration
-  Features: Product showcase, testimonials, customer avatars, dynamic layout
+  Simple Hero Section with React component integration
 {% endcomment %}
 
 {% liquid
-  assign title = section.settings.title | default: 'Elevate Your Style With Bold Fashion'
-  assign primary_button_text = section.settings.primary_button_text | default: 'Explore Collections'
-  assign primary_button_url = section.settings.primary_button_url | default: '/collections/all'
-  assign testimonial_text = section.settings.testimonial_text | default: 'TrendZone styles are fresh, bold and exactly what I needed to upgrade my wardrobe. Love the quality and vibe!'
-  assign testimonial_author = section.settings.testimonial_author | default: 'Ruby Chen'
-  assign show_customers = section.settings.show_customers | default: true
-  assign featured_collection = section.settings.featured_collection
-
-  # Get featured products from collection or all products
-  if featured_collection != blank
-    assign all_products = collections[featured_collection].products
-  else
-    assign all_products = collections.all.products
-  endif
+  assign title = section.settings.title | default: shop.name
+  assign subtitle = section.settings.subtitle | default: shop.description
+  assign description = section.settings.description | default: shop.metafields.custom.hero_description | default: 'Discover our curated selection of premium products.'
+  assign cta_text = section.settings.cta_text | default: 'Shop Now'
+  assign cta_url = section.settings.cta_url | default: routes.all_products_collection_url
+  assign secondary_cta_text = section.settings.secondary_cta_text | default: 'Browse Collections'
+  assign secondary_cta_url = section.settings.secondary_cta_url | default: routes.collections_url
+  assign background_image = section.settings.background_image
 %}
 
 {% capture hero_props %}
 {
-  "title": "{{ title | escape }}",
-  "primaryButtonText": "{{ primary_button_text | escape }}",
-  "primaryButtonUrl": "{{ primary_button_url }}",
-  "testimonialText": "{{ testimonial_text | escape }}",
-  "testimonialAuthor": "{{ testimonial_author | escape }}",
-  "showCustomers": {{ show_customers }},
-  "products": [
-    {% assign product_count = 0 %}
-    {% for product in all_products %}
-      {% if product_count < 6 %}
-        {% assign product_count = product_count | plus: 1 %}
-        {
-          "id": "{{ product.id }}",
-          "title": "{{ product.title | escape }}",
-          "image": "{{ product.featured_image | image_url: width: 400, height: 500 }}",
-          "url": "{{ product.url }}",
-          "price": "{{ product.price | money }}",
-          "color": "{% cycle 'bg-orange-400', 'bg-emerald-500', 'bg-yellow-400', 'bg-sky-400', 'bg-stone-200', 'bg-emerald-600' %}"
-        }{% unless product_count == 6 or forloop.last %},{% endunless %}
-      {% endif %}
-    {% endfor %}
-  ],
-  "customerAvatars": [
-    {% for block in section.blocks %}
-      {% if block.type == 'customer_avatar' and block.settings.avatar %}
-        "{{ block.settings.avatar | image_url: width: 80, height: 80 }}"{% unless forloop.last %},{% endunless %}
-      {% endif %}
-    {% endfor %}
-  ]
+  "title": {{ title | json }},
+  "subtitle": {{ subtitle | json }},
+  "description": {{ description | json }},
+  "cta_text": {{ cta_text | json }},
+  "cta_url": {{ cta_url | json }},
+  "secondary_cta_text": {{ secondary_cta_text | json }},
+  "secondary_cta_url": {{ secondary_cta_url | json }}{% if background_image %},
+  "background_image": {{ background_image | image_url: width: 1920, height: 1080 | json }}{% endif %}
 }
 {% endcapture %}
 
@@ -58,96 +30,62 @@
 
 {% schema %}
 {
-  "name": "Expressive Hero Section",
+  "name": "Hero Section",
   "tag": "section",
   "class": "hero-section",
   "settings": [
     {
-      "type": "header",
-      "content": "Content"
-    },
-    {
       "type": "text",
       "id": "title",
       "label": "Main Title",
-      "default": "Elevate Your Style With Bold Fashion"
+      "info": "Leave empty to use shop name"
     },
     {
       "type": "text",
-      "id": "primary_button_text",
-      "label": "Button Text",
-      "default": "Explore Collections"
-    },
-    {
-      "type": "url",
-      "id": "primary_button_url",
-      "label": "Button URL",
-      "default": "/collections/all"
-    },
-    {
-      "type": "header",
-      "content": "Products"
-    },
-    {
-      "type": "collection",
-      "id": "featured_collection",
-      "label": "Featured Collection",
-      "info": "Select a collection to showcase products. If none selected, will show latest products."
-    },
-    {
-      "type": "header",
-      "content": "Testimonial"
+      "id": "subtitle",
+      "label": "Subtitle",
+      "info": "Leave empty to use shop description"
     },
     {
       "type": "textarea",
-      "id": "testimonial_text",
-      "label": "Testimonial Text",
-      "default": "TrendZone styles are fresh, bold and exactly what I needed to upgrade my wardrobe. Love the quality and vibe!"
+      "id": "description",
+      "label": "Description",
+      "info": "Leave empty to use shop metafield or default text"
     },
     {
       "type": "text",
-      "id": "testimonial_author",
-      "label": "Testimonial Author",
-      "default": "Ruby Chen"
+      "id": "cta_text",
+      "label": "Button Text",
+      "default": "Shop Now"
     },
     {
-      "type": "header",
-      "content": "Social Proof"
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button URL",
+      "info": "Leave empty to use all products collection"
     },
     {
-      "type": "checkbox",
-      "id": "show_customers",
-      "label": "Show Customer Avatars",
-      "default": true
-    }
-  ],
-  "blocks": [
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "Secondary Button Text",
+      "default": "Browse Collections"
+    },
     {
-      "type": "customer_avatar",
-      "name": "Customer Avatar",
-      "settings": [
-        {
-          "type": "image_picker",
-          "id": "avatar",
-          "label": "Customer Avatar"
-        }
-      ]
+      "type": "url",
+      "id": "secondary_cta_url",
+      "label": "Secondary Button URL",
+      "info": "Leave empty to use collections page"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image",
+      "info": "Recommended size: 1920x1080px"
     }
   ],
   "presets": [
     {
-      "name": "Expressive Hero Section",
-      "blocks": [
-        {
-          "type": "customer_avatar"
-        },
-        {
-          "type": "customer_avatar"
-        },
-        {
-          "type": "customer_avatar"
-        }
-      ]
+      "name": "Hero Section"
     }
   ]
 }

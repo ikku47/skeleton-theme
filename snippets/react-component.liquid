@@ -22,7 +22,7 @@
   <div
     data-component="{{ component_name }}"
     {%- if component_props != blank -%}
-      data-props="{{ component_props | escape }}"
+      data-props='{{ component_props }}'
     {%- endif -%}
     {%- if container_class != blank -%}
       class="{{ container_class }}"

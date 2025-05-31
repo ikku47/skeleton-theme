@@ -1,18 +1,21 @@
 import React from 'react'
 
-// Import all components here
+// Import essential components
 import { HeroSection } from './HeroSection'
 import { AnimatedButton } from './AnimatedButton'
 import { IconButton } from './IconButton'
 import { ProductCard } from './ProductCard'
-import { CartDrawer } from './CartDrawer'
-import { SearchModal } from './SearchModal'
-import { ImageGallery } from './ImageGallery'
-import { FeaturedProducts } from './FeaturedProducts'
-import { ProductCategories } from './ProductCategories'
-import { BrandStory } from './BrandStory'
-import { TestimonialsSection } from './TestimonialsSection'
-import { NewsletterSignup } from './NewsletterSignup'
+import { CollectionCard } from './CollectionCard'
+
+// Import product detail components
+import { ProductImageGallery } from './ProductImageGallery'
+import { ProductInfo } from './ProductInfo'
+import { ProductVariantSelector } from './ProductVariantSelector'
+import { ProductQuantitySelector } from './ProductQuantitySelector'
+import { ProductActions } from './ProductActions'
+import { ProductBreadcrumbs } from './ProductBreadcrumbs'
+import { RelatedProducts } from './RelatedProducts'
+import { ProductReviews } from './ProductReviews'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -20,14 +23,15 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   AnimatedButton,
   IconButton,
   ProductCard,
-  CartDrawer,
-  SearchModal,
-  ImageGallery,
-  FeaturedProducts,
-  ProductCategories,
-  BrandStory,
-  TestimonialsSection,
-  NewsletterSignup,
+  CollectionCard,
+  ProductImageGallery,
+  ProductInfo,
+  ProductVariantSelector,
+  ProductQuantitySelector,
+  ProductActions,
+  ProductBreadcrumbs,
+  RelatedProducts,
+  ProductReviews,
 }
 
 // Type for component names

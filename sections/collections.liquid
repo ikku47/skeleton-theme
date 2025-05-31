@@ -1,83 +1,58 @@
 {% comment %}
-  This section is used in the list-collections template to render a list of
-  collections.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+  Simple Collections List Page Section
 {% endcomment %}
 
-<h1>{{ 'collections.title' | t }}</h1>
+<section class="py-16 bg-white">
+  <div class="container">
+    <!-- Collections Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {{ 'collections.title' | t | default: 'All Collections' }}
+      </h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Browse our curated collections at {{ shop.name }} and find exactly what you're looking for.
+      </p>
+    </div>
 
-<div
-  class="collections {{ section.settings.grid_item_width }}"
-  style="--grid-gap: {{ section.settings.grid_gap }}px"
->
-  {% for collection in collections %}
-    <a class="collection-card" href="{{ collection.url }}">
-      {% if collection.featured_image %}
-        {% render 'image',
-          class: 'collection-card__image',
-          image: collection.featured_image,
-          width: 600,
-          height: 600,
-          crop: 'center'
-        %}
-      {% endif %}
-
-      <div class="collection-card__content">
-        <p>{{ collection.title }}</p>
-
-        {% if collection.description %}
-          <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-        {% endif %}
+    <!-- Collections Grid -->
+    {% if collections.size > 0 %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for collection in collections %}
+          {% unless collection.handle == 'frontpage' %}
+            {% capture collection_card_props %}
+            {
+              "title": "{{ collection.title | escape }}",
+              {% if collection.description != blank %}
+              "description": "{{ collection.description | strip_html | truncatewords: 15 | escape }}",
+              {% endif %}
+              {% if collection.featured_image %}
+              "imageUrl": "{{ collection.featured_image | image_url: width: 600, height: 600 }}",
+              "imageAlt": "{{ collection.featured_image.alt | escape }}",
+              {% endif %}
+              "collectionUrl": "{{ collection.url }}",
+              "productCount": {{ collection.products_count }}
+            }
+            {% endcapture %}
+            {% render 'react-component', component: 'CollectionCard', props: collection_card_props %}
+          {% endunless %}
+        {% endfor %}
       </div>
-    </a>
-  {% endfor %}
-</div>
-
-{% stylesheet %}
-  .collections {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(var(--collection-card-size), 100%), 1fr));
-    gap: var(--grid-gap);
-  }
-  .collections--compact {
-    --collection-card-size: 160px;
-  }
-  .collections--full {
-    --collection-card-size: 280px;
-  }
-  .collection-card {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-{% endstylesheet %}
+    {% else %}
+      <div class="text-center py-16">
+        <p class="text-gray-500 text-lg">No collections found.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
 
 {% schema %}
 {
-  "name": "t:general.collections_grid",
-  "settings": [
+  "name": "Collections List",
+  "settings": [],
+  "presets": [
     {
-      "type": "select",
-      "id": "grid_item_width",
-      "label": "t:labels.grid_item_width",
-      "options": [
-        { "value": "collections--compact", "label": "t:options.size.small" },
-        { "value": "collections--full", "label": "t:options.size.large" }
-      ],
-      "default": "collections--full"
-    },
-    {
-      "type": "range",
-      "id": "grid_gap",
-      "label": "t:labels.grid_gap",
-      "min": 0,
-      "max": 50,
-      "step": 5,
-      "unit": "px",
-      "default": 10
+      "name": "Collections List"
     }
-  ],
-  "presets": [{ "name": "t:general.collections_grid" }]
+  ]
 }
 {% endschema %}
