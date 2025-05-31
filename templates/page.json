@@ -1,20 +1,67 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "page",
       "settings": {}
+    },
+    "page_features": {
+      "type": "feature-callouts",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "award",
+            "title": "Quality Guarantee",
+            "description": "We stand behind every product with our quality guarantee and excellent customer service."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "headphones",
+            "title": "Expert Support",
+            "description": "Our knowledgeable team is here to help you make the right choice for your needs."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "heart",
+            "title": "Customer First",
+            "description": "Your satisfaction is our priority. We go above and beyond for every customer."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ]
+    },
+    "newsletter": {
+      "type": "versa-newsletter",
+      "settings": {
+        "title": "Stay Connected",
+        "subtitle": "Newsletter",
+        "description": "Subscribe to get updates, special offers, and company news delivered to your inbox.",
+        "incentive": "10% off your first order",
+        "placeholder": "Enter your email address",
+        "button_text": "Subscribe"
+      }
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "main",
+    "page_features",
+    "newsletter"
   ]
 }

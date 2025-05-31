@@ -1,20 +1,65 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "search",
       "settings": {}
+    },
+    "popular_products": {
+      "type": "versa-product-grid",
+      "settings": {
+        "title": "Popular Products",
+        "subtitle": "Trending",
+        "products_limit": 8,
+        "show_view_all": true
+      }
+    },
+    "search_help": {
+      "type": "feature-callouts",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "eye",
+            "title": "Browse Categories",
+            "description": "Explore our organized product categories to find what you need."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "headphones",
+            "title": "Need Help?",
+            "description": "Our customer support team is here to help you find the perfect product."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "heart",
+            "title": "Save Favorites",
+            "description": "Add products to your wishlist to save them for later."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ]
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "main",
+    "popular_products",
+    "search_help"
   ]
 }

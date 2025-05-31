@@ -1,0 +1,61 @@
+{% comment %}
+  VersaCommerce Product Gallery - Enhanced gallery with zoom and fullscreen
+{% endcomment %}
+
+{% liquid
+  assign product = product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+%}
+
+{% if product and product.images.size > 0 %}
+  {% capture images_json %}
+  [
+    {% for image in product.images %}
+      {
+        "id": {{ image.id | json }},
+        "url": {{ image | image_url | json }},
+        "alt": {{ image.alt | default: product.title | json }},
+        "width": {{ image.width | json }},
+        "height": {{ image.height | json }},
+        "aspectRatio": {{ image.aspect_ratio | json }},
+        "sizes": {
+          "thumbnail": {{ image | image_url: width: 120, height: 120 | json }},
+          "small": {{ image | image_url: width: 300 | json }},
+          "medium": {{ image | image_url: width: 600 | json }},
+          "large": {{ image | image_url: width: 1200 | json }},
+          "xlarge": {{ image | image_url: width: 1800 | json }},
+          "square_small": {{ image | image_url: width: 300, height: 300 | json }},
+          "square_medium": {{ image | image_url: width: 600, height: 600 | json }},
+          "square_large": {{ image | image_url: width: 1200, height: 1200 | json }}
+        },
+        "srcset": "{{ image | image_url: width: 300 }} 300w, {{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w, {{ image | image_url: width: 1200 }} 1200w, {{ image | image_url: width: 1800 }} 1800w"
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+  {% endcapture %}
+
+  {% capture gallery_props %}
+  {
+    "images": {{ images_json | strip }},
+    "productTitle": {{ product.title | json }}
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'VersaProductGallery', props: gallery_props %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Versa Product Gallery",
+  "tag": "section",
+  "class": "versa-product-gallery-section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Versa Product Gallery"
+    }
+  ]
+}
+{% endschema %}

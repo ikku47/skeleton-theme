@@ -1,24 +1,179 @@
 {
   "sections": {
-    "hero": {
-      "type": "hero-section",
-      "settings": {}
-    },
-    "featured_products": {
-      "type": "featured-products",
+    "versa_hero": {
+      "type": "versa-hero",
       "settings": {
-        "products_limit": 8,
+        "title": "Welcome to VersaCommerce",
+        "subtitle": "Premium Quality",
+        "description": "Discover our curated selection of premium products designed for the modern lifestyle. Experience quality, style, and innovation in every purchase.",
+        "cta_text": "Shop Now",
+        "secondary_cta_text": "Browse Collections"
+      }
+    },
+    "feature_callouts": {
+      "type": "feature-callouts",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Free Shipping",
+            "description": "Free shipping on orders over $50. Fast and reliable delivery to your doorstep."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Checkout",
+            "description": "Your payment information is protected with industry-standard encryption."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "headphones",
+            "title": "24/7 Support",
+            "description": "Our customer support team is here to help you anytime, anywhere."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ]
+    },
+    "featured_showcase": {
+      "type": "featured-product-showcase",
+      "blocks": {
+        "info_1": {
+          "type": "info_block",
+          "settings": {
+            "icon": "star",
+            "title": "Premium Quality",
+            "description": "Crafted with the finest materials and attention to detail."
+          }
+        },
+        "info_2": {
+          "type": "info_block",
+          "settings": {
+            "icon": "heart",
+            "title": "Customer Favorite",
+            "description": "Loved by thousands of satisfied customers worldwide."
+          }
+        },
+        "info_3": {
+          "type": "info_block",
+          "settings": {
+            "icon": "shopping-cart",
+            "title": "Best Seller",
+            "description": "Our most popular product with outstanding reviews."
+          }
+        },
+        "info_4": {
+          "type": "info_block",
+          "settings": {
+            "icon": "eye",
+            "title": "Trending Now",
+            "description": "Currently trending and highly sought after."
+          }
+        }
+      },
+      "block_order": [
+        "info_1",
+        "info_2",
+        "info_3",
+        "info_4"
+      ],
+      "settings": {
+        "title": "Product Spotlight",
+        "subtitle": "Featured"
+      }
+    },
+    "versa_product_grid": {
+      "type": "versa-product-grid",
+      "settings": {
+        "title": "Featured Products",
+        "subtitle": "Best Sellers",
+        "products_limit": 4,
         "show_view_all": true
       }
     },
-    "newsletter": {
-      "type": "newsletter",
-      "settings": {}
+    "accessories_carousel": {
+      "type": "accessories-carousel",
+      "settings": {
+        "title": "Complete Your Look",
+        "subtitle": "Accessories",
+        "products_limit": 4
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_1": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Sarah Johnson",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "Amazing quality and fast shipping! The product exceeded my expectations and the customer service was outstanding.",
+            "location": "New York, NY"
+          }
+        },
+        "testimonial_2": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Michael Chen",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "I have been shopping here for months and every purchase has been perfect. Highly recommend to anyone looking for quality products.",
+            "location": "Los Angeles, CA"
+          }
+        },
+        "testimonial_3": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Emily Rodriguez",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "The best online shopping experience I have had. Great products, easy checkout, and excellent customer support.",
+            "location": "Miami, FL"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_1",
+        "testimonial_2",
+        "testimonial_3"
+      ],
+      "settings": {
+        "title": "What Our Customers Say",
+        "subtitle": "Testimonials",
+        "layout": "carousel",
+        "auto_play": true,
+        "auto_play_interval": 5000
+      }
+    },
+    "versa_newsletter": {
+      "type": "versa-newsletter",
+      "settings": {
+        "title": "Stay in the Loop",
+        "subtitle": "Newsletter",
+        "description": "Get the latest updates on new products, exclusive offers, and style tips delivered straight to your inbox.",
+        "incentive": "10% off your first order",
+        "placeholder": "Enter your email address",
+        "button_text": "Subscribe"
+      }
     }
   },
   "order": [
-    "hero",
-    "featured_products",
-    "newsletter"
+    "versa_hero",
+    "feature_callouts",
+    "featured_showcase",
+    "versa_product_grid",
+    "accessories_carousel",
+    "testimonials",
+    "versa_newsletter"
   ]
 }

@@ -1,0 +1,220 @@
+{% comment %}
+  VersaCommerce Page Header - Consistent page headers with breadcrumbs
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title
+  assign subtitle = section.settings.subtitle
+  assign description = section.settings.description
+  assign background_image = section.settings.background_image
+  assign overlay = section.settings.overlay
+  assign text_align = section.settings.text_align
+  assign size = section.settings.size
+  assign show_breadcrumbs = section.settings.show_breadcrumbs
+  
+  if title == blank
+    case template.name
+      when 'collection'
+        assign title = collection.title
+      when 'list-collections'
+        assign title = 'Collections'
+      when 'product'
+        assign title = product.title
+      when 'page'
+        assign title = page.title
+      when 'blog'
+        assign title = blog.title
+      when 'article'
+        assign title = article.title
+      when 'search'
+        assign title = 'Search Results'
+      else
+        assign title = 'Page'
+    endcase
+  endif
+
+  if description == blank
+    case template.name
+      when 'collection'
+        if collection.description != blank
+          assign description = collection.description
+        endif
+      when 'product'
+        if product.description != blank
+          assign description = product.description | strip_html | truncatewords: 30
+        endif
+      when 'page'
+        if page.content != blank
+          assign description = page.content | strip_html | truncatewords: 30
+        endif
+    endcase
+  endif
+%}
+
+{% capture breadcrumbs_json %}
+[
+  {% if show_breadcrumbs %}
+    {% case template.name %}
+      {% when 'collection' %}
+        {
+          "title": {{ collection.title | json }}
+        }
+      {% when 'list-collections' %}
+        {
+          "title": "Collections"
+        }
+      {% when 'product' %}
+        {% for collection in product.collections limit: 1 %}
+          {
+            "title": {{ collection.title | json }},
+            "url": {{ collection.url | json }}
+          },
+        {% endfor %}
+        {
+          "title": {{ product.title | json }}
+        }
+      {% when 'page' %}
+        {
+          "title": {{ page.title | json }}
+        }
+      {% when 'blog' %}
+        {
+          "title": {{ blog.title | json }}
+        }
+      {% when 'article' %}
+        {
+          "title": {{ blog.title | json }},
+          "url": {{ blog.url | json }}
+        },
+        {
+          "title": {{ article.title | json }}
+        }
+      {% when 'search' %}
+        {
+          "title": "Search Results"
+        }
+    {% endcase %}
+  {% endif %}
+]
+{% endcapture %}
+
+{% capture header_props %}
+{
+  "title": {{ title | json }},
+  {% if subtitle != blank %}"subtitle": {{ subtitle | json }},{% endif %}
+  {% if description != blank %}"description": {{ description | json }},{% endif %}
+  {% if background_image %}"backgroundImage": {{ background_image | image_url: width: 1920, height: 600 | json }},{% endif %}
+  "overlay": {{ overlay | json }},
+  "textAlign": {{ text_align | json }},
+  "size": {{ size | json }},
+  "breadcrumbs": {{ breadcrumbs_json | strip }}
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaPageHeader', props: header_props %}
+
+{% schema %}
+{
+  "name": "Versa Page Header",
+  "tag": "section",
+  "class": "versa-page-header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Custom Title",
+      "info": "Leave empty to use page/product/collection title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "info": "Optional subtitle above the main title"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "info": "Optional description below the title"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image",
+      "info": "Optional background image"
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay",
+      "label": "Add dark overlay",
+      "default": true,
+      "info": "Only applies when background image is set"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Header Size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Versa Page Header",
+      "settings": {
+        "text_align": "center",
+        "size": "medium",
+        "show_breadcrumbs": true,
+        "overlay": true
+      }
+    }
+  ]
+}
+{% endschema %}

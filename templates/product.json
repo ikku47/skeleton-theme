@@ -1,20 +1,77 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "main": {
-      "type": "product",
-      "settings": {}
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "small",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
+    "enhanced_product_page": {
+      "type": "enhanced-product-page",
+      "settings": {
+        "show_trust_badges": true,
+        "show_trust_badge_1": true,
+        "trust_badge_1_text": "Free shipping on orders over $50",
+        "show_trust_badge_2": true,
+        "trust_badge_2_text": "30-day return policy",
+        "show_trust_badge_3": true,
+        "trust_badge_3_text": "Secure payment guaranteed",
+        "show_trust_badge_4": true,
+        "trust_badge_4_text": "24/7 customer support",
+        "show_related_products": true,
+        "related_products_limit": 4
+      }
+    },
+    "accessories": {
+      "type": "accessories-carousel",
+      "settings": {
+        "title": "Complete Your Look",
+        "subtitle": "Accessories",
+        "products_limit": 6
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_1": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Sarah Johnson",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "Amazing quality and fast shipping! The product exceeded my expectations and the customer service was outstanding.",
+            "location": "New York, NY"
+          }
+        },
+        "testimonial_2": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Michael Chen",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "I have been shopping here for months and every purchase has been perfect. Highly recommend to anyone looking for quality products.",
+            "location": "Los Angeles, CA"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_1",
+        "testimonial_2"
+      ],
+      "settings": {
+        "title": "What Our Customers Say",
+        "subtitle": "Reviews",
+        "layout": "grid",
+        "auto_play": false
+      }
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "enhanced_product_page",
+    "accessories",
+    "testimonials"
   ]
 }

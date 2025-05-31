@@ -1,42 +1,42 @@
 {% comment %}
-  Simple Collections List Page Section
+  Collections List Page Section - Works with versa-page-header
 {% endcomment %}
 
-<section class="py-16 bg-white">
+<section class="section-padding bg-white">
   <div class="container">
-    <!-- Collections Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-        {{ 'collections.title' | t | default: 'All Collections' }}
-      </h1>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        Browse our curated collections at {{ shop.name }} and find exactly what you're looking for.
-      </p>
-    </div>
-
     <!-- Collections Grid -->
     {% if collections.size > 0 %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% comment %} Build collections array for VersaCollectionGrid {% endcomment %}
+      {% capture collections_json %}
+      [
         {% for collection in collections %}
           {% unless collection.handle == 'frontpage' %}
-            {% capture collection_card_props %}
             {
-              "title": "{{ collection.title | escape }}",
+              "id": {{ collection.id | json }},
+              "title": {{ collection.title | json }},
               {% if collection.description != blank %}
-              "description": "{{ collection.description | strip_html | truncatewords: 15 | escape }}",
+              "description": {{ collection.description | strip_html | truncatewords: 15 | json }},
               {% endif %}
               {% if collection.featured_image %}
-              "imageUrl": "{{ collection.featured_image | image_url: width: 600, height: 600 }}",
-              "imageAlt": "{{ collection.featured_image.alt | escape }}",
+              "imageUrl": {{ collection.featured_image | image_url: width: 600, height: 600 | json }},
+              "imageAlt": {{ collection.featured_image.alt | default: collection.title | json }},
               {% endif %}
-              "collectionUrl": "{{ collection.url }}",
+              "url": {{ collection.url | json }},
               "productCount": {{ collection.products_count }}
-            }
-            {% endcapture %}
-            {% render 'react-component', component: 'CollectionCard', props: collection_card_props %}
+            }{% unless forloop.last %},{% endunless %}
           {% endunless %}
         {% endfor %}
-      </div>
+      ]
+      {% endcapture %}
+
+      {% capture collection_grid_props %}
+      {
+        "collections": {{ collections_json | strip }},
+        "showProductCount": true
+      }
+      {% endcapture %}
+
+      {% render 'react-component', component: 'VersaCollectionGrid', props: collection_grid_props %}
     {% else %}
       <div class="text-center py-16">
         <p class="text-gray-500 text-lg">No collections found.</p>

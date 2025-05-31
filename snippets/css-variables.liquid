@@ -3,17 +3,81 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 {% style %}
-  {% comment %} Load Inter font {% endcomment %}
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  {% comment %} VersaCommerce Typography - Load Google Fonts {% endcomment %}
+  @import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Bebas+Neue:wght@400&family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
   :root {
-    {% comment %} Font family variables {% endcomment %}
-    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    {% comment %} VersaCommerce Font Variables {% endcomment %}
+    --font-display: 'Anton', 'Bebas Neue', system-ui, sans-serif;
+    --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+    --font-body: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
 
-    {% comment %} Basic color variables {% endcomment %}
-    --color-primary: {{ settings.primary_color | default: '#2563eb' }};
-    --color-secondary: {{ settings.secondary_color | default: '#64748b' }};
-    --color-accent: {{ settings.accent_color | default: '#f59e0b' }};
+    {% comment %} VersaCommerce Color System {% endcomment %}
+    --color-primary: {{ settings.primary_color | default: '#111111' }};
+    --color-secondary: {{ settings.secondary_color | default: '#2B2B2B' }};
+    --color-accent: {{ settings.accent_color | default: '#FFD100' }};
+    --color-light-bg: {{ settings.light_bg_color | default: '#F9F9F9' }};
+    --color-neutral: {{ settings.neutral_color | default: '#6F6F6F' }};
+    --color-card-bg: {{ settings.card_bg_color | default: '#FFFFFF' }};
+    --color-border: {{ settings.border_color | default: '#E0E0E0' }};
+
+    {% comment %} VersaCommerce Typography Scale {% endcomment %}
+    --text-hero: 56px;
+    --text-section-title: 36px;
+    --text-body: 16px;
+    --text-caption: 14px;
+
+    {% comment %} VersaCommerce Spacing System {% endcomment %}
+    --container-max-width: 1440px;
+    --gutter-width: 5%;
+    --section-padding-desktop: 80px;
+    --section-padding-tablet: 60px;
+    --section-padding-mobile: 40px;
+
+    {% comment %} VersaCommerce Border Radius {% endcomment %}
+    --border-radius-cta: 12px;
+    --border-radius-card: 8px;
+  }
+
+  {% comment %} VersaCommerce Base Styles {% endcomment %}
+  .container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding-left: var(--gutter-width);
+    padding-right: var(--gutter-width);
+  }
+
+  .section-padding {
+    padding-top: var(--section-padding-desktop);
+    padding-bottom: var(--section-padding-desktop);
+  }
+
+  @media (max-width: 1024px) {
+    .section-padding {
+      padding-top: var(--section-padding-tablet);
+      padding-bottom: var(--section-padding-tablet);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .section-padding {
+      padding-top: var(--section-padding-mobile);
+      padding-bottom: var(--section-padding-mobile);
+    }
+  }
+
+  {% comment %} VersaCommerce CTA Button Styles {% endcomment %}
+  .btn-cta {
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    border-radius: var(--border-radius-cta);
+    font-weight: 600;
+    padding: 12px 24px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cta:hover {
+    background-color: #e6bc00;
+    transform: translateY(-1px);
   }
 {% endstyle %}

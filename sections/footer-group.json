@@ -11,15 +11,25 @@
   "type": "footer",
   "name": "t:general.footer",
   "sections": {
-    "footer": {
-      "type": "footer",
+    "versa_footer": {
+      "type": "versa-footer",
       "settings": {
-        "menu": "",
-        "show_payment_icons": true
+        "logo_text": "VersaCommerce",
+        "description": "Discover premium quality products designed for the modern lifestyle. Experience excellence in every purchase.",
+        "newsletter_title": "Stay Connected",
+        "newsletter_description": "Get the latest updates on new products and exclusive offers.",
+        "contact_email": "hello@versacommerce.com",
+        "contact_phone": "+1 (555) 123-4567",
+        "contact_address": "123 Commerce Street, New York, NY 10001",
+        "social_facebook": "https://facebook.com/versacommerce",
+        "social_instagram": "https://instagram.com/versacommerce",
+        "social_twitter": "https://twitter.com/versacommerce",
+        "show_payment_icons": true,
+        "show_trust_badges": true
       }
     }
   },
   "order": [
-    "footer"
+    "versa_footer"
   ]
 }

@@ -1,0 +1,319 @@
+{% comment %}
+  Enhanced Product Page - Complete product page layout with gallery and details
+{% endcomment %}
+
+{% liquid
+  assign product = product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+%}
+
+<section class="py-8 bg-white min-h-screen">
+  <div class="container mx-auto px-4 max-w-7xl">
+    
+
+
+    <!-- Main Product Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-16">
+      
+      <!-- Product Gallery -->
+      <div class="order-1">
+        {% if product and product.images.size > 0 %}
+          {% capture images_json %}
+          [
+            {% for image in product.images %}
+              {
+                "id": {{ image.id | json }},
+                "url": {{ image | image_url: width: 1200, height: 1200 | json }},
+                "alt": {{ image.alt | default: product.title | json }},
+                "width": {{ image.width | json }},
+                "height": {{ image.height | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+          {% endcapture %}
+
+          {% capture gallery_props %}
+          {
+            "images": {{ images_json | strip }},
+            "productTitle": {{ product.title | json }}
+          }
+          {% endcapture %}
+
+          {% render 'react-component', component: 'EnhancedProductGallery', props: gallery_props %}
+        {% else %}
+          <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500 text-sm">No images available</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Details -->
+      <div class="order-2">
+        {% if product %}
+          {% comment %} Build variants JSON {% endcomment %}
+          {% capture variants_json %}
+          [
+            {% for variant in product.variants %}
+              {
+                "id": {{ variant.id | json }},
+                "title": {{ variant.title | json }},
+                "price": {{ variant.price | money | json }},
+                {% if variant.compare_at_price > variant.price %}
+                "compareAtPrice": {{ variant.compare_at_price | money | json }},
+                {% endif %}
+                "available": {{ variant.available | json }},
+                "options": {
+                  {% for option in product.options %}
+                    {% assign option_value = variant.options[forloop.index0] %}
+                    {{ option | json }}: {{ option_value | json }}{% unless forloop.last %},{% endunless %}
+                  {% endfor %}
+                }
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+          {% endcapture %}
+
+          {% comment %} Build options JSON {% endcomment %}
+          {% capture options_json %}
+          [
+            {% for option in product.options %}
+              {
+                "name": {{ option | json }},
+                "values": [
+                  {% assign option_values = product.variants | map: 'options' | map: forloop.index0 | uniq %}
+                  {% for value in option_values %}
+                    {{ value | json }}{% unless forloop.last %},{% endunless %}
+                  {% endfor %}
+                ]
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+          {% endcapture %}
+
+          {% capture product_json %}
+          {
+            "id": {{ product.id | json }},
+            "title": {{ product.title | json }},
+            {% if product.vendor != blank %}"vendor": {{ product.vendor | json }},{% endif %}
+            "price": {{ product.price | money | json }},
+            {% if product.compare_at_price > product.price %}
+            "compareAtPrice": {{ product.compare_at_price | money | json }},
+            {% endif %}
+            "description": {{ product.description | json }},
+            "variants": {{ variants_json | strip }},
+            "options": {{ options_json | strip }}
+            {% if product.metafields.reviews.rating.value %}
+            ,"rating": {{ product.metafields.reviews.rating.value | json }}
+            {% endif %}
+            {% if product.metafields.reviews.rating_count.value %}
+            ,"reviewCount": {{ product.metafields.reviews.rating_count.value | json }}
+            {% endif %}
+            {% if product.tags.size > 0 %}
+            ,"tags": [
+              {% for tag in product.tags %}
+                {{ tag | json }}{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            ]
+            {% endif %}
+          }
+          {% endcapture %}
+
+          {% capture details_props %}
+          {
+            "product": {{ product_json | strip }},
+            "showTrustBadges": {{ section.settings.show_trust_badges | json }},
+            "trustBadges": [
+              {
+                "text": {{ section.settings.trust_badge_1_text | default: "Free shipping on orders over $50" | json }},
+                "show": {{ section.settings.show_trust_badge_1 | json }}
+              },
+              {
+                "text": {{ section.settings.trust_badge_2_text | default: "30-day return policy" | json }},
+                "show": {{ section.settings.show_trust_badge_2 | json }}
+              },
+              {
+                "text": {{ section.settings.trust_badge_3_text | default: "Secure payment guaranteed" | json }},
+                "show": {{ section.settings.show_trust_badge_3 | json }}
+              },
+              {
+                "text": {{ section.settings.trust_badge_4_text | default: "24/7 customer support" | json }},
+                "show": {{ section.settings.show_trust_badge_4 | json }}
+              }
+            ]
+          }
+          {% endcapture %}
+
+          {% render 'react-component', component: 'EnhancedProductDetails', props: details_props %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if section.settings.show_related_products %}
+      {% liquid
+        assign related_collection = collections[product.collections.first.handle] | default: collections.all
+        assign related_products = related_collection.products | where: 'id', '!=', product.id
+        assign related_limit = section.settings.related_products_limit | default: 4
+      %}
+
+      {% if related_products.size > 0 %}
+        {% liquid
+          assign related_products_json = ''
+          for related_product in related_products limit: related_limit
+            assign product_image = related_product.featured_image
+            assign image_url = ''
+            if product_image
+              assign image_url = product_image | image_url: width: 400, height: 500
+            else
+              assign image_url = 'product-placeholder.svg' | asset_url
+            endif
+
+            assign product_title = related_product.title | json
+            assign product_price = related_product.price | money | json
+            assign product_image_alt = product_image.alt | default: related_product.title | json
+            assign product_url = related_product.url | json
+
+            assign product_data = '{"id": "' | append: related_product.id | append: '", "title": ' | append: product_title | append: ', "price": ' | append: product_price | append: ', "imageUrl": "' | append: image_url | append: '", "imageAlt": ' | append: product_image_alt | append: ', "productUrl": ' | append: product_url | append: '"'
+
+            if related_product.compare_at_price > related_product.price
+              assign compare_price = related_product.compare_at_price | money | json
+              assign product_data = product_data | append: ', "compareAtPrice": ' | append: compare_price
+            endif
+
+            assign product_data = product_data | append: '}'
+
+            if forloop.first
+              assign related_products_json = related_products_json | append: product_data
+            else
+              assign related_products_json = related_products_json | append: ', ' | append: product_data
+            endif
+          endfor
+        %}
+
+        {% capture related_products_props %}
+        {
+          "products": [{{ related_products_json }}],
+          "title": "{% if product.collections.first %}More from {{ product.collections.first.title }}{% else %}Related Products{% endif %}",
+          "subtitle": "You might also like these products",
+          {% if related_products.size > related_limit %}
+          "viewAllUrl": "{{ product.collections.first.url | default: routes.all_products_collection_url }}",
+          "viewAllText": "View All {% if product.collections.first %}{{ product.collections.first.title }}{% else %}Products{% endif %}",
+          {% endif %}
+          "limit": {{ related_limit }}
+        }
+        {% endcapture %}
+        
+        <div class="border-t pt-16">
+          {% render 'react-component', component: 'RelatedProducts', props: related_products_props %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Enhanced Product Page",
+  "tag": "section",
+  "class": "enhanced-product-page",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Trust Badges"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": true,
+      "info": "Display trust badges below product actions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_1",
+      "label": "Show shipping badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_1_text",
+      "label": "Shipping badge text",
+      "default": "Free shipping on orders over $50"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_2",
+      "label": "Show return policy badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_2_text",
+      "label": "Return policy badge text",
+      "default": "30-day return policy"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_3",
+      "label": "Show security badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_3_text",
+      "label": "Security badge text",
+      "default": "Secure payment guaranteed"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badge_4",
+      "label": "Show support badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_4_text",
+      "label": "Support badge text",
+      "default": "24/7 customer support"
+    },
+    {
+      "type": "header",
+      "content": "Related Products"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related_products",
+      "label": "Show related products",
+      "default": true,
+      "info": "Shows products from the same collection"
+    },
+    {
+      "type": "range",
+      "id": "related_products_limit",
+      "label": "Number of related products",
+      "min": 2,
+      "max": 8,
+      "step": 2,
+      "default": 4
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "presets": [
+    {
+      "name": "Enhanced Product Page"
+    }
+  ]
+}
+{% endschema %}

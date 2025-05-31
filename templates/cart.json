@@ -1,20 +1,55 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "cart",
       "settings": {}
+    },
+    "cart_upsells": {
+      "type": "accessories-carousel",
+      "settings": {
+        "title": "Add These to Your Order",
+        "subtitle": "Recommended",
+        "products_limit": 6
+      }
+    },
+    "trust_signals": {
+      "type": "feature-callouts",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Checkout",
+            "description": "Your payment information is protected with 256-bit SSL encryption."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Fast Shipping",
+            "description": "Free shipping on orders over $50. Express delivery available."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "award",
+            "title": "Money Back Guarantee",
+            "description": "30-day return policy. Shop with confidence."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ]
     }
   },
   "order": [
-    "main"
+    "main",
+    "cart_upsells",
+    "trust_signals"
   ]
 }

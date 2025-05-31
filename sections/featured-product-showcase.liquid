@@ -1,0 +1,168 @@
+{% comment %}
+  VersaCommerce Featured Product Showcase - Large central image with 4 surrounding info blocks
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title | default: 'Featured Product'
+  assign subtitle = section.settings.subtitle
+  assign featured_product = section.settings.featured_product
+  assign info_blocks = section.blocks | where: 'type', 'info_block'
+  
+  if featured_product == blank
+    assign featured_product = collections.all.products.first
+  endif
+%}
+
+{% if featured_product and info_blocks.size >= 4 %}
+  {% capture product_json %}
+  {
+    "name": {{ featured_product.title | json }},
+    "price": {{ featured_product.price | money | json }},
+    {% if featured_product.compare_at_price > featured_product.price %}
+    "compareAtPrice": {{ featured_product.compare_at_price | money | json }},
+    {% endif %}
+    "imageUrl": {{ featured_product.featured_image | image_url: width: 600, height: 600 | json }},
+    "productUrl": {{ featured_product.url | json }}
+    {% if featured_product.metafields.reviews.rating.value %}
+    ,"rating": {{ featured_product.metafields.reviews.rating.value | json }}
+    {% endif %}
+    {% if featured_product.metafields.reviews.rating_count.value %}
+    ,"reviewCount": {{ featured_product.metafields.reviews.rating_count.value | json }}
+    {% endif %}
+  }
+  {% endcapture %}
+
+  {% capture info_blocks_json %}
+  [
+    {% for block in info_blocks limit: 4 %}
+      {
+        "icon": {{ block.settings.icon | json }},
+        "title": {{ block.settings.title | json }},
+        "description": {{ block.settings.description | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+  {% endcapture %}
+
+  {% capture showcase_props %}
+  {
+    "title": {{ title | json }},
+    {% if subtitle != blank %}"subtitle": {{ subtitle | json }},{% endif %}
+    "product": {{ product_json }},
+    "infoBlocks": {{ info_blocks_json }}
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'FeaturedProductShowcase', props: showcase_props %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Featured Product Showcase",
+  "tag": "section",
+  "class": "featured-product-showcase-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Featured Product"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "info": "Optional subtitle"
+    },
+    {
+      "type": "product",
+      "id": "featured_product",
+      "label": "Featured Product",
+      "info": "Leave empty to use the first product from all products"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "info_block",
+      "name": "Info Block",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "star",
+              "label": "Star"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "shopping-cart",
+              "label": "Shopping Cart"
+            },
+            {
+              "value": "eye",
+              "label": "Eye"
+            }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Premium Quality"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Crafted with the finest materials and attention to detail."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Product Showcase",
+      "blocks": [
+        {
+          "type": "info_block",
+          "settings": {
+            "icon": "star",
+            "title": "Premium Quality",
+            "description": "Crafted with the finest materials and attention to detail."
+          }
+        },
+        {
+          "type": "info_block",
+          "settings": {
+            "icon": "heart",
+            "title": "Customer Favorite",
+            "description": "Loved by thousands of satisfied customers worldwide."
+          }
+        },
+        {
+          "type": "info_block",
+          "settings": {
+            "icon": "shopping-cart",
+            "title": "Best Seller",
+            "description": "Our most popular product with outstanding reviews."
+          }
+        },
+        {
+          "type": "info_block",
+          "settings": {
+            "icon": "eye",
+            "title": "Trending Now",
+            "description": "Currently trending and highly sought after."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

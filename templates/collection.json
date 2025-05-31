@@ -1,20 +1,67 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "collection",
       "settings": {}
+    },
+    "feature_callouts": {
+      "type": "feature-callouts",
+      "blocks": {
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Free Shipping",
+            "description": "Free shipping on orders over $50. Fast and reliable delivery to your doorstep."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Checkout",
+            "description": "Your payment information is protected with industry-standard encryption."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "headphones",
+            "title": "24/7 Support",
+            "description": "Our customer support team is here to help you anytime, anywhere."
+          }
+        }
+      },
+      "block_order": [
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ]
+    },
+    "newsletter": {
+      "type": "versa-newsletter",
+      "settings": {
+        "title": "Stay Updated",
+        "subtitle": "Newsletter",
+        "description": "Get notified when new products arrive in this collection.",
+        "incentive": "10% off your first order",
+        "placeholder": "Enter your email address",
+        "button_text": "Subscribe"
+      }
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "main",
+    "feature_callouts",
+    "newsletter"
   ]
 }

@@ -76,37 +76,69 @@
       {% else %}
         <!-- Search Results Grid -->
         {% paginate search.results by 20 %}
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-            {% for result in search.results %}
-              {% if result.object_type == 'product' %}
-                <!-- Product Result -->
-                {% liquid
-                  assign product_image = result.featured_image
-                  assign image_url = ''
-                  if product_image
-                    assign image_url = product_image | image_url: width: 400, height: 500
-                  endif
-                %}
-                {% capture product_card_props %}
-                {
-                  "title": {{ result.title | json }},
-                  "price": {{ result.price | money | json }},
-                  {% if result.compare_at_price > result.price %}
-                  "compareAtPrice": {{ result.compare_at_price | money | json }},
-                  {% endif %}
-                  {% if image_url != blank %}
-                  "imageUrl": {{ image_url | json }},
-                  "imageAlt": {{ product_image.alt | default: result.title | json }},
-                  {% else %}
-                  "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
-                  "imageAlt": {{ result.title | json }},
-                  {% endif %}
-                  "productUrl": {{ result.url | json }}
-                }
-                {% endcapture %}
-                {% render 'react-component', component: 'ProductCard', props: product_card_props %}
-              {% else %}
-                <!-- Article/Page Result -->
+          {% comment %} Separate products from other results {% endcomment %}
+          {% assign product_results = search.results | where: 'object_type', 'product' %}
+          {% assign other_results = search.results | where: 'object_type', 'article' %}
+          {% assign page_results = search.results | where: 'object_type', 'page' %}
+          {% assign all_other_results = other_results | concat: page_results %}
+
+          {% if product_results.size > 0 %}
+            {% comment %} Build products array for VersaProductGrid with null checks {% endcomment %}
+            {% capture products_json %}[{% for product in product_results %}{% liquid
+              # Safely handle product data with fallbacks
+              assign product_title = product.title | default: 'Untitled Product' | strip | truncate: 100
+              assign product_price = product.price | default: 0
+              assign product_compare_price = product.compare_at_price | default: 0
+              assign product_url = product.url | default: '#'
+
+              # Handle image safely
+              assign product_image = product.featured_image
+              assign image_url = ''
+              assign image_alt = product_title
+              if product_image
+                assign image_url = product_image | image_url: width: 400, height: 500
+                assign image_alt = product_image.alt | default: product_title | strip | truncate: 100
+              else
+                assign image_url = 'product-placeholder.svg' | asset_url
+              endif
+
+              # Check for new and sale status
+              assign is_new = false
+              if product.tags contains 'new'
+                assign is_new = true
+              endif
+
+              assign is_on_sale = false
+              if product_compare_price > product_price and product_compare_price > 0
+                assign is_on_sale = true
+              endif
+            %}{
+              "id": {{ product.id | default: 0 | json }},
+              "title": {{ product_title | json }},
+              "price": {{ product_price | money | json }},{% if is_on_sale %}
+              "compareAtPrice": {{ product_compare_price | money | json }},{% endif %}
+              "imageUrl": {{ image_url | json }},
+              "imageAlt": {{ image_alt | json }},
+              "productUrl": {{ product_url | json }},
+              "isNew": {{ is_new | json }},
+              "isOnSale": {{ is_on_sale | json }}
+            }{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}
+
+            {% capture product_grid_props %}
+            {
+              "products": {{ products_json | strip }},
+              "showViewAll": false,
+              "className": "mb-8"
+            }
+            {% endcapture %}
+
+            {% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
+          {% endif %}
+
+          {% comment %} Display other results (articles/pages) in traditional grid {% endcomment %}
+          {% if all_other_results.size > 0 %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {% for result in all_other_results %}
                 <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
                   {% if result.image %}
                     <div class="aspect-video mb-4 overflow-hidden rounded-lg bg-gray-100">
@@ -131,9 +163,9 @@
                     <p class="text-sm text-gray-600 line-clamp-3">{{ result.summary | strip_html | truncate: 120 }}</p>
                   {% endif %}
                 </div>
-              {% endif %}
-            {% endfor %}
-          </div>
+              {% endfor %}
+            </div>
+          {% endif %}
 
           <!-- Pagination -->
           {% if paginate.pages > 1 %}

@@ -58,7 +58,18 @@ export default defineConfig(({ mode }) => {
     },
     // Optimize dependencies for faster dev builds
     optimizeDeps: {
-      include: ['react', 'react-dom', 'framer-motion', 'lucide-react']
+      include: [
+        'react',
+        'react-dom',
+        'framer-motion',
+        'lucide-react',
+        'react-zoom-pan-pinch'
+      ],
+      exclude: [
+        'swiper',
+        'react-image-gallery',
+        'embla-carousel-react'
+      ]
     }
   }
 })

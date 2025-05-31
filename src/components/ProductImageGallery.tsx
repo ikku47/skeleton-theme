@@ -3,15 +3,87 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 
 interface ProductImage {
+  id?: string
   url: string
   alt: string
-  id?: string
+  width?: number
+  height?: number
+  aspectRatio?: number
+  sizes?: {
+    thumbnail: string
+    small: string
+    medium: string
+    large: string
+    xlarge: string
+    square_small: string
+    square_medium: string
+    square_large: string
+  }
+  srcset?: string
 }
 
 interface ProductImageGalleryProps {
   images: ProductImage[]
   productTitle: string
   className?: string
+}
+
+// Utility functions for responsive image handling
+const getOptimalImageUrl = (image: ProductImage, context: 'main' | 'thumbnail' | 'fullscreen'): string => {
+  if (!image.sizes) return image.url
+
+  switch (context) {
+    case 'thumbnail':
+      return image.sizes.thumbnail
+    case 'main':
+      return image.sizes.large
+    case 'fullscreen':
+      return image.sizes.xlarge
+    default:
+      return image.url
+  }
+}
+
+const getImageSizes = (context: 'main' | 'thumbnail'): string => {
+  switch (context) {
+    case 'thumbnail':
+      return '(max-width: 768px) 60px, 80px'
+    case 'main':
+      return '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px'
+    default:
+      return '100vw'
+  }
+}
+
+const getContainerAspectRatio = (images: ProductImage[]): string => {
+  if (!images.length) return 'aspect-square'
+
+  // Calculate average aspect ratio
+  const validRatios = images
+    .filter(img => img.aspectRatio && img.aspectRatio > 0)
+    .map(img => img.aspectRatio!)
+
+  if (validRatios.length === 0) return 'aspect-square'
+
+  const avgRatio = validRatios.reduce((sum, ratio) => sum + ratio, 0) / validRatios.length
+
+  // Determine best fit aspect ratio class
+  if (avgRatio >= 1.4) return 'aspect-[3/2]'
+  if (avgRatio >= 1.2) return 'aspect-[4/3]'
+  if (avgRatio >= 0.9) return 'aspect-square'
+  if (avgRatio >= 0.7) return 'aspect-[3/4]'
+  return 'aspect-[2/3]'
+}
+
+const getObjectFitClass = (image: ProductImage): string => {
+  if (!image.aspectRatio) return 'object-cover'
+
+  // Use object-contain for very wide or very tall images to prevent cropping
+  if (image.aspectRatio > 2 || image.aspectRatio < 0.5) {
+    return 'object-contain'
+  }
+
+  return 'object-cover'
 }
 
 export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
@@ -21,6 +93,9 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
+
+  // Calculate dynamic aspect ratio for the container
+  const containerAspectRatio = getContainerAspectRatio(images)
 
   if (!images || images.length === 0) {
     return (
@@ -46,13 +121,15 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 group">
+      <div className={`relative ${containerAspectRatio} overflow-hidden rounded-lg bg-gray-100 group`}>
         <AnimatePresence mode="wait">
           <motion.img
             key={selectedImageIndex}
-            src={currentImage.url}
+            src={getOptimalImageUrl(currentImage, 'main')}
+            srcSet={currentImage.srcset}
+            sizes={getImageSizes('main')}
             alt={currentImage.alt || productTitle}
-            className="w-full h-full object-cover cursor-zoom-in"
+            className={`w-full h-full ${getObjectFitClass(currentImage)} cursor-zoom-in`}
             onClick={() => setIsZoomed(true)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -110,7 +187,8 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
               whileTap={{ scale: 0.95 }}
             >
               <img
-                src={image.url}
+                src={getOptimalImageUrl(image, 'thumbnail')}
+                sizes={getImageSizes('thumbnail')}
                 alt={image.alt || `${productTitle} view ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -130,7 +208,9 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             onClick={() => setIsZoomed(false)}
           >
             <motion.img
-              src={currentImage.url}
+              src={getOptimalImageUrl(currentImage, 'fullscreen')}
+              srcSet={currentImage.srcset}
+              sizes="100vw"
               alt={currentImage.alt || productTitle}
               className="max-w-full max-h-full object-contain"
               initial={{ scale: 0.8 }}

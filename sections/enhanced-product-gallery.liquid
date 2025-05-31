@@ -1,0 +1,97 @@
+{% comment %}
+  Enhanced Product Gallery - Premium image gallery with zoom, swipe, and fullscreen
+{% endcomment %}
+
+{% liquid
+  assign product = product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+%}
+
+{% if product and product.images.size > 0 %}
+  {% capture images_json %}
+  [
+    {% for image in product.images %}
+      {
+        "id": {{ image.id | json }},
+        "url": {{ image | image_url: width: 1200, height: 1200 | json }},
+        "alt": {{ image.alt | default: product.title | json }},
+        "width": {{ image.width | json }},
+        "height": {{ image.height | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+  {% endcapture %}
+
+  {% capture gallery_props %}
+  {
+    "images": {{ images_json | strip }},
+    "productTitle": {{ product.title | json }}
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'EnhancedProductGallery', props: gallery_props %}
+{% else %}
+  <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <p class="text-gray-500 text-sm">No images available</p>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Enhanced Product Gallery",
+  "tag": "section",
+  "class": "enhanced-product-gallery-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Gallery Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Enable zoom functionality",
+      "default": true,
+      "info": "Allow users to zoom into product images"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fullscreen",
+      "label": "Enable fullscreen mode",
+      "default": true,
+      "info": "Allow users to view images in fullscreen"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnail navigation",
+      "default": true,
+      "info": "Display thumbnail images for navigation"
+    },
+    {
+      "type": "range",
+      "id": "image_quality",
+      "label": "Image quality",
+      "min": 70,
+      "max": 100,
+      "step": 5,
+      "default": 85,
+      "unit": "%",
+      "info": "Higher quality means larger file sizes"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Product Gallery"
+    }
+  ]
+}
+{% endschema %}

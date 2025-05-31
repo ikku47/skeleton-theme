@@ -1,0 +1,248 @@
+{% comment %}
+  VersaCommerce Enhanced Footer - Premium footer with navigation, social links, and newsletter
+{% endcomment %}
+
+{% liquid
+  assign logo = section.settings.logo
+  assign logo_text = section.settings.logo_text | default: shop.name
+  assign description = section.settings.description | default: 'Discover premium quality products designed for the modern lifestyle. Experience excellence in every purchase.'
+  
+  assign newsletter_title = section.settings.newsletter_title | default: 'Stay Connected'
+  assign newsletter_description = section.settings.newsletter_description | default: 'Get the latest updates on new products and exclusive offers.'
+  
+  assign contact_email = section.settings.contact_email
+  assign contact_phone = section.settings.contact_phone
+  assign contact_address = section.settings.contact_address
+%}
+
+{% comment %} Build navigation sections {% endcomment %}
+{% capture sections_json %}
+[
+  {
+    "title": "Shop",
+    "links": [
+      {"title": "All Products", "url": "{{ routes.all_products_collection_url }}"},
+      {"title": "Collections", "url": "{{ routes.collections_url }}"},
+      {"title": "New Arrivals", "url": "/collections/new-arrivals"},
+      {"title": "Best Sellers", "url": "/collections/best-sellers"},
+      {"title": "Sale", "url": "/collections/sale"}
+    ]
+  },
+  {
+    "title": "Customer Care",
+    "links": [
+      {"title": "Contact Us", "url": "/pages/contact"},
+      {"title": "Shipping Info", "url": "/pages/shipping"},
+      {"title": "Returns", "url": "/pages/returns"},
+      {"title": "Size Guide", "url": "/pages/size-guide"},
+      {"title": "FAQ", "url": "/pages/faq"}
+    ]
+  },
+  {
+    "title": "Company",
+    "links": [
+      {"title": "About Us", "url": "/pages/about"},
+      {"title": "Careers", "url": "/pages/careers"},
+      {"title": "Press", "url": "/pages/press"},
+      {"title": "Privacy Policy", "url": "/pages/privacy-policy"},
+      {"title": "Terms of Service", "url": "/pages/terms-of-service"}
+    ]
+  }
+]
+{% endcapture %}
+
+{% comment %} Build social links {% endcomment %}
+{% capture social_links_json %}
+[
+  {% assign first_social = true %}
+  {% if section.settings.social_facebook != blank %}
+    {% unless first_social %},{% endunless %}
+    {
+      "platform": "Facebook",
+      "url": {{ section.settings.social_facebook | json }},
+      "icon": "Facebook"
+    }
+    {% assign first_social = false %}
+  {% endif %}
+  {% if section.settings.social_instagram != blank %}
+    {% unless first_social %},{% endunless %}
+    {
+      "platform": "Instagram",
+      "url": {{ section.settings.social_instagram | json }},
+      "icon": "Instagram"
+    }
+    {% assign first_social = false %}
+  {% endif %}
+  {% if section.settings.social_twitter != blank %}
+    {% unless first_social %},{% endunless %}
+    {
+      "platform": "Twitter",
+      "url": {{ section.settings.social_twitter | json }},
+      "icon": "Twitter"
+    }
+    {% assign first_social = false %}
+  {% endif %}
+  {% if section.settings.social_youtube != blank %}
+    {% unless first_social %},{% endunless %}
+    {
+      "platform": "YouTube",
+      "url": {{ section.settings.social_youtube | json }},
+      "icon": "Youtube"
+    }
+    {% assign first_social = false %}
+  {% endif %}
+]
+{% endcapture %}
+
+{% comment %} Build contact info {% endcomment %}
+{% capture contact_info_json %}
+{
+  {% assign first_contact = true %}
+  {% if contact_email != blank %}
+    {% unless first_contact %},{% endunless %}
+    "email": {{ contact_email | json }}
+    {% assign first_contact = false %}
+  {% endif %}
+  {% if contact_phone != blank %}
+    {% unless first_contact %},{% endunless %}
+    "phone": {{ contact_phone | json }}
+    {% assign first_contact = false %}
+  {% endif %}
+  {% if contact_address != blank %}
+    {% unless first_contact %},{% endunless %}
+    "address": {{ contact_address | json }}
+    {% assign first_contact = false %}
+  {% endif %}
+}
+{% endcapture %}
+
+{% capture footer_props %}
+{
+  {% if logo %}
+  "logo": {{ logo | image_url: width: 200 | json }},
+  {% endif %}
+  "logoText": {{ logo_text | json }},
+  "description": {{ description | json }},
+  "sections": {{ sections_json | strip }},
+  "socialLinks": {{ social_links_json | strip }},
+  "contactInfo": {{ contact_info_json | strip }},
+  "newsletterTitle": {{ newsletter_title | json }},
+  "newsletterDescription": {{ newsletter_description | json }},
+  "showPaymentIcons": {{ section.settings.show_payment_icons | json }},
+  "showTrustBadges": {{ section.settings.show_trust_badges | json }}
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaFooter', props: footer_props %}
+
+{% schema %}
+{
+  "name": "Versa Footer",
+  "tag": "footer",
+  "class": "versa-footer-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo & Branding"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer Logo",
+      "info": "Recommended: 200x60px. Leave empty to use text logo."
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "info": "Used if no logo image is uploaded. Leave empty to use shop name."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Company Description",
+      "default": "Discover premium quality products designed for the modern lifestyle. Experience excellence in every purchase."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter Title",
+      "default": "Stay Connected"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_description",
+      "label": "Newsletter Description",
+      "default": "Get the latest updates on new products and exclusive offers."
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Phone Number"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_address",
+      "label": "Address"
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "url",
+      "id": "social_facebook",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "social_twitter",
+      "label": "Twitter URL"
+    },
+    {
+      "type": "url",
+      "id": "social_youtube",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "header",
+      "content": "Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show Payment Icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Versa Footer"
+    }
+  ]
+}
+{% endschema %}

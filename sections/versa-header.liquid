@@ -1,0 +1,80 @@
+{% comment %}
+  VersaCommerce Header - Sticky header with mega dropdown nav
+{% endcomment %}
+
+{% liquid
+  assign logo = section.settings.logo
+  assign logo_text = section.settings.logo_text | default: shop.name
+  assign menu = section.settings.menu | default: linklists.main-menu
+%}
+
+{% capture menu_items_json %}
+[
+  {% for link in menu.links %}
+    {
+      "title": {{ link.title | json }},
+      "url": {{ link.url | json }}
+      {% if link.links.size > 0 %}
+      ,"children": [
+        {% for child_link in link.links %}
+          {
+            "title": {{ child_link.title | json }},
+            "url": {{ child_link.url | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+      {% endif %}
+    }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]
+{% endcapture %}
+
+{% capture header_props %}
+{
+  {% if logo %}"logo": {{ logo | image_url: width: 200 | json }},{% endif %}
+  "logoText": {{ logo_text | json }},
+  "menuItems": {{ menu_items_json }},
+  "cartCount": {{ cart.item_count | json }},
+  "wishlistCount": 0
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaHeader', props: header_props %}
+
+{% schema %}
+{
+  "name": "Versa Header",
+  "tag": "header",
+  "class": "versa-header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Recommended: 200x60px"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "info": "Used if no logo image is uploaded. Leave empty to use shop name",
+      "default": "VersaCommerce"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "info": "Leave empty to use main menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}

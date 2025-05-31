@@ -1,0 +1,151 @@
+{% comment %}
+  VersaCommerce Product Grid - 4-column responsive grid with hover overlays
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title
+  assign subtitle = section.settings.subtitle
+  assign collection = section.settings.collection
+  assign products_limit = section.settings.products_limit | default: 8
+  assign show_view_all = section.settings.show_view_all
+  assign view_all_url = section.settings.view_all_url
+  
+  if collection == blank
+    assign collection = collections.all
+  endif
+  
+  if view_all_url == blank
+    assign view_all_url = collection.url
+  endif
+%}
+
+{% if collection.products.size > 0 %}
+  {% comment %} Build products array with aggressive size limits {% endcomment %}
+  {% assign safe_products_limit = products_limit | default: 4 %}
+  {% if safe_products_limit > 6 %}{% assign safe_products_limit = 6 %}{% endif %}
+
+  {% capture products_json %}[{% for product in collection.products limit: safe_products_limit %}{% liquid
+    # Aggressively truncate data to prevent JSON size issues
+    assign product_title = product.title | default: 'Product' | strip | truncate: 40, ''
+    assign product_price = product.price | default: 0
+    assign product_compare_price = product.compare_at_price | default: 0
+    assign product_url = product.url | default: '#'
+
+    # Handle image safely with shorter URLs
+    assign image_url = ''
+    assign image_alt = product_title | truncate: 30, ''
+    if product.featured_image
+      assign image_url = product.featured_image | image_url: width: 300, height: 400
+    else
+      assign image_url = 'product-placeholder.svg' | asset_url
+    endif
+
+    # Simplified date calculation
+    assign is_new = false
+    if product.created_at
+      assign created_days_ago = 'now' | date: '%s' | minus: product.created_at | date: '%s' | divided_by: 86400
+      if created_days_ago <= 30
+        assign is_new = true
+      endif
+    endif
+
+    # Simplified sale calculation
+    assign is_on_sale = false
+    if product_compare_price > product_price and product_compare_price > 0
+      assign is_on_sale = true
+    endif
+  %}{
+    "id": {{ product.id | default: 0 | json }},
+    "title": {{ product_title | json }},
+    "price": {{ product_price | money | json }},{% if is_on_sale %}
+    "compareAtPrice": {{ product_compare_price | money | json }},{% endif %}
+    "imageUrl": {{ image_url | json }},
+    "imageAlt": {{ image_alt | json }},
+    "productUrl": {{ product_url | json }},
+    "isNew": {{ is_new | json }},
+    "isOnSale": {{ is_on_sale | json }}
+  }{% unless forloop.last %},{% endunless %}{% endfor %}]{% endcapture %}
+
+  {% capture grid_props %}
+  {
+    {% if title != blank %}"title": {{ title | json }},{% endif %}
+    {% if subtitle != blank %}"subtitle": {{ subtitle | json }},{% endif %}
+    "products": {{ products_json }},
+    "showViewAll": {{ show_view_all | json }},
+    "viewAllUrl": {{ view_all_url | json }}
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'VersaProductGrid', props: grid_props %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Versa Product Grid",
+  "tag": "section",
+  "class": "versa-product-grid-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "info": "Optional subtitle"
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to show all products"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Number of products to show",
+      "min": 4,
+      "max": 16,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "View All Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' button",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "View All URL",
+      "info": "Leave empty to use collection URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Versa Product Grid",
+      "settings": {
+        "title": "Featured Products",
+        "products_limit": 8,
+        "show_view_all": true
+      }
+    }
+  ]
+}
+{% endschema %}

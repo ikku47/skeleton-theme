@@ -6,7 +6,7 @@ interface CollectionCardProps {
   description?: string
   imageUrl?: string
   imageAlt?: string
-  collectionUrl: string
+  url: string
   productCount?: number
   className?: string
 }
@@ -16,7 +16,7 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
   description,
   imageUrl,
   imageAlt = '',
-  collectionUrl,
+  url,
   productCount,
   className = '',
 }) => {
@@ -25,7 +25,7 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
 
   return (
     <motion.a
-      href={collectionUrl}
+      href={url}
       className={`group block ${className}`}
       whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}

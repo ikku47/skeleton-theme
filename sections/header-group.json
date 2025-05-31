@@ -11,12 +11,15 @@
   "type": "header",
   "name": "t:general.header",
   "sections": {
-    "header": {
-      "type": "header",
-      "settings": {}
+    "versa_header": {
+      "type": "versa-header",
+      "settings": {
+        "logo_text": "VersaCommerce",
+        "menu": "main-menu"
+      }
     }
   },
   "order": [
-    "header"
-  ],
+    "versa_header"
+  ]
 }

@@ -1,0 +1,91 @@
+{% comment %}
+  VersaCommerce Newsletter - Full-width banner with email input and incentive
+{% endcomment %}
+
+{% liquid
+  assign title = section.settings.title | default: 'Stay in the Loop'
+  assign subtitle = section.settings.subtitle | default: 'Newsletter'
+  assign description = section.settings.description | default: 'Get the latest updates on new products, exclusive offers, and style tips delivered straight to your inbox.'
+  assign incentive = section.settings.incentive | default: '10% off your first order'
+  assign placeholder = section.settings.placeholder | default: 'Enter your email address'
+  assign button_text = section.settings.button_text | default: 'Subscribe'
+%}
+
+{% capture newsletter_props %}
+{
+  "title": {{ title | json }},
+  "subtitle": {{ subtitle | json }},
+  "description": {{ description | json }},
+  "incentive": {{ incentive | json }},
+  "placeholder": {{ placeholder | json }},
+  "buttonText": {{ button_text | json }}
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaNewsletter', props: newsletter_props %}
+
+{% schema %}
+{
+  "name": "Versa Newsletter",
+  "tag": "section",
+  "class": "versa-newsletter-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Stay in the Loop"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Newsletter"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Get the latest updates on new products, exclusive offers, and style tips delivered straight to your inbox."
+    },
+    {
+      "type": "text",
+      "id": "incentive",
+      "label": "Incentive Text",
+      "default": "10% off your first order",
+      "info": "Promotional text to encourage signups"
+    },
+    {
+      "type": "header",
+      "content": "Form Settings"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Email Input Placeholder",
+      "default": "Enter your email address"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Subscribe"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Versa Newsletter",
+      "settings": {
+        "title": "Stay in the Loop",
+        "subtitle": "Newsletter",
+        "description": "Get the latest updates on new products, exclusive offers, and style tips delivered straight to your inbox.",
+        "incentive": "10% off your first order"
+      }
+    }
+  ]
+}
+{% endschema %}

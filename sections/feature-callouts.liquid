@@ -1,0 +1,121 @@
+{% comment %}
+  VersaCommerce Feature Callouts - 3 equal-width cards with icons
+{% endcomment %}
+
+{% liquid
+  assign features = section.blocks | where: 'type', 'feature'
+%}
+
+{% if features.size > 0 %}
+  {% capture features_json %}
+  [
+    {% for block in features %}
+      {
+        "icon": {{ block.settings.icon | json }},
+        "title": {{ block.settings.title | json }},
+        "description": {{ block.settings.description | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+  {% endcapture %}
+
+  {% capture callouts_props %}
+  {
+    "features": {{ features_json }}
+  }
+  {% endcapture %}
+
+  {% render 'react-component', component: 'FeatureCallouts', props: callouts_props %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Feature Callouts",
+  "tag": "section",
+  "class": "feature-callouts-section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "truck",
+              "label": "Truck (Shipping)"
+            },
+            {
+              "value": "shield",
+              "label": "Shield (Security)"
+            },
+            {
+              "value": "headphones",
+              "label": "Headphones (Support)"
+            },
+            {
+              "value": "credit-card",
+              "label": "Credit Card (Payment)"
+            },
+            {
+              "value": "clock",
+              "label": "Clock (Time)"
+            },
+            {
+              "value": "award",
+              "label": "Award (Quality)"
+            }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Free shipping on orders over $50. Fast and reliable delivery to your doorstep."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Feature Callouts",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Free Shipping",
+            "description": "Free shipping on orders over $50. Fast and reliable delivery to your doorstep."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Checkout",
+            "description": "Your payment information is protected with industry-standard encryption."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "headphones",
+            "title": "24/7 Support",
+            "description": "Our customer support team is here to help you anytime, anywhere."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

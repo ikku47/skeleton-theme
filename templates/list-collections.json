@@ -9,12 +9,21 @@
  */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "collections",
       "settings": {}
     }
   },
   "order": [
+    "page_header",
     "main"
   ]
 }

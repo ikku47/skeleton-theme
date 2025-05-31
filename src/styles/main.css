@@ -2,17 +2,25 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* Basic Design System */
+/* Import custom Swiper styles */
+@import "./swiper-custom.css";
+
+/* VersaCommerce Design System */
 @layer base {
   :root {
-    /* Font variables - set by Liquid in css-variables.liquid */
-    --font-heading: 'Inter', system-ui, sans-serif;
-    --font-body: 'Inter', system-ui, sans-serif;
+    /* VersaCommerce Font Variables - set by Liquid in css-variables.liquid */
+    --font-display: 'Anton', 'Bebas Neue', system-ui, sans-serif;
+    --font-heading: 'Poppins', system-ui, sans-serif;
+    --font-body: 'Inter', 'Poppins', system-ui, sans-serif;
 
-    /* Basic color palette */
-    --color-primary: #2563eb;
-    --color-secondary: #64748b;
-    --color-accent: #f59e0b;
+    /* VersaCommerce Color Palette */
+    --color-primary: #111111;        /* Modern Black */
+    --color-secondary: #2B2B2B;      /* Muted Charcoal */
+    --color-accent: #FFD100;         /* Vibrant Yellow */
+    --color-light-bg: #F9F9F9;       /* Off-White */
+    --color-neutral: #6F6F6F;        /* Warm Gray */
+    --color-card-bg: #FFFFFF;        /* White */
+    --color-border: #E0E0E0;         /* Light Gray */
   }
 
   /* Typography */
@@ -52,15 +60,19 @@
   }
 
   .btn-primary {
-    @apply bg-primary text-white hover:bg-blue-700 focus:ring-blue-500;
+    @apply bg-primary text-white hover:bg-secondary focus:ring-primary;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-gray-600 focus:ring-gray-500;
+    @apply bg-secondary text-white hover:bg-primary focus:ring-secondary;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-primary hover:bg-yellow-400 focus:ring-accent;
   }
 
   .btn-outline {
-    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-blue-500;
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary;
   }
 
   /* Card system */
@@ -80,9 +92,9 @@
     @apply transition-transform duration-300 ease-out;
   }
 
-  /* Container utilities */
+  /* VersaCommerce Container utilities */
   .container {
-    @apply max-w-7xl mx-auto px-4;
+    @apply max-w-container mx-auto px-4;
   }
 }
 
@@ -104,5 +116,58 @@
 
   .aspect-hero {
     aspect-ratio: 16/9;
+  }
+
+  /* Additional aspect ratios for responsive image galleries */
+  .aspect-\[3\/2\] {
+    aspect-ratio: 3/2;
+  }
+
+  .aspect-\[4\/3\] {
+    aspect-ratio: 4/3;
+  }
+
+  .aspect-\[2\/3\] {
+    aspect-ratio: 2/3;
+  }
+
+  /* Image optimization utilities */
+  .image-responsive {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .image-contain {
+    object-fit: contain;
+  }
+
+  .image-cover {
+    object-fit: cover;
+  }
+
+  /* Text truncation utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }

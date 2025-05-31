@@ -1,56 +1,29 @@
 {% comment %}
-  Simple Featured Products Section
+  VersaCommerce Featured Products Section
 {% endcomment %}
 
 {% liquid
   assign title = section.settings.title | default: 'Featured Products'
+  assign subtitle = section.settings.subtitle | default: 'Best Sellers'
   assign selected_collection = collections[section.settings.collection]
   assign collection = selected_collection | default: collections.all
   assign products_limit = section.settings.products_limit | default: 8
+  assign show_view_all = section.settings.show_view_all | default: true
+  assign view_all_url = section.settings.view_all_url | default: routes.all_products_collection_url
 %}
 
-<section class="py-16 bg-white">
-  <div class="container">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ title }}</h2>
-    </div>
-    
-    {% if collection.products.size > 0 %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {% for product in collection.products limit: products_limit %}
-          {% liquid
-            assign product_image = product.featured_image
-            assign image_url = ''
-            if product_image
-              assign image_url = product_image | image_url: width: 400, height: 500
-            endif
-          %}
-          {% capture product_card_props %}
-          {
-            "title": {{ product.title | json }},
-            "price": {{ product.price | money | json }},
-            {% if product.compare_at_price > product.price %}
-            "compareAtPrice": {{ product.compare_at_price | money | json }},
-            {% endif %}
-            {% if image_url != blank %}
-            "imageUrl": {{ image_url | json }},
-            "imageAlt": {{ product_image.alt | default: product.title | json }},
-            {% else %}
-            "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
-            "imageAlt": {{ product.title | json }},
-            {% endif %}
-            "productUrl": {{ product.url | json }}
-          }
-          {% endcapture %}
-          {% render 'react-component', component: 'ProductCard', props: product_card_props %}
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="text-center py-12">
-        <p class="text-gray-500 text-lg">No products available at the moment.</p>
-        <p class="text-gray-400 text-sm mt-2">Please check back later or browse our collections.</p>
-      </div>
-    {% endif %}
+{% capture product_grid_props %}
+{
+  "title": {{ title | json }},
+  "subtitle": {{ subtitle | json }},
+  "products_limit": {{ products_limit | json }},
+  "show_view_all": {{ show_view_all | json }},
+  "view_all_url": {{ view_all_url | json }},
+  "collection_handle": {{ collection.handle | json }}
+}
+{% endcapture %}
+
+{% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
     
     {% if section.settings.show_view_all and collection.products.size > 0 %}
       <div class="text-center mt-12">
@@ -74,15 +47,21 @@
 
 {% schema %}
 {
-  "name": "Featured Products",
+  "name": "Versa Product Grid",
   "tag": "section",
-  "class": "featured-products",
+  "class": "versa-product-grid",
   "settings": [
     {
       "type": "text",
       "id": "title",
       "label": "Section Title",
       "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Best Sellers"
     },
     {
       "type": "collection",
@@ -114,7 +93,7 @@
   ],
   "presets": [
     {
-      "name": "Featured Products"
+      "name": "Versa Product Grid"
     }
   ]
 }

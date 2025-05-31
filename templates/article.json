@@ -9,12 +9,33 @@
  */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "small",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "article",
       "settings": {}
+    },
+    "newsletter": {
+      "type": "versa-newsletter",
+      "settings": {
+        "title": "Stay Informed",
+        "subtitle": "Newsletter",
+        "description": "Get the latest articles, tips, and updates delivered to your inbox.",
+        "incentive": "10% off your first order",
+        "placeholder": "Enter your email address",
+        "button_text": "Subscribe"
+      }
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "main",
+    "newsletter"
   ]
 }

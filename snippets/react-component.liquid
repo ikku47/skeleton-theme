@@ -19,10 +19,19 @@
 -%}
 
 {%- if component_name != blank -%}
+  {%- assign component_id = component_name | append: '-' | append: 'now' | date: '%s' | append: forloop.index | default: '' -%}
+
+  {%- if component_props != blank -%}
+    {%- comment %} Use script tag for large JSON data to avoid HTML attribute limits {% endcomment -%}
+    <script type="application/json" id="{{ component_id }}-data">
+      {{ component_props | strip }}
+    </script>
+  {%- endif -%}
+
   <div
     data-component="{{ component_name }}"
     {%- if component_props != blank -%}
-      data-props='{{ component_props }}'
+      data-props-id="{{ component_id }}-data"
     {%- endif -%}
     {%- if container_class != blank -%}
       class="{{ container_class }}"

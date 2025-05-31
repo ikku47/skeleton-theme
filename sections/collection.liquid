@@ -2,71 +2,11 @@
   Collection Page Section - Shows products within a specific collection
 {% endcomment %}
 
-<section class="py-8 bg-white min-h-screen">
+<section class="pt-8 pb-8 bg-white min-h-screen">
   <div class="container">
-    <!-- Breadcrumbs -->
-    {% if section.settings.show_breadcrumbs %}
-      {% liquid
-        assign breadcrumb_items = ''
-        assign breadcrumb_items = breadcrumb_items | append: '{"label": "Home", "url": "' | append: routes.root_url | append: '"}'
 
-        unless collection.handle == 'all'
-          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "Collections", "url": "' | append: routes.collections_url | append: '"}'
-        endunless
 
-        if collection.handle == 'all'
-          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "All Products", "isActive": true}'
-        else
-          assign breadcrumb_items = breadcrumb_items | append: ', {"label": "' | append: collection.title | append: '", "isActive": true}'
-        endif
-      %}
-      {% capture breadcrumbs_props %}
-      {
-        "items": [{{ breadcrumb_items }}]
-      }
-      {% endcapture %}
-      {% render 'react-component', component: 'ProductBreadcrumbs', props: breadcrumbs_props %}
-    {% endif %}
 
-    <!-- Collection Header -->
-    <div class="text-center mb-12">
-      {% liquid
-        if collection.handle == 'all'
-          assign is_all_collection = true
-          assign display_title = 'All Products'
-        else
-          assign is_all_collection = false
-          assign display_title = collection.title
-        endif
-      %}
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ display_title }}</h1>
-      {% if collection.description != blank %}
-        <div class="text-lg text-gray-600 max-w-2xl mx-auto">{{ collection.description }}</div>
-      {% elsif is_all_collection %}
-        <div class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Discover our complete collection of products at {{ shop.name }}.
-        </div>
-      {% endif %}
-      {% if section.settings.show_product_count %}
-        <p class="text-sm text-gray-500 mt-4">
-          {{ collection.products_count }}
-          {% if collection.products_count == 1 %}product{% else %}products{% endif %}
-        </p>
-      {% endif %}
-
-      {% comment %} Debug information - only visible in theme editor {% endcomment %}
-      {% if request.design_mode and section.settings.show_debug_info %}
-        <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
-          <strong>Debug Info:</strong><br>
-          Collection Handle: {{ collection.handle }}<br>
-          Collection ID: {{ collection.id }}<br>
-          Products Count: {{ collection.products_count }}<br>
-          Products in Current Page: {{ collection.products.size }}<br>
-          Collection URL: {{ collection.url }}<br>
-          Is All Collection: {{ is_all_collection }}
-        </div>
-      {% endif %}
-    </div>
 
     <!-- Products Grid -->
     {% liquid
@@ -74,35 +14,45 @@
     %}
     {% paginate collection.products by products_per_page %}
       {% if collection.products.size > 0 %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+        {% comment %} Build products array for VersaProductGrid {% endcomment %}
+        {% capture products_json %}
+        [
           {% for product in collection.products %}
             {% liquid
               assign product_image = product.featured_image
               assign image_url = ''
               if product_image
                 assign image_url = product_image | image_url: width: 400, height: 500
+              else
+                assign image_url = 'product-placeholder.svg' | asset_url
               endif
             %}
-            {% capture product_card_props %}
             {
+              "id": {{ product.id | json }},
               "title": {{ product.title | json }},
               "price": {{ product.price | money | json }},
               {% if product.compare_at_price > product.price %}
               "compareAtPrice": {{ product.compare_at_price | money | json }},
               {% endif %}
-              {% if image_url != blank %}
               "imageUrl": {{ image_url | json }},
-              "imageAlt": {{ product_image.alt | default: product.title | json }},
-              {% else %}
-              "imageUrl": {{ 'product-placeholder.svg' | asset_url | json }},
-              "imageAlt": {{ product.title | json }},
-              {% endif %}
-              "productUrl": {{ product.url | json }}
-            }
-            {% endcapture %}
-            {% render 'react-component', component: 'ProductCard', props: product_card_props %}
+              "imageAlt": {{ product_image.alt | default: product.title | escape | json }},
+              "productUrl": {{ product.url | json }},
+              "isNew": {% if product.tags contains 'new' %}true{% else %}false{% endif %},
+              "isOnSale": {% if product.compare_at_price > product.price %}true{% else %}false{% endif %}
+            }{% unless forloop.last %},{% endunless %}
           {% endfor %}
-        </div>
+        ]
+        {% endcapture %}
+
+        {% capture product_grid_props %}
+        {
+          "products": {{ products_json | strip }},
+          "showViewAll": false,
+          "className": "mb-12"
+        }
+        {% endcapture %}
+
+        {% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
       {% else %}
         <div class="text-center py-16">
           <div class="max-w-md mx-auto">
@@ -182,12 +132,7 @@
       "label": "Show product count",
       "default": true
     },
-    {
-      "type": "checkbox",
-      "id": "show_breadcrumbs",
-      "label": "Show breadcrumbs",
-      "default": true
-    },
+
     {
       "type": "checkbox",
       "id": "show_debug_info",

@@ -36,6 +36,142 @@ function sanitizeJsonString(str: string): string {
   return sanitized
 }
 
+// Helper function to fix truncated JSON
+function fixTruncatedJson(str: string): string {
+  let fixed = str.trim()
+
+  // Handle completely empty or invalid input
+  if (!fixed || fixed.length < 2) {
+    return '{}'
+  }
+
+  // Find the last complete object/array in case of truncation
+  let lastCompleteIndex = -1
+  let braceCount = 0
+  let bracketCount = 0
+  let inString = false
+  let escaped = false
+
+  for (let i = 0; i < fixed.length; i++) {
+    const char = fixed[i]
+
+    if (escaped) {
+      escaped = false
+      continue
+    }
+
+    if (char === '\\') {
+      escaped = true
+      continue
+    }
+
+    if (char === '"') {
+      inString = !inString
+      continue
+    }
+
+    if (inString) {
+      continue
+    }
+
+    if (char === '{') {
+      braceCount++
+    } else if (char === '}') {
+      braceCount--
+      if (braceCount === 0 && bracketCount === 0) {
+        lastCompleteIndex = i
+      }
+    } else if (char === '[') {
+      bracketCount++
+    } else if (char === ']') {
+      bracketCount--
+      if (braceCount === 0 && bracketCount === 0) {
+        lastCompleteIndex = i
+      }
+    }
+  }
+
+  // If we found a complete structure, use it
+  if (lastCompleteIndex > -1) {
+    fixed = fixed.substring(0, lastCompleteIndex + 1)
+  } else {
+    // Try to repair the truncated JSON
+    // Check if we're in the middle of a string value
+    const lastQuoteIndex = fixed.lastIndexOf('"')
+    const secondLastQuoteIndex = fixed.lastIndexOf('"', lastQuoteIndex - 1)
+
+    // Count quotes to see if we're in an unterminated string
+    const quoteCount = (fixed.match(/"/g) || []).length
+    if (quoteCount % 2 === 1) {
+      // We have an unterminated string, close it
+      fixed += '"'
+    }
+
+    // Remove trailing comma if present
+    if (fixed.endsWith(',')) {
+      fixed = fixed.slice(0, -1)
+    }
+
+    // Count and close unmatched braces/brackets
+    const openBraces = (fixed.match(/\{/g) || []).length
+    const closeBraces = (fixed.match(/\}/g) || []).length
+    const openBrackets = (fixed.match(/\[/g) || []).length
+    const closeBrackets = (fixed.match(/\]/g) || []).length
+
+    // Close any open objects
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      fixed += '}'
+    }
+
+    // Close any open arrays
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      fixed += ']'
+    }
+  }
+
+  return fixed
+}
+
+// Helper function to validate and provide fallback data
+function validateComponentProps(componentName: string, props: any): any {
+  // Provide safe fallbacks for common component types
+  switch (componentName) {
+    case 'VersaProductGrid':
+      return {
+        title: props?.title || 'Products',
+        subtitle: props?.subtitle || '',
+        products: Array.isArray(props?.products) ? props.products : [],
+        showViewAll: props?.showViewAll || false,
+        viewAllUrl: props?.viewAllUrl || '#'
+      }
+
+    case 'AccessoriesCarousel':
+      return {
+        title: props?.title || 'Accessories',
+        subtitle: props?.subtitle || '',
+        products: Array.isArray(props?.products) ? props.products : []
+      }
+
+    case 'EnhancedProductDetails':
+      return {
+        product: props?.product || {
+          id: 0,
+          title: 'Product Not Found',
+          price: '$0.00',
+          description: '',
+          variants: [],
+          options: [],
+          tags: []
+        },
+        showTrustBadges: props?.showTrustBadges || false,
+        trustBadges: Array.isArray(props?.trustBadges) ? props.trustBadges : []
+      }
+
+    default:
+      return props || {}
+  }
+}
+
 // Initialize components
 function initializeComponents() {
   // Find all elements with data-component attribute
@@ -49,16 +185,35 @@ function initializeComponents() {
 
     const componentName = element.getAttribute('data-component')
     const propsData = element.getAttribute('data-props')
+    const propsId = element.getAttribute('data-props-id')
 
     if (componentName && ComponentRegistry[componentName]) {
       try {
         const Component = ComponentRegistry[componentName]
         let props = {}
 
-        if (propsData) {
-          // Sanitize and parse JSON
-          const sanitizedProps = sanitizeJsonString(propsData)
-          props = JSON.parse(sanitizedProps)
+        // Try to get props from script tag first (new method), then fallback to attribute (old method)
+        let rawPropsData = null
+
+        if (propsId) {
+          // New method: get JSON from script tag
+          const scriptElement = document.getElementById(propsId)
+          if (scriptElement) {
+            rawPropsData = scriptElement.textContent || scriptElement.innerHTML
+          }
+        } else if (propsData) {
+          // Old method: get JSON from data attribute
+          rawPropsData = propsData
+        }
+
+        if (rawPropsData) {
+          // Sanitize and fix truncated JSON
+          let sanitizedProps = sanitizeJsonString(rawPropsData)
+          sanitizedProps = fixTruncatedJson(sanitizedProps)
+          const parsedProps = JSON.parse(sanitizedProps)
+
+          // Validate and provide fallbacks for component props
+          props = validateComponentProps(componentName, parsedProps)
         }
 
         // Create React root and render component
@@ -72,15 +227,32 @@ function initializeComponents() {
         componentRoots.set(element, root)
       } catch (error) {
         console.error(`Error initializing component ${componentName}:`, error)
-        console.error('Original props data:', propsData)
 
-        if (propsData) {
-          const sanitizedProps = sanitizeJsonString(propsData)
+        // Get the raw props data for debugging
+        let debugPropsData = null
+        if (propsId) {
+          const scriptElement = document.getElementById(propsId)
+          if (scriptElement) {
+            debugPropsData = scriptElement.textContent || scriptElement.innerHTML
+          }
+        } else if (propsData) {
+          debugPropsData = propsData
+        }
+
+        console.error('Original props data:', debugPropsData)
+
+        if (debugPropsData) {
+          let sanitizedProps = sanitizeJsonString(debugPropsData)
           console.error('Sanitized props data:', sanitizedProps)
+
+          // Try to fix truncated JSON
+          const fixedProps = fixTruncatedJson(sanitizedProps)
+          console.error('Fixed props data:', fixedProps)
 
           // Try to identify the specific issue
           try {
-            JSON.parse(sanitizedProps)
+            JSON.parse(fixedProps)
+            console.log('JSON parsing successful after fixing')
           } catch (parseError) {
             console.error('JSON parse error details:', parseError)
           }

@@ -1,0 +1,123 @@
+/* Custom Swiper Styles for Enhanced Product Gallery */
+
+/* Main Gallery Swiper */
+.main-gallery-swiper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.main-gallery-swiper .swiper-wrapper {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.main-gallery-swiper .swiper-slide {
+  width: 100% !important;
+  height: 100% !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Thumbnail Swiper */
+.thumbnail-swiper {
+  width: 100% !important;
+}
+
+.thumbnail-swiper .swiper-wrapper {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.thumbnail-swiper .swiper-slide {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Fullscreen Swiper */
+.fullscreen-swiper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.fullscreen-swiper .swiper-wrapper {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.fullscreen-swiper .swiper-slide {
+  width: 100% !important;
+  height: 100% !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Custom Pagination Styles */
+.swiper-pagination-custom .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.swiper-pagination-custom .swiper-pagination-bullet-active {
+  background: #FFD100 !important;
+}
+
+.fullscreen-swiper-pagination .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.fullscreen-swiper-pagination .swiper-pagination-bullet-active {
+  background: #ffffff !important;
+}
+
+/* Ensure proper aspect ratios */
+.enhanced-product-gallery .aspect-square {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Fix any potential layout issues */
+.swiper-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.swiper-wrapper {
+  display: flex !important;
+}
+
+.swiper-slide {
+  flex-shrink: 0 !important;
+}
+
+/* Prevent vertical stacking */
+.swiper-slide img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Thumbnail specific styles */
+.thumbnail-swiper .swiper-slide {
+  width: 64px !important;
+  height: 64px !important;
+}
+
+/* Ensure proper z-index for navigation */
+.swiper-button-prev-custom,
+.swiper-button-next-custom,
+.fullscreen-swiper-button-prev,
+.fullscreen-swiper-button-next {
+  z-index: 10 !important;
+}
+
+.swiper-pagination-custom,
+.fullscreen-swiper-pagination {
+  z-index: 10 !important;
+}

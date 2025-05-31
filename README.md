@@ -1,17 +1,35 @@
-# Shopify React Tailwind Boilerplate
+# VersaCommerce - Shopify 2.0 Theme
 
-A minimal, modern Shopify theme boilerplate built with React, Tailwind CSS v3, and hot reload functionality.
+A premium, modular Shopify 2.0 theme built with React, Tailwind CSS v3, and modern web technologies. VersaCommerce features a clean, editorial design optimized for high engagement and conversions.
+
+## 🎨 Design System
+
+### Color Palette
+- **Primary Accent**: Modern Black (#111111)
+- **Secondary Accent**: Muted Charcoal (#2B2B2B)
+- **CTA/Highlight**: Vibrant Yellow (#FFD100)
+- **Light Background**: Off-White (#F9F9F9)
+- **Neutral Text**: Warm Gray (#6F6F6F)
+- **Card Background**: White (#FFFFFF)
+- **Border**: Light Gray (#E0E0E0)
+
+### Typography
+- **Display Font**: Anton / Bebas Neue (Hero headers, 56px)
+- **Heading Font**: Poppins SemiBold (Section titles, 36px)
+- **Body Font**: Inter / Poppins Regular (Content, 16px)
+- **Caption Font**: Inter Medium (Labels, 14px)
 
 ## ✨ Features
 
-- 🎨 **Tailwind CSS v3** - Utility-first CSS framework with JIT compilation
+- 🎨 **VersaCommerce Design System** - Modern color palette and typography
 - ⚛️ **React 18** - Interactive components with TypeScript support
 - 🎭 **Framer Motion** - Smooth animations and micro-interactions
 - 🎯 **Lucide Icons** - Beautiful, consistent iconography
 - 🔥 **Hot Reload** - Instant development feedback for CSS and React changes
-- 📱 **Responsive Design** - Mobile-first approach
-- 🛍️ **Shopify Integration** - Native Liquid templating with React components
+- 📱 **Mobile Optimized** - Responsive design with mobile-first approach
+- 🛍️ **Shopify 2.0 Compatible** - Native Liquid templating with React components
 - ⚡ **Performance Optimized** - Fast loading with optimized builds
+- 🧩 **Modular Components** - Reusable VersaCommerce components
 
 ## 🚀 Quick Start
 
@@ -61,16 +79,34 @@ bun run build
 bun run deploy
 ```
 
+## 🧩 VersaCommerce Components
+
+### Core Components
+- **VersaHeader** - Sticky header with mega dropdown navigation
+- **VersaHeroSection** - 50/50 split hero with left text, right image
+- **FeatureCallouts** - 3-column responsive feature cards
+- **FeaturedProductShowcase** - Large central product with 4 info blocks
+- **VersaProductGrid** - 4-column responsive product grid with hover effects
+- **AccessoriesCarousel** - Horizontal scrolling product carousel
+- **TestimonialsSection** - Customer testimonials with carousel/grid layouts
+- **VersaNewsletter** - Email signup with incentive messaging
+
+### Legacy Components (Maintained for Compatibility)
+- **HeroSection** - Original hero section
+- **ProductCard** - Standard product cards
+- **AnimatedButton** - Animated buttons
+- **IconButton** - Icon buttons
+- **Product Detail Components** - Gallery, info, variants, etc.
+
 ## 🏗️ Project Structure
 
 ```bash
 .
 ├── src/                    # Source files
 │   ├── components/         # React components
-│   │   ├── HeroSection.tsx # Simple hero section
-│   │   ├── ProductCard.tsx # Product cards
-│   │   ├── AnimatedButton.tsx # Animated buttons
-│   │   └── IconButton.tsx  # Icon buttons
+│   │   ├── Versa*.tsx     # VersaCommerce components
+│   │   ├── *.tsx          # Legacy components
+│   │   └── ComponentRegistry.tsx # Component registry
 │   ├── styles/            # CSS source files
 │   │   └── main.css       # Main Tailwind CSS file
 │   └── main.tsx           # React entry point
@@ -78,7 +114,11 @@ bun run deploy
 │   ├── application.css    # Compiled Tailwind CSS
 │   └── application.js     # Compiled React bundle
 ├── sections/              # Shopify sections
+│   ├── versa-*.liquid     # VersaCommerce sections
+│   └── *.liquid           # Legacy sections
 ├── templates/             # Shopify templates
+│   ├── index-versa.json   # VersaCommerce homepage
+│   └── *.json             # Other templates
 ├── snippets/              # Reusable Liquid code
 └── config/                # Theme settings
 ```

@@ -1,20 +1,42 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
+    "page_header": {
+      "type": "versa-page-header",
+      "settings": {
+        "size": "medium",
+        "text_align": "left",
+        "show_breadcrumbs": true
+      }
+    },
     "main": {
       "type": "blog",
       "settings": {}
+    },
+    "featured_products": {
+      "type": "versa-product-grid",
+      "settings": {
+        "title": "Featured Products",
+        "subtitle": "Shop Now",
+        "products_limit": 4,
+        "show_view_all": true
+      }
+    },
+    "newsletter": {
+      "type": "versa-newsletter",
+      "settings": {
+        "title": "Never Miss a Post",
+        "subtitle": "Blog Updates",
+        "description": "Subscribe to get the latest blog posts, style tips, and product updates delivered to your inbox.",
+        "incentive": "10% off your first order",
+        "placeholder": "Enter your email address",
+        "button_text": "Subscribe"
+      }
     }
   },
   "order": [
-    "main"
+    "page_header",
+    "main",
+    "featured_products",
+    "newsletter"
   ]
 }
