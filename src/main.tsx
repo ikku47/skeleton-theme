@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { ComponentRegistry } from './components/ComponentRegistry'
+import { ComponentRegistry } from './components/shared/ComponentRegistry'
 
 // Extend Window interface for global functions
 declare global {

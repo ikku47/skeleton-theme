@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw } from 'lucide-react'
-import { cartUtils } from './CartManager'
-import { notificationManager } from './CartNotification'
+import { cartUtils } from '../shared/CartManager'
+import { notificationManager } from '../shared/CartNotification'
 
 interface ProductVariant {
   id: string

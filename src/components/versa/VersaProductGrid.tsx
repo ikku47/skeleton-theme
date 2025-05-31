@@ -1,8 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Heart, ShoppingCart, Eye, Star } from 'lucide-react'
-import { cartUtils } from './CartManager'
-import { notificationManager } from './CartNotification'
+import { cartUtils } from '../shared/CartManager'
+import { notificationManager } from '../shared/CartNotification'
 
 interface Product {
   id: string

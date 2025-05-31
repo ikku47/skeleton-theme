@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, ShoppingCart, Zap, Share2 } from 'lucide-react'
-import { cartUtils } from './CartManager'
-import { notificationManager } from './CartNotification'
+import { cartUtils } from '../shared/CartManager'
+import { notificationManager } from '../shared/CartNotification'
 
 interface ProductActionsProps {
   isAvailable: boolean

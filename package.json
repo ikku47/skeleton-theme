@@ -1,7 +1,7 @@
 {
-  "name": "shopify-react-tailwind-boilerplate",
-  "version": "1.0.0",
-  "description": "A minimal Shopify theme boilerplate with React, Tailwind CSS v3, and hot reload",
+  "name": "versacommerce-skeleton-theme",
+  "version": "2.0.0",
+  "description": "VersaCommerce - Premium Shopify 2.0 theme with React 18, TypeScript, and Tailwind CSS v3",
   "scripts": {
     "dev": "concurrently --kill-others \"bun run dev:css\" \"bun run dev:js\"",
     "dev:full": "concurrently --kill-others --names \"CSS,JS,SHOPIFY\" --prefix-colors \"blue,green,magenta\" \"bun run dev:css\" \"bun run dev:js\" \"bun run dev:shopify\"",
