@@ -84,6 +84,11 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
     window.location.href = '/pages/wishlist'
   }
 
+  const handleCartClick = () => {
+    // Navigate to cart page
+    window.location.href = '/cart'
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -196,7 +201,7 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
               className="relative p-2 text-neutral hover:text-primary transition-colors duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.openCartDrawer?.()}
+              onClick={handleCartClick}
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
@@ -302,7 +307,7 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
                 <button
                   className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
-                  onClick={() => window.openCartDrawer?.()}
+                  onClick={handleCartClick}
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>Cart</span>
