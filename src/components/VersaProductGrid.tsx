@@ -149,7 +149,7 @@ const ProductCard: React.FC<{ product: Product; variants: any }> = ({ product, v
         <motion.img
           src={product.imageUrl}
           alt={product.imageAlt || product.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-scale-down group-hover:scale-105 transition-transform duration-500"
         />
 
         {/* Badges */}

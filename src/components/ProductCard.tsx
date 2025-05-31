@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <motion.img
           src={imageUrl}
           alt={imageAlt || title}
-          className="card-product-image w-full h-full object-cover"
+          className="card-product-image w-full h-full object-scale-down"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
         />

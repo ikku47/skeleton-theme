@@ -121,3 +121,218 @@
 .fullscreen-swiper-pagination {
   z-index: 10 !important;
 }
+
+/* Testimonials Swiper Styles */
+.testimonials-swiper {
+  width: 100% !important;
+  padding-bottom: 50px !important;
+  overflow: hidden !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.testimonials-swiper .swiper-wrapper {
+  align-items: stretch !important;
+  display: flex !important;
+}
+
+.testimonials-swiper .swiper-slide {
+  height: auto !important;
+  display: flex !important;
+  align-items: stretch !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+}
+
+.testimonials-swiper .swiper-slide > div {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.testimonials-swiper-pagination .swiper-pagination-bullet {
+  background: rgba(17, 17, 17, 0.3) !important;
+  opacity: 1 !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 6px !important;
+}
+
+.testimonials-swiper-pagination .swiper-pagination-bullet-active {
+  background: #111111 !important;
+  transform: scale(1.2) !important;
+}
+
+/* Carousel Swiper Styles */
+.carousel-swiper {
+  width: 100% !important;
+  padding-bottom: 50px !important;
+  overflow: visible !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.carousel-swiper .swiper-wrapper {
+  align-items: center !important;
+}
+
+.carousel-swiper .swiper-slide {
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+.carousel-swiper-pagination .swiper-pagination-bullet {
+  background: rgba(17, 17, 17, 0.3) !important;
+  opacity: 1 !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 6px !important;
+}
+
+.carousel-swiper-pagination .swiper-pagination-bullet-active {
+  background: #111111 !important;
+  transform: scale(1.2) !important;
+}
+
+/* Custom navigation button styles */
+.testimonials-swiper-button-prev,
+.testimonials-swiper-button-next,
+.carousel-swiper-button-prev,
+.carousel-swiper-button-next {
+  z-index: 10 !important;
+}
+
+/* Container overflow fixes */
+.testimonials-swiper-container,
+.carousel-swiper-container {
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Navigation button positioning fixes */
+.testimonials-swiper-button-prev,
+.testimonials-swiper-button-next,
+.carousel-swiper-button-prev,
+.carousel-swiper-button-next {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 20 !important;
+  pointer-events: auto !important;
+}
+
+.testimonials-swiper-button-prev,
+.carousel-swiper-button-prev {
+  left: -60px !important;
+}
+
+.testimonials-swiper-button-next,
+.carousel-swiper-button-next {
+  right: -60px !important;
+}
+
+/* Responsive navigation positioning */
+@media (max-width: 1200px) {
+  .testimonials-swiper-button-prev,
+  .carousel-swiper-button-prev {
+    left: -40px !important;
+  }
+
+  .testimonials-swiper-button-next,
+  .carousel-swiper-button-next {
+    right: -40px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials-swiper-button-prev,
+  .carousel-swiper-button-prev {
+    left: 10px !important;
+  }
+
+  .testimonials-swiper-button-next,
+  .carousel-swiper-button-next {
+    right: 10px !important;
+  }
+}
+
+/* Grid layout specific styles */
+.testimonials-grid .swiper-slide {
+  height: auto !important;
+}
+
+/* Fix for testimonial card overflow */
+.testimonial-card {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Force proper Swiper behavior */
+.testimonials-swiper .swiper-wrapper {
+  transform: translate3d(0px, 0px, 0px) !important;
+  transition-duration: 300ms !important;
+}
+
+.testimonials-swiper .swiper-slide {
+  transform: translate3d(0px, 0px, 0px) !important;
+}
+
+/* Ensure slides don't all show at once */
+.testimonials-swiper {
+  --swiper-navigation-size: 44px !important;
+}
+
+.testimonials-swiper .swiper-slide {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure proper spacing for navigation buttons */
+.testimonials-section-container {
+  padding-left: 80px !important;
+  padding-right: 80px !important;
+}
+
+@media (max-width: 1200px) {
+  .testimonials-section-container {
+    padding-left: 60px !important;
+    padding-right: 60px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials-section-container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* Fix for Swiper not respecting slidesPerView */
+.testimonials-swiper .swiper-wrapper {
+  width: 100% !important;
+}
+
+@media (min-width: 1024px) {
+  .testimonials-swiper .swiper-slide {
+    width: calc(33.333% - 21.333px) !important;
+    margin-right: 32px !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .testimonials-swiper .swiper-slide {
+    width: calc(50% - 12px) !important;
+    margin-right: 24px !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .testimonials-swiper .swiper-slide {
+    width: 100% !important;
+    margin-right: 32px !important;
+  }
+}

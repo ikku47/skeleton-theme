@@ -5,7 +5,7 @@
 {% liquid
   assign title = section.settings.title | default: 'What Our Customers Say'
   assign subtitle = section.settings.subtitle | default: 'Testimonials'
-  assign layout = section.settings.layout | default: 'carousel'
+  assign layout = section.settings.layout | default: 'three-column'
   assign auto_play = section.settings.auto_play | default: true
   assign auto_play_interval = section.settings.auto_play_interval | default: 5000
   assign testimonials = section.blocks | where: 'type', 'testimonial'
@@ -74,6 +74,10 @@
       "label": "Layout",
       "options": [
         {
+          "value": "three-column",
+          "label": "Three Column (Recommended)"
+        },
+        {
           "value": "carousel",
           "label": "Carousel"
         },
@@ -82,7 +86,7 @@
           "label": "Grid (2 columns)"
         }
       ],
-      "default": "carousel"
+      "default": "three-column"
     },
     {
       "type": "header",

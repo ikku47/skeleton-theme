@@ -140,17 +140,50 @@
             "content": "The best online shopping experience I have had. Great products, easy checkout, and excellent customer support.",
             "location": "Miami, FL"
           }
+        },
+        "testimonial_4": {
+          "type": "testimonial",
+          "settings": {
+            "name": "David Thompson",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "Outstanding customer service and product quality. I have recommended this store to all my friends and family.",
+            "location": "Chicago, IL"
+          }
+        },
+        "testimonial_5": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Jessica Williams",
+            "role": "Verified Customer",
+            "rating": 4,
+            "content": "Great selection and competitive prices. The delivery was quick and everything arrived in perfect condition.",
+            "location": "Austin, TX"
+          }
+        },
+        "testimonial_6": {
+          "type": "testimonial",
+          "settings": {
+            "name": "Robert Martinez",
+            "role": "Verified Customer",
+            "rating": 5,
+            "content": "Exceptional quality products and seamless shopping experience. Will definitely be a returning customer.",
+            "location": "Seattle, WA"
+          }
         }
       },
       "block_order": [
         "testimonial_1",
         "testimonial_2",
-        "testimonial_3"
+        "testimonial_3",
+        "testimonial_4",
+        "testimonial_5",
+        "testimonial_6"
       ],
       "settings": {
         "title": "What Our Customers Say",
         "subtitle": "Testimonials",
-        "layout": "carousel",
+        "layout": "three-column",
         "auto_play": true,
         "auto_play_interval": 5000
       }

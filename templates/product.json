@@ -63,8 +63,9 @@
       "settings": {
         "title": "What Our Customers Say",
         "subtitle": "Reviews",
-        "layout": "grid",
-        "auto_play": false
+        "layout": "three-column",
+        "auto_play": true,
+        "auto_play_interval": 6000
       }
     }
   },

@@ -83,15 +83,9 @@ const getContainerAspectRatio = (images: ProductImage[]): string => {
   return 'aspect-[2/3]'
 }
 
-const getObjectFitClass = (image: ProductImage): string => {
-  if (!image.aspectRatio) return 'object-cover'
-
-  // Use object-contain for very wide or very tall images to prevent cropping
-  if (image.aspectRatio > 2 || image.aspectRatio < 0.5) {
-    return 'object-contain'
-  }
-
-  return 'object-cover'
+const getObjectFitClass = (): string => {
+  // Always use scale-down for product images to prevent cropping
+  return 'object-scale-down'
 }
 
 export const EnhancedProductGallery: React.FC<EnhancedProductGalleryProps> = ({
@@ -230,7 +224,7 @@ export const EnhancedProductGallery: React.FC<EnhancedProductGalleryProps> = ({
                       srcSet={image.srcset}
                       sizes={getImageSizes('main')}
                       alt={image.alt || `${productTitle} view ${index + 1}`}
-                      className={`w-full h-full ${getObjectFitClass(image)}`}
+                      className={`w-full h-full ${getObjectFitClass()}`}
                       loading={index === 0 ? 'eager' : 'lazy'}
                       onError={() => handleImageError(image.id)}
                     />
@@ -314,7 +308,7 @@ export const EnhancedProductGallery: React.FC<EnhancedProductGalleryProps> = ({
                         src={getOptimalImageUrl(image, 'thumbnail')}
                         sizes={getImageSizes('thumbnail')}
                         alt={image.alt || `${productTitle} thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-scale-down"
                         onError={() => handleImageError(image.id)}
                       />
                     ) : (

@@ -198,7 +198,7 @@ const AccessoryCard: React.FC<{ product: AccessoryProduct }> = ({ product }) => 
         <motion.img
           src={product.imageUrl}
           alt={product.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-scale-down group-hover:scale-105 transition-transform duration-300"
         />
         
         {/* Quick Add Overlay */}

@@ -75,15 +75,9 @@ const getContainerAspectRatio = (images: ProductImage[]): string => {
   return 'aspect-[2/3]'
 }
 
-const getObjectFitClass = (image: ProductImage): string => {
-  if (!image.aspectRatio) return 'object-cover'
-
-  // Use object-contain for very wide or very tall images to prevent cropping
-  if (image.aspectRatio > 2 || image.aspectRatio < 0.5) {
-    return 'object-contain'
-  }
-
-  return 'object-cover'
+const getObjectFitClass = (): string => {
+  // Always use scale-down for product images to prevent cropping
+  return 'object-scale-down'
 }
 
 export const VersaProductGallery: React.FC<VersaProductGalleryProps> = ({
@@ -142,7 +136,7 @@ export const VersaProductGallery: React.FC<VersaProductGalleryProps> = ({
                 srcSet={currentImage.srcset}
                 sizes={getImageSizes('main')}
                 alt={currentImage.alt || productTitle}
-                className={`w-full h-full ${getObjectFitClass(currentImage)}`}
+                className={`w-full h-full ${getObjectFitClass()}`}
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -215,7 +209,7 @@ export const VersaProductGallery: React.FC<VersaProductGalleryProps> = ({
                     src={getOptimalImageUrl(image, 'thumbnail')}
                     sizes={getImageSizes('thumbnail')}
                     alt={image.alt || `${productTitle} ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-scale-down"
                   />
                 </motion.button>
               ))}
@@ -302,7 +296,7 @@ export const VersaProductGallery: React.FC<VersaProductGalleryProps> = ({
                         src={getOptimalImageUrl(image, 'thumbnail')}
                         sizes={getImageSizes('thumbnail')}
                         alt={image.alt || `${productTitle} ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-scale-down"
                       />
                     </motion.button>
                   ))}

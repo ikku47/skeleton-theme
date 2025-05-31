@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Star, ChevronLeft, ChevronRight, Quote, User } from 'lucide-react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import type { Swiper as SwiperType } from 'swiper'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import 'swiper/css/autoplay'
 
 interface Testimonial {
   id: string
@@ -16,7 +23,7 @@ interface TestimonialsSectionProps {
   title?: string
   subtitle?: string
   testimonials: Testimonial[]
-  layout?: 'carousel' | 'grid'
+  layout?: 'carousel' | 'grid' | 'three-column'
   autoPlay?: boolean
   autoPlayInterval?: number
   className?: string
@@ -26,34 +33,115 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   title = 'What Our Customers Say',
   subtitle = 'Testimonials',
   testimonials,
-  layout = 'carousel',
+  layout = 'three-column',
   autoPlay = true,
   autoPlayInterval = 5000,
   className = '',
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Auto-play functionality for carousel
-  useEffect(() => {
-    if (autoPlay && layout === 'carousel' && testimonials.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-      }, autoPlayInterval)
-
-      return () => clearInterval(interval)
-    }
-  }, [autoPlay, autoPlayInterval, testimonials.length, layout])
-
-  const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length)
+  const handleSlideChange = (swiper: SwiperType) => {
+    setCurrentIndex(swiper.activeIndex)
   }
 
-  const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-  }
+  // Three-column layout with Swiper
+  if (layout === 'three-column') {
+    return (
+      <section className={`section-padding bg-light-bg ${className}`}>
+        <div className="container testimonials-section-container">
+          {/* Section Header */}
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            {subtitle && (
+              <p className="font-body text-neutral text-lg mb-4 uppercase tracking-wide">
+                {subtitle}
+              </p>
+            )}
+            <h2 className="font-heading text-primary text-4xl md:text-5xl font-bold">
+              {title}
+            </h2>
+          </motion.div>
 
-  const goToTestimonial = (index: number) => {
-    setCurrentIndex(index)
+          {/* Testimonials Swiper */}
+          <div className="relative testimonials-swiper-container overflow-hidden">
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={32}
+              slidesPerView={1}
+              slidesPerGroup={1}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  slidesPerGroup: 1,
+                  spaceBetween: 24,
+                },
+                1024: {
+                  slidesPerView: 3,
+                  slidesPerGroup: 1,
+                  spaceBetween: 32,
+                },
+              }}
+              navigation={{
+                nextEl: '.testimonials-swiper-button-next',
+                prevEl: '.testimonials-swiper-button-prev',
+              }}
+              pagination={{
+                el: '.testimonials-swiper-pagination',
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              autoplay={autoPlay ? {
+                delay: autoPlayInterval,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              } : false}
+              loop={testimonials.length > 3}
+              onSlideChange={handleSlideChange}
+              className="testimonials-swiper !overflow-hidden"
+              style={{
+                '--swiper-theme-color': '#FFD100',
+                '--swiper-pagination-color': '#111111',
+              } as any}
+            >
+              {testimonials.map((testimonial) => (
+                <SwiperSlide key={testimonial.id}>
+                  <TestimonialCard testimonial={testimonial} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* Custom Navigation Buttons */}
+            {testimonials.length > 3 && (
+              <>
+                <motion.button
+                  className="testimonials-swiper-button-prev p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </motion.button>
+
+                <motion.button
+                  className="testimonials-swiper-button-next p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </motion.button>
+              </>
+            )}
+
+            {/* Custom Pagination */}
+            <div className="testimonials-swiper-pagination flex justify-center mt-12"></div>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   if (layout === 'grid') {
@@ -103,10 +191,10 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
     )
   }
 
-  // Carousel Layout
+  // Carousel Layout with Swiper
   return (
     <section className={`section-padding bg-light-bg ${className}`}>
-      <div className="container">
+      <div className="container testimonials-section-container">
         {/* Section Header */}
         <motion.div
           className="text-center mb-12"
@@ -126,57 +214,59 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         </motion.div>
 
         {/* Carousel Container */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Navigation Buttons */}
-          <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 flex justify-between pointer-events-none z-10">
-            <motion.button
-              onClick={prevTestimonial}
-              className="pointer-events-auto p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200 -translate-x-6"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </motion.button>
-            
-            <motion.button
-              onClick={nextTestimonial}
-              className="pointer-events-auto p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200 translate-x-6"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </motion.button>
-          </div>
-
-          {/* Testimonial Cards */}
-          <div className="overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-              >
-                <TestimonialCard testimonial={testimonials[currentIndex]} large />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Pagination Dots */}
-          <div className="flex justify-center mt-8 gap-2">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToTestimonial(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                  index === currentIndex
-                    ? 'bg-primary w-8'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
+        <div className="relative max-w-4xl mx-auto carousel-swiper-container overflow-hidden">
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={0}
+            slidesPerView={1}
+            navigation={{
+              nextEl: '.carousel-swiper-button-next',
+              prevEl: '.carousel-swiper-button-prev',
+            }}
+            pagination={{
+              el: '.carousel-swiper-pagination',
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            autoplay={autoPlay ? {
+              delay: autoPlayInterval,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            } : false}
+            loop={testimonials.length > 1}
+            onSlideChange={handleSlideChange}
+            className="carousel-swiper"
+            style={{
+              '--swiper-theme-color': '#FFD100',
+              '--swiper-pagination-color': '#111111',
+            } as any}
+          >
+            {testimonials.map((testimonial) => (
+              <SwiperSlide key={testimonial.id}>
+                <TestimonialCard testimonial={testimonial} large />
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
+
+          {/* Custom Navigation Buttons */}
+          <motion.button
+            className="carousel-swiper-button-prev p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </motion.button>
+
+          <motion.button
+            className="carousel-swiper-button-next p-3 bg-white shadow-lg rounded-full text-primary hover:bg-accent hover:text-primary transition-all duration-200"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </motion.button>
+
+          {/* Custom Pagination */}
+          <div className="carousel-swiper-pagination flex justify-center mt-8"></div>
         </div>
       </div>
     </section>
@@ -189,7 +279,7 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial; large?: boolean }> =
   large = false,
 }) => {
   return (
-    <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ${
+    <div className={`testimonial-card bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 h-full ${
       large ? 'p-8 md:p-12' : 'p-6'
     }`}>
       {/* Quote Icon */}
@@ -216,30 +306,51 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial; large?: boolean }> =
       </div>
 
       {/* Content */}
-      <blockquote className={`text-center mb-6 ${
+      <blockquote className={`text-center mb-8 ${
         large ? 'text-lg md:text-xl' : 'text-base'
       } text-neutral leading-relaxed italic`}>
         "{testimonial.content}"
       </blockquote>
 
       {/* Author */}
-      <div className="flex items-center justify-center gap-4">
-        {testimonial.avatar && (
-          <img
-            src={testimonial.avatar}
-            alt={testimonial.name}
-            className="w-12 h-12 rounded-full object-cover"
-          />
-        )}
+      <div className="flex flex-col items-center gap-4">
+        {/* Avatar with placeholder */}
+        <div className="relative">
+          {testimonial.avatar ? (
+            <img
+              src={testimonial.avatar}
+              alt={testimonial.name}
+              className="w-16 h-16 rounded-full object-cover border-2 border-gray-100"
+              onError={(e) => {
+                // Fallback to placeholder if image fails to load
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+                const placeholder = target.nextElementSibling as HTMLElement
+                if (placeholder) placeholder.style.display = 'flex'
+              }}
+            />
+          ) : null}
+          {/* Placeholder avatar */}
+          <div
+            className={`w-16 h-16 rounded-full bg-gradient-to-br from-accent to-yellow-300 flex items-center justify-center border-2 border-gray-100 ${
+              testimonial.avatar ? 'hidden' : 'flex'
+            }`}
+            style={{ display: testimonial.avatar ? 'none' : 'flex' }}
+          >
+            <User className="w-8 h-8 text-primary" />
+          </div>
+        </div>
+
+        {/* Author info */}
         <div className="text-center">
-          <p className="font-heading font-semibold text-primary">
+          <p className="font-heading font-semibold text-primary text-lg">
             {testimonial.name}
           </p>
           {testimonial.role && (
-            <p className="text-sm text-neutral">{testimonial.role}</p>
+            <p className="text-sm text-neutral font-medium">{testimonial.role}</p>
           )}
           {testimonial.location && (
-            <p className="text-xs text-neutral">{testimonial.location}</p>
+            <p className="text-xs text-neutral mt-1">{testimonial.location}</p>
           )}
         </div>
       </div>
@@ -253,6 +364,7 @@ export const defaultTestimonials: Testimonial[] = [
     id: '1',
     name: 'Sarah Johnson',
     role: 'Verified Customer',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
     rating: 5,
     content: 'Amazing quality and fast shipping! The product exceeded my expectations and the customer service was outstanding.',
     location: 'New York, NY',
@@ -269,8 +381,35 @@ export const defaultTestimonials: Testimonial[] = [
     id: '3',
     name: 'Emily Rodriguez',
     role: 'Verified Customer',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     rating: 5,
     content: 'The best online shopping experience I\'ve had. Great products, easy checkout, and excellent customer support.',
     location: 'Miami, FL',
+  },
+  {
+    id: '4',
+    name: 'David Thompson',
+    role: 'Verified Customer',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    rating: 5,
+    content: 'Outstanding customer service and product quality. I\'ve recommended this store to all my friends and family.',
+    location: 'Chicago, IL',
+  },
+  {
+    id: '5',
+    name: 'Jessica Williams',
+    role: 'Verified Customer',
+    rating: 4,
+    content: 'Great selection and competitive prices. The delivery was quick and everything arrived in perfect condition.',
+    location: 'Austin, TX',
+  },
+  {
+    id: '6',
+    name: 'Robert Martinez',
+    role: 'Verified Customer',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    rating: 5,
+    content: 'Exceptional quality products and seamless shopping experience. Will definitely be a returning customer.',
+    location: 'Seattle, WA',
   },
 ]

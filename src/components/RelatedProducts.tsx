@@ -80,7 +80,7 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
               <motion.img
                 src={product.imageUrl}
                 alt={product.imageAlt || product.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-scale-down"
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               />

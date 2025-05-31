@@ -75,15 +75,9 @@ const getContainerAspectRatio = (images: ProductImage[]): string => {
   return 'aspect-[2/3]'
 }
 
-const getObjectFitClass = (image: ProductImage): string => {
-  if (!image.aspectRatio) return 'object-cover'
-
-  // Use object-contain for very wide or very tall images to prevent cropping
-  if (image.aspectRatio > 2 || image.aspectRatio < 0.5) {
-    return 'object-contain'
-  }
-
-  return 'object-cover'
+const getObjectFitClass = (): string => {
+  // Always use scale-down for product images to prevent cropping
+  return 'object-scale-down'
 }
 
 export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
@@ -129,7 +123,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
             srcSet={currentImage.srcset}
             sizes={getImageSizes('main')}
             alt={currentImage.alt || productTitle}
-            className={`w-full h-full ${getObjectFitClass(currentImage)} cursor-zoom-in`}
+            className={`w-full h-full ${getObjectFitClass()} cursor-zoom-in`}
             onClick={() => setIsZoomed(true)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -190,7 +184,7 @@ export const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
                 src={getOptimalImageUrl(image, 'thumbnail')}
                 sizes={getImageSizes('thumbnail')}
                 alt={image.alt || `${productTitle} view ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-scale-down"
               />
             </motion.div>
           ))}

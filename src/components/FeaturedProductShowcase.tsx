@@ -121,7 +121,7 @@ export const FeaturedProductShowcase: React.FC<FeaturedProductShowcaseProps> = (
                 <img
                   src={product.imageUrl}
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-scale-down group-hover:scale-105 transition-transform duration-500"
                 />
                 
                 {/* Product Overlay */}
@@ -181,7 +181,7 @@ export const FeaturedProductShowcase: React.FC<FeaturedProductShowcaseProps> = (
                 <img
                   src={product.imageUrl}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-scale-down"
                 />
               </div>
               
