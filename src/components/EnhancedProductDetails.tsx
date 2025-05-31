@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, AlertCircle } from 'lucide-react'
+import { EnhancedVariantSelector } from './EnhancedVariantSelector'
 
 interface ProductVariant {
   id: string
@@ -9,6 +10,12 @@ interface ProductVariant {
   compareAtPrice?: string
   available: boolean
   options: Record<string, string>
+  inventory_quantity?: number
+  inventory_policy?: string
+  featured_image?: {
+    url: string
+    alt: string
+  }
 }
 
 interface ProductOption {
@@ -54,29 +61,99 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
   const [addToCartSuccess, setAddToCartSuccess] = useState(false)
 
   useEffect(() => {
-    // Initialize selected options with first variant
-    if (product.variants.length > 0 && product.options.length > 0) {
-      const initialOptions: Record<string, string> = {}
-      product.options.forEach(option => {
-        if (option.values.length > 0) {
-          initialOptions[option.name] = option.values[0]
-        }
-      })
-      setSelectedOptions(initialOptions)
+    // Initialize selected options with first available variant's actual options
+    if (product.variants.length > 0) {
+      const firstVariant = product.variants[0]
+      console.log('Initializing with first variant:', firstVariant)
+      console.log('All available variants:', product.variants)
+      setSelectedVariant(firstVariant)
+      setSelectedOptions(firstVariant.options)
+
+      // Update URL with variant ID
+      const url = new URL(window.location.href)
+      url.searchParams.set('variant', firstVariant.id)
+      window.history.replaceState({}, '', url.toString())
     }
   }, [product])
 
-  const handleOptionChange = (optionName: string, value: string) => {
+  // Check URL for variant parameter on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const variantId = urlParams.get('variant')
+
+    if (variantId) {
+      const variant = product.variants.find(v => v.id === variantId)
+      if (variant) {
+        setSelectedVariant(variant)
+        setSelectedOptions(variant.options)
+      }
+    }
+  }, [])
+
+  // Helper function to check if an option value is available
+  const isOptionValueAvailable = (optionName: string, value: string) => {
     const newOptions = { ...selectedOptions, [optionName]: value }
+    return product.variants.some(variant =>
+      Object.entries(newOptions).every(([key, val]) => variant.options[key] === val) &&
+      variant.available
+    )
+  }
+
+  // Helper function to get all available variants for current selection
+  const getAvailableVariants = () => {
+    return product.variants.filter(variant => variant.available)
+  }
+
+  const handleOptionChange = (optionName: string, value: string) => {
+    console.log('Option changed:', optionName, '=', value)
+    const newOptions = { ...selectedOptions, [optionName]: value }
+    console.log('New options:', newOptions)
     setSelectedOptions(newOptions)
-    
+
     // Find matching variant
     const matchingVariant = product.variants.find(variant =>
       Object.entries(newOptions).every(([key, val]) => variant.options[key] === val)
     )
-    
+
+    console.log('Matching variant found:', matchingVariant)
+
     if (matchingVariant) {
+      console.log('Setting variant:', matchingVariant.id, 'Price:', matchingVariant.price)
       setSelectedVariant(matchingVariant)
+
+      // Update URL with new variant
+      const url = new URL(window.location.href)
+      url.searchParams.set('variant', matchingVariant.id)
+      window.history.replaceState({}, '', url.toString())
+    } else {
+      console.log('No exact match found, looking for best match...')
+      // If no exact match, find the closest available variant
+      const availableVariants = getAvailableVariants()
+      if (availableVariants.length > 0) {
+        // Find variant that matches the most options
+        let bestMatch = availableVariants[0]
+        let maxMatches = 0
+
+        availableVariants.forEach(variant => {
+          const matches = Object.entries(newOptions).filter(([key, val]) =>
+            variant.options[key] === val
+          ).length
+
+          if (matches > maxMatches) {
+            maxMatches = matches
+            bestMatch = variant
+          }
+        })
+
+        console.log('Best match found:', bestMatch.id, 'Price:', bestMatch.price)
+        setSelectedVariant(bestMatch)
+        setSelectedOptions(bestMatch.options)
+
+        // Update URL
+        const url = new URL(window.location.href)
+        url.searchParams.set('variant', bestMatch.id)
+        window.history.replaceState({}, '', url.toString())
+      }
     }
   }
 
@@ -177,6 +254,12 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
           <span className="text-3xl font-bold text-gray-900">
             {selectedVariant.price}
           </span>
+          {/* Debug info */}
+          {process.env.NODE_ENV === 'development' && (
+            <small className="text-xs text-gray-400">
+              (Variant: {selectedVariant.id})
+            </small>
+          )}
           {hasDiscount && (
             <>
               <span className="text-xl text-gray-500 line-through">
@@ -194,7 +277,16 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
           {selectedVariant.available ? (
             <>
               <Check className="w-5 h-5 text-green-600" />
-              <span className="text-green-600 font-medium">In Stock</span>
+              <div className="flex flex-col">
+                <span className="text-green-600 font-medium">In Stock</span>
+                {selectedVariant.inventory_quantity !== undefined &&
+                 selectedVariant.inventory_quantity > 0 &&
+                 selectedVariant.inventory_quantity <= 10 && (
+                  <span className="text-orange-600 text-sm">
+                    Only {selectedVariant.inventory_quantity} left!
+                  </span>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -207,37 +299,12 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
 
       {/* Product Options */}
       {product.options.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="space-y-4"
-        >
-          {product.options.map((option) => (
-            <div key={option.name}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {option.name}
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {option.values.map((value) => (
-                  <motion.button
-                    key={value}
-                    onClick={() => handleOptionChange(option.name, value)}
-                    className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all duration-200 ${
-                      selectedOptions[option.name] === value
-                        ? 'border-yellow-400 bg-yellow-50 text-yellow-800'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {value}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </motion.div>
+        <EnhancedVariantSelector
+          product={product}
+          selectedOptions={selectedOptions}
+          onOptionChange={handleOptionChange}
+          isOptionValueAvailable={isOptionValueAvailable}
+        />
       )}
 
       {/* Quantity Selector */}

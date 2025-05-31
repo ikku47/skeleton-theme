@@ -21,13 +21,14 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
   logo,
   logoText = 'VersaCommerce',
   menuItems,
-  cartCount = 0,
+  cartCount: initialCartCount = 0,
   wishlistCount = 0,
   className = '',
 }) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [cartCount, setCartCount] = useState(initialCartCount)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +37,29 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Update cart count when initial prop changes
+  useEffect(() => {
+    setCartCount(initialCartCount)
+  }, [initialCartCount])
+
+  // Listen for cart update events
+  useEffect(() => {
+    const handleCartUpdate = async () => {
+      try {
+        const response = await fetch('/cart.js')
+        if (response.ok) {
+          const cartData = await response.json()
+          setCartCount(cartData.item_count)
+        }
+      } catch (error) {
+        console.error('Error fetching cart data:', error)
+      }
+    }
+
+    window.addEventListener('cart:updated', handleCartUpdate)
+    return () => window.removeEventListener('cart:updated', handleCartUpdate)
   }, [])
 
   const toggleMobileMenu = () => {
@@ -48,6 +72,16 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
   const handleDropdownLeave = () => {
     setActiveDropdown(null)
+  }
+
+  const handleAccountClick = () => {
+    // Navigate to account page or login page
+    window.location.href = '/account'
+  }
+
+  const handleWishlistClick = () => {
+    // Navigate to wishlist page or open wishlist modal
+    window.location.href = '/pages/wishlist'
   }
 
   return (
@@ -148,6 +182,7 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
               className="relative p-2 text-neutral hover:text-primary transition-colors duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleWishlistClick}
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
@@ -175,6 +210,7 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
               className="p-2 text-neutral hover:text-primary transition-colors duration-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleAccountClick}
             >
               <User className="w-5 h-5" />
             </motion.button>
@@ -251,7 +287,10 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
                   <span>Search</span>
                 </button>
 
-                <button className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200">
+                <button
+                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
+                  onClick={handleWishlistClick}
+                >
                   <Heart className="w-5 h-5" />
                   <span>Wishlist</span>
                   {wishlistCount > 0 && (
@@ -274,7 +313,10 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
                   )}
                 </button>
 
-                <button className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200">
+                <button
+                  className="flex items-center gap-2 text-neutral hover:text-primary transition-colors duration-200"
+                  onClick={handleAccountClick}
+                >
                   <User className="w-5 h-5" />
                   <span>Account</span>
                 </button>

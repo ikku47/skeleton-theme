@@ -71,6 +71,18 @@
                 "compareAtPrice": {{ variant.compare_at_price | money | json }},
                 {% endif %}
                 "available": {{ variant.available | json }},
+                {% if variant.inventory_quantity %}
+                "inventory_quantity": {{ variant.inventory_quantity | json }},
+                {% endif %}
+                {% if variant.inventory_policy %}
+                "inventory_policy": {{ variant.inventory_policy | json }},
+                {% endif %}
+                {% if variant.featured_image %}
+                "featured_image": {
+                  "url": {{ variant.featured_image | image_url: width: 800 | json }},
+                  "alt": {{ variant.featured_image.alt | default: product.title | json }}
+                },
+                {% endif %}
                 "options": {
                   {% for option in product.options %}
                     {% assign option_value = variant.options[forloop.index0] %}
@@ -86,12 +98,28 @@
           {% capture options_json %}
           [
             {% for option in product.options %}
+              {% assign option_index = forloop.index0 %}
+              {% assign unique_values = '' %}
+
+              {% comment %} Collect unique values for this option {% endcomment %}
+              {% for variant in product.variants %}
+                {% assign variant_option_value = variant.options[option_index] %}
+                {% if variant_option_value != blank %}
+                  {% assign value_key = variant_option_value | append: '|' %}
+                  {% unless unique_values contains value_key %}
+                    {% assign unique_values = unique_values | append: value_key %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+
               {
                 "name": {{ option | json }},
                 "values": [
-                  {% assign option_values = product.variants | map: 'options' | map: forloop.index0 | uniq %}
-                  {% for value in option_values %}
-                    {{ value | json }}{% unless forloop.last %},{% endunless %}
+                  {% assign values_array = unique_values | split: '|' %}
+                  {% for value in values_array %}
+                    {% if value != blank %}
+                      {{ value | json }}{% unless forloop.last %},{% endunless %}
+                    {% endif %}
                   {% endfor %}
                 ]
               }{% unless forloop.last %},{% endunless %}

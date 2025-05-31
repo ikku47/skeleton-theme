@@ -24,8 +24,12 @@
         {% endfor %}
       ]
       {% endif %}
-    }{% unless forloop.last %},{% endunless %}
+    },
   {% endfor %}
+  {
+    "title": "Blog",
+    "url": "{{ blog.url | default: '/blogs/news' }}"
+  }
 ]
 {% endcapture %}
 
