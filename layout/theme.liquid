@@ -25,7 +25,11 @@
 
     {% sections 'footer-group' %}
 
+    {% # Cart Notifications %}
+    <div id="cart-notifications"></div>
+    {% render 'react-component', component: 'NotificationContainer', props: '{}' %}
+
     {% # Load React components %}
-    {{ 'application.js' | asset_url | script_tag }}
+    <script src="{{ 'application.js' | asset_url }}" defer></script>
   </body>
 </html>

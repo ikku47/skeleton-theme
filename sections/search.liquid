@@ -146,6 +146,8 @@
                         src="{{ result.image | image_url: width: 400, height: 225 }}"
                         alt="{{ result.image.alt | default: result.title }}"
                         class="w-full h-full object-cover"
+                        width="400"
+                        height="225"
                       >
                     </div>
                   {% endif %}

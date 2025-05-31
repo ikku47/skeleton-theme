@@ -1,6 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Heart, ShoppingCart, Eye, Star } from 'lucide-react'
+import { cartUtils } from './CartManager'
+import { notificationManager } from './CartNotification'
 
 interface Product {
   id: string
@@ -120,10 +122,28 @@ export const VersaProductGrid: React.FC<VersaProductGridProps> = ({
 
 // Individual Product Card Component
 const ProductCard: React.FC<{ product: Product; variants: any }> = ({ product, variants }) => {
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
-    // Add to cart logic here
-    console.log('Add to cart:', product.id)
+
+    // Get the first available variant
+    const firstVariant = variants?.find((v: any) => v.available) || variants?.[0]
+    if (!firstVariant) {
+      notificationManager.error('No variants available for this product')
+      return
+    }
+
+    try {
+      const success = await cartUtils.addToCart(firstVariant.id, 1)
+
+      if (success) {
+        // Success notification is handled by CartManager
+      } else {
+        throw new Error('Failed to add to cart')
+      }
+    } catch (error) {
+      console.error('Failed to add to cart:', error)
+      notificationManager.error('Failed to add item to cart. Please try again.')
+    }
   }
 
   const handleToggleWishlist = (e: React.MouseEvent) => {

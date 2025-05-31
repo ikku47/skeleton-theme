@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, AlertCircle } from 'lucide-react'
 import { EnhancedVariantSelector } from './EnhancedVariantSelector'
+import { cartUtils } from './CartManager'
+import { notificationManager } from './CartNotification'
 
 interface ProductVariant {
   id: string
@@ -175,15 +177,22 @@ export const EnhancedProductDetails: React.FC<EnhancedProductDetailsProps> = ({
   }
 
   const handleAddToCart = async () => {
+    if (!selectedVariant.available || isAddingToCart || !selectedVariant.id) return
+
     setIsAddingToCart(true)
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setAddToCartSuccess(true)
-      setTimeout(() => setAddToCartSuccess(false), 3000)
+      const success = await cartUtils.addToCart(selectedVariant.id, quantity)
+
+      if (success) {
+        setAddToCartSuccess(true)
+        setTimeout(() => setAddToCartSuccess(false), 3000)
+      } else {
+        throw new Error('Failed to add to cart')
+      }
     } catch (error) {
       console.error('Failed to add to cart:', error)
+      notificationManager.error('Failed to add item to cart. Please try again.')
     } finally {
       setIsAddingToCart(false)
     }

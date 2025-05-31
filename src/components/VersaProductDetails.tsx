@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Heart, Share2, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw } from 'lucide-react'
+import { cartUtils } from './CartManager'
+import { notificationManager } from './CartNotification'
 
 interface ProductVariant {
   id: string
@@ -60,12 +62,21 @@ export const VersaProductDetails: React.FC<VersaProductDetailsProps> = ({
     setQuantity(Math.max(1, quantity + change))
   }
 
-  const handleAddToCart = () => {
-    // Add to cart logic here
-    console.log('Add to cart:', {
-      variantId: selectedVariant.id,
-      quantity,
-    })
+  const handleAddToCart = async () => {
+    if (!selectedVariant.available || !selectedVariant.id) return
+
+    try {
+      const success = await cartUtils.addToCart(selectedVariant.id, quantity)
+
+      if (success) {
+        // Success notification is handled by CartManager
+      } else {
+        throw new Error('Failed to add to cart')
+      }
+    } catch (error) {
+      console.error('Failed to add to cart:', error)
+      notificationManager.error('Failed to add item to cart. Please try again.')
+    }
   }
 
   const toggleWishlist = () => {

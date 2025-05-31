@@ -24,26 +24,6 @@
 {% endcapture %}
 
 {% render 'react-component', component: 'VersaProductGrid', props: product_grid_props %}
-    
-    {% if section.settings.show_view_all and collection.products.size > 0 %}
-      <div class="text-center mt-12">
-        {% liquid
-          assign view_all_url = section.settings.view_all_url
-          unless view_all_url
-            if selected_collection
-              assign view_all_url = selected_collection.url
-            else
-              assign view_all_url = routes.all_products_collection_url
-            endif
-          endunless
-        %}
-        <a href="{{ view_all_url }}" class="btn btn-outline">
-          {% if selected_collection %}View All {{ selected_collection.title }}{% else %}View All Products{% endif %}
-        </a>
-      </div>
-    {% endif %}
-  </div>
-</section>
 
 {% schema %}
 {

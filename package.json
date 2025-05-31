@@ -11,7 +11,7 @@
     "build": "bun run build:css && bun run build:js",
     "build:css": "tailwindcss -i src/styles/main.css -o assets/application.css --minify",
     "build:js": "vite build --mode production",
-    "preview": "shopify theme dev",
+    "preview": "shopify theme dev --store=joycommerce-dxb",
     "deploy": "shopify theme push",
     "pull": "shopify theme pull",
     "check": "shopify theme check"

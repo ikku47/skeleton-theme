@@ -19,9 +19,11 @@
               <div class="flex justify-center md:justify-start">
                 {% if item.image %}
                   <img
-                    src="{{ item.image | img_url: '150x150' }}"
+                    src="{{ item.image | image_url: width: 150, height: 150 }}"
                     alt="{{ item.image.alt | escape }}"
                     class="w-20 h-20 object-cover rounded-md"
+                    width="150"
+                    height="150"
                   >
                 {% else %}
                   <div class="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center">

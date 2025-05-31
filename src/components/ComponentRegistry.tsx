@@ -36,6 +36,8 @@ import { VersaFooter } from './VersaFooter'
 import { EnhancedProductGallery } from './EnhancedProductGallery'
 import { EnhancedProductDetails } from './EnhancedProductDetails'
 import { EnhancedVariantSelector } from './EnhancedVariantSelector'
+import { CartNotification, NotificationContainer } from './CartNotification'
+import { CartProvider } from './CartManager'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -73,6 +75,9 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   EnhancedProductGallery,
   EnhancedProductDetails,
   EnhancedVariantSelector,
+  CartNotification,
+  NotificationContainer,
+  CartProvider,
 }
 
 // Type for component names

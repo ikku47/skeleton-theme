@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, ShoppingCart, Zap, Share2 } from 'lucide-react'
+import { cartUtils } from './CartManager'
+import { notificationManager } from './CartNotification'
 
 interface ProductActionsProps {
   isAvailable: boolean
@@ -59,29 +61,17 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     setIsAddingToCart(true)
 
     try {
-      const response = await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: variantId,
-          quantity: currentQuantity,
-        }),
-      })
+      const success = await cartUtils.addToCart(variantId, currentQuantity)
 
-      if (response.ok) {
+      if (success) {
         setIsAddedToCart(true)
         setTimeout(() => setIsAddedToCart(false), 2000)
-
-        // Trigger cart update event
-        window.dispatchEvent(new CustomEvent('cart:updated'))
       } else {
         throw new Error('Failed to add to cart')
       }
     } catch (error) {
       console.error('Error adding to cart:', error)
-      alert('Failed to add item to cart. Please try again.')
+      notificationManager.error('Failed to add item to cart. Please try again.')
     } finally {
       setIsAddingToCart(false)
     }
@@ -91,19 +81,10 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     if (!isAvailable || !variantId) return
 
     try {
-      // Add to cart first
-      const response = await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: variantId,
-          quantity: currentQuantity,
-        }),
-      })
+      // Add to cart first using cart utils
+      const success = await cartUtils.addToCart(variantId, currentQuantity)
 
-      if (response.ok) {
+      if (success) {
         // Redirect to checkout
         window.location.href = '/checkout'
       } else {
@@ -111,7 +92,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
       }
     } catch (error) {
       console.error('Error with buy now:', error)
-      alert('Failed to process buy now. Please try again.')
+      notificationManager.error('Failed to process buy now. Please try again.')
     }
   }
 
