@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Eye, Star } from 'lucide-react'
 import { AddToCartButton } from '../shared/AddToCartButton'
+import { useQuickViewContext, transformProductForQuickView } from './useQuickView'
 
 interface Product {
   id: string
@@ -19,6 +20,19 @@ interface Product {
     id: string
     available: boolean
   }>
+  // Additional fields for quick view
+  vendor?: string
+  description?: string
+  images?: Array<{
+    url: string
+    alt?: string
+  }>
+  options?: Array<{
+    name: string
+    values: string[]
+  }>
+  tags?: string[]
+  handle?: string
 }
 
 interface VersaProductGridProps {
@@ -156,6 +170,12 @@ const ProductCard: React.FC<{
   // Get the first available variant from product data
   const firstVariant = product.variants?.find((v: any) => v.available) || product.variants?.[0]
 
+  // Use global quick view function
+  const openQuickView = (window as any).globalQuickView?.openQuickView || (() => {
+    console.warn('Global QuickView not available, redirecting to product page')
+    window.location.href = product.productUrl
+  })
+
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     // Wishlist logic here
@@ -164,8 +184,34 @@ const ProductCard: React.FC<{
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault()
-    // Quick view logic here
-    console.log('Quick view:', product.id)
+
+    console.log('Quick view clicked for product:', product.id)
+
+    // Transform product data for quick view
+    const quickViewProduct = transformProductForQuickView({
+      id: product.id,
+      title: product.title,
+      vendor: product.vendor,
+      price: product.price,
+      compare_at_price: product.compareAtPrice,
+      description: product.description || '',
+      images: product.images || [{ url: product.imageUrl, alt: product.imageAlt }],
+      variants: product.variants?.map(v => ({
+        id: v.id,
+        title: 'Default',
+        price: product.price,
+        compare_at_price: product.compareAtPrice,
+        available: v.available,
+        options: {}
+      })) || [],
+      options: product.options || [],
+      tags: product.tags || [],
+      url: product.productUrl,
+      handle: product.handle || product.id
+    })
+
+    console.log('Transformed product for quick view:', quickViewProduct)
+    openQuickView(quickViewProduct)
   }
 
   if (layout === 'list') {

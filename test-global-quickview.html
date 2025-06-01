@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Quick View Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none !important; }
+        .backdrop-blur-sm { backdrop-filter: blur(4px); }
+        
+        /* Versa theme colors */
+        .bg-off-white { background-color: #faf9f7; }
+        .text-dark { color: #2c2c2c; }
+        .text-charcoal { color: #4a4a4a; }
+        .text-medium-gray { color: #6b6b6b; }
+        .text-warm-brown { color: #8b6f47; }
+        .text-gold { color: #d4af37; }
+        .bg-gold { background-color: #d4af37; }
+        .border-gold { border-color: #d4af37; }
+        .border-light-gray { border-color: #e5e5e5; }
+        .rounded-card { border-radius: 12px; }
+        .rounded-button { border-radius: 8px; }
+        .shadow-elegant { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .font-heading { font-family: 'Georgia', serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">Global Quick View Test</h1>
+        
+        <!-- Debug Info -->
+        <div class="max-w-md mx-auto mb-6 p-4 bg-blue-50 rounded-lg">
+            <h4 class="font-medium text-blue-900 mb-2">Debug Info:</h4>
+            <p id="debugInfo" class="text-sm text-blue-700">Initializing...</p>
+            <div id="globalState" class="text-xs text-blue-600 mt-2"></div>
+        </div>
+        
+        <!-- Test Product Card -->
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+            <div class="relative">
+                <img 
+                    src="https://via.placeholder.com/400x400/D4AF37/FFFFFF?text=Test+Product" 
+                    alt="Test Product"
+                    class="w-full h-64 object-cover"
+                />
+                <div class="absolute top-4 right-4">
+                    <span class="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
+                        25% OFF
+                    </span>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Elegant Test Ring</h3>
+                <p class="text-sm text-gray-600 mb-3">Premium Collection</p>
+                
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-xl font-bold text-gray-900">$299.99</span>
+                    <span class="text-lg text-gray-500 line-through">$399.99</span>
+                </div>
+                
+                <button 
+                    id="testQuickViewBtn"
+                    class="w-full bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                >
+                    Test Global Quick View
+                </button>
+            </div>
+        </div>
+
+        <!-- Manual Test Buttons -->
+        <div class="max-w-md mx-auto space-y-3">
+            <button 
+                id="checkGlobalBtn"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+                Check Global Quick View State
+            </button>
+            
+            <button 
+                id="reinitBtn"
+                class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+            >
+                Reinitialize Components
+            </button>
+        </div>
+    </div>
+
+    <!-- Load the React components -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+        let debugInfo = null;
+        let globalState = null;
+        
+        function updateDebug(message) {
+            if (debugInfo) {
+                debugInfo.textContent = message;
+            }
+            console.log('DEBUG:', message);
+        }
+        
+        function updateGlobalState() {
+            if (!globalState) return;
+            
+            const global = window.globalQuickView;
+            if (global) {
+                globalState.innerHTML = `
+                    <strong>Global Quick View:</strong><br>
+                    Available: Yes<br>
+                    Is Open: ${global.isOpen ? 'Yes' : 'No'}<br>
+                    Product: ${global.product ? global.product.title || 'Loaded' : 'None'}
+                `;
+            } else {
+                globalState.innerHTML = `
+                    <strong>Global Quick View:</strong><br>
+                    Available: No<br>
+                    Status: Not initialized
+                `;
+            }
+        }
+        
+        function testGlobalQuickView() {
+            updateDebug('Testing global quick view...');
+            
+            const global = window.globalQuickView;
+            if (!global) {
+                updateDebug('ERROR: Global quick view not available!');
+                return;
+            }
+            
+            // Test product data
+            const testProduct = {
+                id: 'test-product-123',
+                title: 'Elegant Test Ring',
+                vendor: 'Premium Collection',
+                price: '$299.99',
+                compareAtPrice: '$399.99',
+                description: 'A beautiful test ring with elegant design and premium materials.',
+                images: [
+                    { url: 'https://via.placeholder.com/600x600/D4AF37/FFFFFF?text=Ring+Detail+1', alt: 'Ring Detail 1' },
+                    { url: 'https://via.placeholder.com/600x600/C4A037/FFFFFF?text=Ring+Detail+2', alt: 'Ring Detail 2' },
+                    { url: 'https://via.placeholder.com/600x600/B4A037/FFFFFF?text=Ring+Detail+3', alt: 'Ring Detail 3' }
+                ],
+                variants: [
+                    {
+                        id: 'variant-1',
+                        title: 'Size 6',
+                        price: '$299.99',
+                        compareAtPrice: '$399.99',
+                        available: true,
+                        options: { Size: '6' }
+                    },
+                    {
+                        id: 'variant-2',
+                        title: 'Size 7',
+                        price: '$299.99',
+                        compareAtPrice: '$399.99',
+                        available: true,
+                        options: { Size: '7' }
+                    }
+                ],
+                options: [
+                    {
+                        name: 'Size',
+                        values: ['6', '7', '8', '9']
+                    }
+                ],
+                tags: ['ring', 'elegant', 'premium'],
+                productUrl: '/products/test-ring'
+            };
+            
+            try {
+                updateDebug('Opening quick view with test product...');
+                global.openQuickView(testProduct);
+                updateDebug('Quick view opened successfully!');
+            } catch (error) {
+                updateDebug(`ERROR: ${error.message}`);
+                console.error('Quick view error:', error);
+            }
+        }
+        
+        function checkGlobalState() {
+            updateDebug('Checking global state...');
+            
+            console.log('Window object keys:', Object.keys(window));
+            console.log('Global quick view:', window.globalQuickView);
+            console.log('Component registry:', window.ComponentRegistry);
+            console.log('Reinitialize function:', window.reinitializeComponents);
+            
+            updateGlobalState();
+            
+            if (window.globalQuickView) {
+                updateDebug('Global quick view is available and ready!');
+            } else {
+                updateDebug('Global quick view is not available. Checking initialization...');
+                
+                // Check if main.tsx is loaded
+                if (window.ComponentRegistry) {
+                    updateDebug('ComponentRegistry found, but globalQuickView missing');
+                } else {
+                    updateDebug('ComponentRegistry not found - main.tsx may not be loaded');
+                }
+            }
+        }
+        
+        function reinitializeComponents() {
+            updateDebug('Reinitializing components...');
+            
+            if (window.reinitializeComponents) {
+                window.reinitializeComponents();
+                updateDebug('Components reinitialized!');
+                setTimeout(() => {
+                    checkGlobalState();
+                }, 1000);
+            } else {
+                updateDebug('Reinitialize function not available');
+            }
+        }
+        
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            debugInfo = document.getElementById('debugInfo');
+            globalState = document.getElementById('globalState');
+            
+            updateDebug('DOM ready, setting up event listeners...');
+            
+            // Set up event listeners
+            document.getElementById('testQuickViewBtn').addEventListener('click', testGlobalQuickView);
+            document.getElementById('checkGlobalBtn').addEventListener('click', checkGlobalState);
+            document.getElementById('reinitBtn').addEventListener('click', reinitializeComponents);
+            
+            // Initial state check
+            setTimeout(() => {
+                checkGlobalState();
+                updateGlobalState();
+            }, 2000);
+            
+            // Periodic state updates
+            setInterval(updateGlobalState, 3000);
+        });
+        
+        // Listen for global quick view state changes
+        window.addEventListener('load', function() {
+            updateDebug('Window loaded, checking for global quick view...');
+            setTimeout(checkGlobalState, 1000);
+        });
+    </script>
+</body>
+</html>

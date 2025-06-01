@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick View Test - Fixed Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none !important; }
+        .backdrop-blur-sm { backdrop-filter: blur(4px); }
+        
+        /* Custom styles for better visual feedback */
+        .btn-hover:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-active:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Product Card -->
+        <div class="relative">
+            <img 
+                src="https://via.placeholder.com/400x400/D4AF37/FFFFFF?text=Elegant+Ring" 
+                alt="Elegant Ring"
+                class="w-full h-64 object-cover"
+            />
+            <div class="absolute top-4 right-4">
+                <span class="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
+                    25% OFF
+                </span>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Elegant Diamond Ring</h3>
+            <p class="text-sm text-gray-600 mb-3">Premium Collection</p>
+            
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-xl font-bold text-gray-900">$299.99</span>
+                <span class="text-lg text-gray-500 line-through">$399.99</span>
+            </div>
+            
+            <button 
+                id="quickViewBtn"
+                class="w-full bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors btn-hover btn-active"
+            >
+                Quick View
+            </button>
+        </div>
+    </div>
+
+    <!-- Debug Info -->
+    <div class="max-w-md mx-auto mt-6 p-4 bg-blue-50 rounded-lg">
+        <h4 class="font-medium text-blue-900 mb-2">Debug Info:</h4>
+        <p id="debugInfo" class="text-sm text-blue-700">Ready to test quick view...</p>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-xl">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <!-- Image Section -->
+                    <div class="relative bg-gray-100">
+                        <!-- Navigation and Close Buttons -->
+                        <div class="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
+                            <div class="flex gap-2">
+                                <button 
+                                    id="prevBtn"
+                                    class="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-md hover:shadow-lg btn-hover btn-active"
+                                    aria-label="Previous image"
+                                >
+                                    ←
+                                </button>
+                                <button 
+                                    id="nextBtn"
+                                    class="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-md hover:shadow-lg btn-hover btn-active"
+                                    aria-label="Next image"
+                                >
+                                    →
+                                </button>
+                            </div>
+                            
+                            <button 
+                                id="closeBtn"
+                                class="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-md hover:shadow-lg btn-hover btn-active"
+                                aria-label="Close quick view"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        
+                        <!-- Product Image -->
+                        <div class="aspect-square relative overflow-hidden">
+                            <img 
+                                id="modalImage"
+                                src="https://via.placeholder.com/600x600/D4AF37/FFFFFF?text=Ring+Detail+1" 
+                                alt="Product Detail"
+                                class="w-full h-full object-cover transition-opacity duration-300"
+                            />
+                        </div>
+                        
+                        <!-- Image Indicators -->
+                        <div id="imageIndicators" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+                            <button class="w-3 h-3 rounded-full bg-amber-500 shadow-md btn-hover" data-index="0"></button>
+                            <button class="w-3 h-3 rounded-full bg-white/60 hover:bg-white/80 btn-hover" data-index="1"></button>
+                            <button class="w-3 h-3 rounded-full bg-white/60 hover:bg-white/80 btn-hover" data-index="2"></button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Details Section -->
+                    <div class="p-6 lg:p-8 overflow-y-auto">
+                        <div class="space-y-6">
+                            <!-- Header -->
+                            <div>
+                                <h2 class="text-2xl lg:text-3xl font-normal text-gray-900 leading-tight">
+                                    Elegant Diamond Ring
+                                </h2>
+                                <p class="text-sm text-gray-600 font-medium uppercase tracking-wide mt-1">
+                                    Premium Collection
+                                </p>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-medium text-gray-900">$299.99</span>
+                                <span class="text-lg text-gray-500 line-through">$399.99</span>
+                                <span class="px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded">25% OFF</span>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Exquisite diamond ring crafted with precision and elegance. Features a brilliant cut diamond set in premium gold band.
+                                </p>
+                            </div>
+                            
+                            <!-- Size Options -->
+                            <div class="space-y-3">
+                                <label class="block text-sm font-medium text-gray-900">Size</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="px-4 py-2 border border-amber-500 bg-amber-500 text-white rounded text-sm font-medium btn-hover btn-active">6</button>
+                                    <button class="px-4 py-2 border border-gray-300 text-gray-700 hover:border-amber-500 rounded text-sm font-medium btn-hover btn-active">7</button>
+                                    <button class="px-4 py-2 border border-gray-300 text-gray-700 hover:border-amber-500 rounded text-sm font-medium btn-hover btn-active">8</button>
+                                    <button class="px-4 py-2 border border-gray-300 text-gray-700 hover:border-amber-500 rounded text-sm font-medium btn-hover btn-active">9</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Quantity -->
+                            <div class="space-y-3">
+                                <label class="block text-sm font-medium text-gray-900">Quantity</label>
+                                <div class="flex items-center gap-3">
+                                    <button 
+                                        id="decreaseQty"
+                                        class="p-2 border border-gray-300 rounded hover:border-amber-500 transition-colors btn-hover btn-active"
+                                        aria-label="Decrease quantity"
+                                    >
+                                        −
+                                    </button>
+                                    <span id="quantity" class="w-12 text-center font-medium">1</span>
+                                    <button 
+                                        id="increaseQty"
+                                        class="p-2 border border-gray-300 rounded hover:border-amber-500 transition-colors btn-hover btn-active"
+                                        aria-label="Increase quantity"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="space-y-3">
+                                <button class="w-full bg-amber-600 text-white py-3 px-4 rounded font-medium hover:bg-amber-700 transition-colors btn-hover btn-active">
+                                    ADD TO BAG — $299.99
+                                </button>
+                                
+                                <button class="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded font-medium hover:border-amber-500 transition-colors btn-hover btn-active">
+                                    BUY IT NOW
+                                </button>
+                                
+                                <div class="flex gap-3">
+                                    <button class="flex-1 flex items-center justify-center gap-2 p-3 border border-gray-300 rounded hover:border-amber-500 transition-colors btn-hover btn-active">
+                                        ♡ <span class="text-sm font-medium">Wishlist</span>
+                                    </button>
+                                    <button class="flex-1 flex items-center justify-center gap-2 p-3 border border-gray-300 rounded hover:border-amber-500 transition-colors btn-hover btn-active">
+                                        ↗ <span class="text-sm font-medium">Share</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test data for multiple images
+        const images = [
+            'https://via.placeholder.com/600x600/D4AF37/FFFFFF?text=Ring+Detail+1',
+            'https://via.placeholder.com/600x600/C4A037/FFFFFF?text=Ring+Detail+2',
+            'https://via.placeholder.com/600x600/B4A037/FFFFFF?text=Ring+Detail+3'
+        ];
+        
+        let currentImageIndex = 0;
+        let quantity = 1;
+        
+        // DOM elements
+        const quickViewBtn = document.getElementById('quickViewBtn');
+        const quickViewModal = document.getElementById('quickViewModal');
+        const closeBtn = document.getElementById('closeBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const modalImage = document.getElementById('modalImage');
+        const imageIndicators = document.getElementById('imageIndicators');
+        const decreaseQtyBtn = document.getElementById('decreaseQty');
+        const increaseQtyBtn = document.getElementById('increaseQty');
+        const quantitySpan = document.getElementById('quantity');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        function updateDebug(message) {
+            debugInfo.textContent = message;
+            console.log(message);
+        }
+        
+        function openQuickView() {
+            updateDebug('Opening quick view modal...');
+            quickViewModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            updateDebug('Quick view modal opened successfully!');
+        }
+        
+        function closeQuickView() {
+            updateDebug('Closing quick view modal...');
+            quickViewModal.classList.add('hidden');
+            document.body.style.overflow = 'unset';
+            updateDebug('Quick view modal closed.');
+        }
+        
+        function updateImage() {
+            modalImage.src = images[currentImageIndex];
+            
+            // Update indicators
+            const indicators = imageIndicators.querySelectorAll('button');
+            indicators.forEach((indicator, index) => {
+                if (index === currentImageIndex) {
+                    indicator.className = 'w-3 h-3 rounded-full bg-amber-500 shadow-md btn-hover';
+                } else {
+                    indicator.className = 'w-3 h-3 rounded-full bg-white/60 hover:bg-white/80 btn-hover';
+                }
+            });
+            
+            updateDebug(`Switched to image ${currentImageIndex + 1} of ${images.length}`);
+        }
+        
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            updateImage();
+        }
+        
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            updateImage();
+        }
+        
+        function updateQuantity() {
+            quantitySpan.textContent = quantity;
+            decreaseQtyBtn.disabled = quantity <= 1;
+            if (quantity <= 1) {
+                decreaseQtyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                decreaseQtyBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            updateDebug(`Quantity updated to ${quantity}`);
+        }
+        
+        // Event listeners
+        quickViewBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            updateDebug('Quick view button clicked');
+            openQuickView();
+        });
+        
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            updateDebug('Close button clicked');
+            closeQuickView();
+        });
+        
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            updateDebug('Previous button clicked');
+            prevImage();
+        });
+        
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            updateDebug('Next button clicked');
+            nextImage();
+        });
+        
+        decreaseQtyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (quantity > 1) {
+                quantity--;
+                updateQuantity();
+            }
+        });
+        
+        increaseQtyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            quantity++;
+            updateQuantity();
+        });
+        
+        // Image indicator clicks
+        imageIndicators.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+                e.stopPropagation();
+                const index = parseInt(e.target.dataset.index);
+                currentImageIndex = index;
+                updateImage();
+            }
+        });
+        
+        // Close on backdrop click
+        quickViewModal.addEventListener('click', (e) => {
+            if (e.target === quickViewModal) {
+                updateDebug('Backdrop clicked');
+                closeQuickView();
+            }
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (!quickViewModal.classList.contains('hidden')) {
+                switch (e.key) {
+                    case 'Escape':
+                        e.preventDefault();
+                        updateDebug('Escape key pressed');
+                        closeQuickView();
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        updateDebug('Left arrow key pressed');
+                        prevImage();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        updateDebug('Right arrow key pressed');
+                        nextImage();
+                        break;
+                }
+            }
+        });
+        
+        // Initialize
+        updateQuantity();
+        updateDebug('Quick view test initialized - all buttons should work now!');
+    </script>
+</body>
+</html>

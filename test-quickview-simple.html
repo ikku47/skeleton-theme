@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick View Test - Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/framer-motion@10/dist/framer-motion.js"></script>
+    <style>
+        /* Versa theme colors */
+        :root {
+            --color-off-white: #fefefe;
+            --color-light-gray: #e5e5e5;
+            --color-medium-gray: #9ca3af;
+            --color-warm-brown: #8b7355;
+            --color-gold: #d4af37;
+            --color-dark: #1f2937;
+            --color-charcoal: #374151;
+            --color-accent-red: #dc2626;
+            --color-lighter-gray: #f3f4f6;
+        }
+        
+        .bg-off-white { background-color: var(--color-off-white); }
+        .border-light-gray { border-color: var(--color-light-gray); }
+        .text-medium-gray { color: var(--color-medium-gray); }
+        .text-warm-brown { color: var(--color-warm-brown); }
+        .bg-gold { background-color: var(--color-gold); }
+        .border-gold { border-color: var(--color-gold); }
+        .text-gold { color: var(--color-gold); }
+        .text-dark { color: var(--color-dark); }
+        .text-charcoal { color: var(--color-charcoal); }
+        .bg-accent-red { background-color: var(--color-accent-red); }
+        .bg-lighter-gray { background-color: var(--color-lighter-gray); }
+        
+        .rounded-card { border-radius: 12px; }
+        .rounded-button { border-radius: 8px; }
+        .shadow-elegant { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .aspect-product { aspect-ratio: 1 / 1; }
+        .font-heading { font-family: 'Georgia', serif; }
+        
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">Quick View Test - Simple</h1>
+        
+        <!-- Test Product Card -->
+        <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="relative">
+                <img 
+                    src="https://via.placeholder.com/400x400/D4AF37/FFFFFF?text=Ring" 
+                    alt="Test Product"
+                    class="w-full h-64 object-cover"
+                />
+                <button 
+                    id="quickViewBtn"
+                    class="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
+                >
+                    👁️
+                </button>
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-lg mb-2">Test Product</h3>
+                <p class="text-gray-600 mb-2">Test Vendor</p>
+                <p class="text-xl font-bold text-green-600">$99.00</p>
+            </div>
+        </div>
+        
+        <!-- Debug Info -->
+        <div class="max-w-2xl mx-auto mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Info</h2>
+            <div id="debugInfo" class="text-sm bg-gray-100 p-4 rounded">
+                Click the eye icon to test quick view...
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-xl">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <!-- Image Section -->
+                    <div class="relative bg-gray-100">
+                        <button 
+                            id="closeBtn"
+                            class="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:shadow-lg z-10"
+                        >
+                            ✕
+                        </button>
+                        <img 
+                            src="https://via.placeholder.com/600x600/D4AF37/FFFFFF?text=Ring+Detail" 
+                            alt="Product Detail"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                    
+                    <!-- Product Details Section -->
+                    <div class="p-6 lg:p-8">
+                        <h2 class="text-2xl lg:text-3xl font-bold mb-4">ENGAGEMENT RING IN 18K YELLOW GOLD</h2>
+                        <p class="text-sm text-gray-600 uppercase tracking-wide mb-4">Luxury Jewelry Co.</p>
+                        
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-2xl font-bold">$2,499.00</span>
+                            <span class="text-lg text-gray-500 line-through">$3,248.70</span>
+                            <span class="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">30% OFF</span>
+                        </div>
+                        
+                        <p class="text-gray-700 mb-6">
+                            Lorem ipsum dolor sit amet nec eliamconsectetur. Egestas cursus a maecenas massa facilisi adipiscing dolor iaculis. In mattis nec...
+                        </p>
+                        
+                        <!-- Material Options -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-3">Material</label>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-2 border-2 border-yellow-500 bg-yellow-500 text-white rounded-lg">Gold</button>
+                                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-yellow-500">Rose Gold</button>
+                                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-yellow-500">White Gold</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Size Options -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-3">Size</label>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-2 border-2 border-yellow-500 bg-yellow-500 text-white rounded-lg">48</button>
+                                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-yellow-500">50</button>
+                                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-yellow-500">52</button>
+                                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-yellow-500">54</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Quantity -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-3">Quantity</label>
+                            <div class="flex items-center gap-3">
+                                <button class="p-2 border border-gray-300 rounded-lg hover:border-yellow-500">-</button>
+                                <span class="w-12 text-center font-medium">1</span>
+                                <button class="p-2 border border-gray-300 rounded-lg hover:border-yellow-500">+</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="space-y-3">
+                            <button class="w-full bg-yellow-500 text-white py-3 rounded-lg font-medium hover:bg-yellow-600 transition-colors">
+                                ADD TO BAG — $2,499.00
+                            </button>
+                            <button class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:border-yellow-500 transition-colors">
+                                BUY IT NOW
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Quick View functionality
+        const quickViewBtn = document.getElementById('quickViewBtn');
+        const quickViewModal = document.getElementById('quickViewModal');
+        const closeBtn = document.getElementById('closeBtn');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        function updateDebug(message) {
+            debugInfo.textContent = message;
+            console.log(message);
+        }
+        
+        function openQuickView() {
+            updateDebug('Opening quick view modal...');
+            quickViewModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            updateDebug('Quick view modal opened successfully!');
+        }
+        
+        function closeQuickView() {
+            updateDebug('Closing quick view modal...');
+            quickViewModal.classList.add('hidden');
+            document.body.style.overflow = 'unset';
+            updateDebug('Quick view modal closed.');
+        }
+        
+        // Event listeners
+        quickViewBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            updateDebug('Quick view button clicked for product: 8979997098197');
+            openQuickView();
+        });
+        
+        closeBtn.addEventListener('click', closeQuickView);
+        
+        // Close on backdrop click
+        quickViewModal.addEventListener('click', (e) => {
+            if (e.target === quickViewModal) {
+                closeQuickView();
+            }
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !quickViewModal.classList.contains('hidden')) {
+                closeQuickView();
+            }
+        });
+        
+        updateDebug('Quick view test initialized. Click the eye icon to test.');
+    </script>
+</body>
+</html>

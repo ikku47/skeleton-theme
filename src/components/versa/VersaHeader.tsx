@@ -91,23 +91,25 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md' : 'bg-white/95 backdrop-blur-sm'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-elegant border-b border-light-gray'
+          : 'bg-white/90 backdrop-blur-sm'
       } ${className}`}
     >
       <div className="container">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-18 lg:h-24">
           {/* Logo */}
           <motion.div
             className="flex items-center"
             whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           >
             <a href="/" className="flex items-center gap-3">
               {logo ? (
-                <img src={logo} alt={logoText} className="h-8 lg:h-10 w-auto" />
+                <img src={logo} alt={logoText} className="h-10 lg:h-12 w-auto" />
               ) : (
-                <span className="font-display text-2xl lg:text-3xl font-bold text-primary">
+                <span className="font-heading text-3xl lg:text-4xl font-light text-dark tracking-display">
                   {logoText}
                 </span>
               )}
@@ -125,15 +127,23 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
               >
                 <motion.a
                   href={item.url}
-                  className="flex items-center gap-1 font-heading font-medium text-primary hover:text-accent transition-colors duration-200 py-2"
-                  whileHover={{ y: -1 }}
-                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-1 font-body font-medium text-warm-brown hover:text-gold transition-colors duration-300 py-3 relative"
+                  whileHover={{ y: -2 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
                 >
-                  {item.title}
+                  <span className="relative">
+                    {item.title}
+                    <motion.div
+                      className="absolute -bottom-1 left-0 h-0.5 bg-gold"
+                      initial={{ width: 0 }}
+                      whileHover={{ width: '100%' }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </span>
                   {item.children && (
                     <motion.div
                       animate={{ rotate: activeDropdown === item.title ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <ChevronDown className="w-4 h-4" />
                     </motion.div>
@@ -173,10 +183,10 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-2">
             <motion.a
               href="/search"
-              className="p-2 text-neutral hover:text-primary transition-colors duration-200"
+              className="p-3 text-warm-brown hover:text-gold hover:bg-off-white rounded-full transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -184,35 +194,45 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
             </motion.a>
 
             <motion.button
-              className="relative p-2 text-neutral hover:text-primary transition-colors duration-200"
+              className="relative p-3 text-warm-brown hover:text-gold hover:bg-off-white rounded-full transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleWishlistClick}
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
+                <motion.span
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-gold text-white text-xs font-medium rounded-full flex items-center justify-center shadow-button"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                >
                   {wishlistCount}
-                </span>
+                </motion.span>
               )}
             </motion.button>
 
             <motion.button
-              className="relative p-2 text-neutral hover:text-primary transition-colors duration-200"
+              className="relative p-3 text-warm-brown hover:text-gold hover:bg-off-white rounded-full transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleCartClick}
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-primary text-xs font-bold rounded-full flex items-center justify-center">
+                <motion.span
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-gold text-white text-xs font-medium rounded-full flex items-center justify-center shadow-button"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                >
                   {cartCount}
-                </span>
+                </motion.span>
               )}
             </motion.button>
 
             <motion.button
-              className="p-2 text-neutral hover:text-primary transition-colors duration-200"
+              className="p-3 text-warm-brown hover:text-gold hover:bg-off-white rounded-full transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleAccountClick}
@@ -253,7 +273,7 @@ export const VersaHeader: React.FC<VersaHeaderProps> = ({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-              style={{ height: '100vh', height: '100dvh' }}
+              style={{ height: '100dvh' }}
             >
               {/* Mobile Menu Header */}
               <div className="flex items-center justify-between p-6 border-b border-border">

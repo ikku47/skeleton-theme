@@ -37,6 +37,12 @@ import { VersaCartSummary } from '../versa/VersaCartSummary'
 import { VersaCartManager } from '../versa/VersaCartManager'
 import { VersaEmptyCart } from '../versa/VersaEmptyCart'
 
+// Import new Elegant Design System components
+import { VersaButton, VersaPrimaryButton, VersaSecondaryButton, VersaOutlineButton, VersaAccentButton } from '../versa/VersaButton'
+import { VersaProductCard, VersaFeaturedProductCard, VersaCompactProductCard } from '../versa/VersaProductCard'
+import { VersaSectionHeader, VersaCenteredSectionHeader, VersaLeftAlignedSectionHeader, VersaHeroSectionHeader, VersaSplitSection } from '../versa/VersaSectionHeader'
+import { VersaElegantHero, VersaFullScreenHero, VersaCompactHero, VersaLeftAlignedHero } from '../versa/VersaElegantHero'
+
 // Import legacy components
 import { HeroSection } from '../legacy/HeroSection'
 import { ProductImageGallery } from '../legacy/ProductImageGallery'
@@ -50,6 +56,9 @@ import { ProductReviews } from '../legacy/ProductReviews'
 import { EnhancedProductGallery } from '../legacy/EnhancedProductGallery'
 import { EnhancedProductDetails } from '../legacy/EnhancedProductDetails'
 import { EnhancedVariantSelector } from '../legacy/EnhancedVariantSelector'
+import { VersaQuickView } from '../versa/VersaQuickView'
+import { VersaQuickViewExample } from '../versa/VersaQuickViewExample'
+import { VersaQuickViewDebug } from '../versa/VersaQuickViewDebug'
 
 // Component registry for dynamic loading
 export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
@@ -102,6 +111,28 @@ export const ComponentRegistry: Record<string, React.ComponentType<any>> = {
   CartNotification,
   NotificationContainer,
   CartProvider,
+
+  // New Elegant Design System components
+  VersaButton,
+  VersaPrimaryButton,
+  VersaSecondaryButton,
+  VersaOutlineButton,
+  VersaAccentButton,
+  VersaProductCard,
+  VersaFeaturedProductCard,
+  VersaCompactProductCard,
+  VersaSectionHeader,
+  VersaCenteredSectionHeader,
+  VersaLeftAlignedSectionHeader,
+  VersaHeroSectionHeader,
+  VersaSplitSection,
+  VersaElegantHero,
+  VersaFullScreenHero,
+  VersaCompactHero,
+  VersaLeftAlignedHero,
+  VersaQuickView,
+  VersaQuickViewExample,
+  VersaQuickViewDebug,
 }
 
 // Type for component names

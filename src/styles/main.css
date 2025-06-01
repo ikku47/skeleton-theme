@@ -5,96 +5,292 @@
 /* Import custom Swiper styles */
 @import "./swiper-custom.css";
 
-/* VersaCommerce Design System */
+/* VersaCommerce Design System - Elegant & Sophisticated */
 @layer base {
   :root {
-    /* VersaCommerce Font Variables - set by Liquid in css-variables.liquid */
-    --font-display: 'Anton', 'Bebas Neue', system-ui, sans-serif;
-    --font-heading: 'Poppins', system-ui, sans-serif;
-    --font-body: 'Inter', 'Poppins', system-ui, sans-serif;
+    /* Typography Hierarchy - Elegant & Sophisticated */
+    --font-display: 'Playfair Display', 'Garamond', 'Times New Roman', serif;
+    --font-heading: 'Playfair Display', 'Garamond', 'Times New Roman', serif;
+    --font-body: 'Montserrat', 'Open Sans', 'Lato', system-ui, sans-serif;
+    --font-accent: 'Dancing Script', 'Brush Script MT', cursive;
 
-    /* VersaCommerce Color Palette */
-    --color-primary: #111111;        /* Modern Black */
-    --color-secondary: #2B2B2B;      /* Muted Charcoal */
-    --color-accent: #FFD100;         /* Vibrant Yellow */
-    --color-light-bg: #F9F9F9;       /* Off-White */
-    --color-neutral: #6F6F6F;        /* Warm Gray */
-    --color-card-bg: #FFFFFF;        /* White */
-    --color-border: #E0E0E0;         /* Light Gray */
+    /* Sophisticated Color Palette - Warm & Elegant */
+    /* Primary Neutrals */
+    --color-white: #FFFFFF;           /* Pure White */
+    --color-off-white: #F8F8F8;      /* Off-White backgrounds */
+    --color-light-gray: #EAEAEA;     /* Light Gray dividers */
+    --color-lighter-gray: #F1F1F1;   /* Secondary backgrounds */
+
+    /* Warm Accents & Text */
+    --color-warm-brown: #6A554A;     /* Primary warm brown */
+    --color-taupe: #D8C7B8;          /* Light taupe backgrounds */
+    --color-gold: #B08D57;           /* Primary gold accent */
+    --color-light-gold: #C9A977;     /* Light gold highlights */
+
+    /* Text & Dark Elements */
+    --color-charcoal: #333333;       /* Primary text */
+    --color-dark: #212121;           /* Headlines & important UI */
+    --color-medium-gray: #6F6F6F;    /* Secondary text */
+
+    /* Accent Colors */
+    --color-accent-red: #BF5700;     /* Sale badges, alerts */
+    --color-success: #4A7C59;        /* Success states */
+    --color-error: #B85450;          /* Error states */
+
+    /* Legacy support - mapped to new colors */
+    --color-primary: var(--color-charcoal);
+    --color-secondary: var(--color-warm-brown);
+    --color-accent: var(--color-gold);
+    --color-light-bg: var(--color-off-white);
+    --color-neutral: var(--color-medium-gray);
+    --color-card-bg: var(--color-white);
+    --color-border: var(--color-light-gray);
   }
 
-  /* Typography */
+  /* Typography - Elegant & Sophisticated */
   body {
     font-family: var(--font-body);
-    line-height: 1.6;
+    line-height: 1.7;
+    color: var(--color-charcoal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Headline Typography - Elegant Serif */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    font-weight: 600;
-    line-height: 1.2;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-dark);
+    letter-spacing: 0.02em;
   }
 
-  /* Form elements */
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 400;
+  }
+
+  /* Body Text - Clean Sans-Serif */
+  p, li, span {
+    font-family: var(--font-body);
+    line-height: 1.7;
+    color: var(--color-charcoal);
+  }
+
+  /* Form elements - Clean & Minimalist */
   input, textarea, select {
-    @apply transition-colors duration-200;
+    @apply transition-all duration-300 ease-out;
+    font-family: var(--font-body);
+    border-radius: 8px;
+    border: 1px solid var(--color-light-gray);
+    background-color: var(--color-white);
   }
 
   input:focus, textarea:focus, select:focus {
-    @apply outline-none ring-2 ring-blue-200 border-blue-500;
+    @apply outline-none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.1);
   }
 
-  /* Interactive elements */
+  /* Interactive elements - Smooth Transitions */
   button, a {
-    @apply transition-all duration-200;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Link Styling */
+  a {
+    color: var(--color-warm-brown);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-gold);
   }
 }
 
 /* Component layer for reusable patterns */
 @layer components {
-  /* Button system */
+  /* Sophisticated Button System */
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center font-medium transition-all duration-300 ease-out focus:outline-none;
+    font-family: var(--font-body);
+    border-radius: 12px;
+    letter-spacing: 0.025em;
+    position: relative;
+    overflow: hidden;
   }
 
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  /* Primary Button - Warm Brown */
   .btn-primary {
-    @apply bg-primary text-white hover:bg-secondary focus:ring-primary;
+    background-color: var(--color-warm-brown);
+    color: var(--color-white);
+    padding: 12px 32px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(106, 85, 74, 0.2);
   }
 
+  .btn-primary:hover {
+    background-color: var(--color-dark);
+    box-shadow: 0 6px 20px rgba(106, 85, 74, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Secondary Button - Gold Accent */
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-primary focus:ring-secondary;
+    background-color: var(--color-gold);
+    color: var(--color-white);
+    padding: 12px 32px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(176, 141, 87, 0.2);
   }
 
-  .btn-accent {
-    @apply bg-accent text-primary hover:bg-yellow-400 focus:ring-accent;
+  .btn-secondary:hover {
+    background-color: var(--color-light-gold);
+    box-shadow: 0 6px 20px rgba(176, 141, 87, 0.3);
+    transform: translateY(-2px);
   }
 
+  /* Outline Button - Elegant Border */
   .btn-outline {
-    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary;
+    background-color: transparent;
+    color: var(--color-warm-brown);
+    border: 2px solid var(--color-warm-brown);
+    padding: 10px 30px;
+    font-weight: 500;
   }
 
-  /* Card system */
+  .btn-outline:hover {
+    background-color: var(--color-warm-brown);
+    color: var(--color-white);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 85, 74, 0.2);
+  }
+
+  /* Accent Button - Light & Elegant */
+  .btn-accent {
+    background-color: var(--color-taupe);
+    color: var(--color-warm-brown);
+    padding: 12px 32px;
+    font-weight: 500;
+  }
+
+  .btn-accent:hover {
+    background-color: var(--color-light-gray);
+    transform: translateY(-2px);
+  }
+
+  /* Button Sizes */
+  .btn-sm {
+    padding: 8px 20px;
+    font-size: 0.875rem;
+  }
+
+  .btn-lg {
+    padding: 16px 40px;
+    font-size: 1.125rem;
+  }
+
+  /* Sophisticated Card System */
   .card {
-    @apply bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-light-gray);
+    border-radius: 16px;
+    transition: all 0.3s ease-out;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    border-color: var(--color-gold);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(106, 85, 74, 0.1);
   }
 
   .card-product {
-    @apply card overflow-hidden;
+    @apply card;
+    position: relative;
   }
 
   .card-product:hover .card-product-image {
-    @apply scale-105;
+    transform: scale(1.03);
   }
 
   .card-product-image {
-    @apply transition-transform duration-300 ease-out;
+    transition: transform 0.4s ease-out;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  /* VersaCommerce Container utilities */
+  /* Elegant Container System */
   .container {
-    @apply max-w-container mx-auto px-4;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .container-narrow {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .container-wide {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Section Spacing - Generous Whitespace */
+  .section-padding {
+    padding: 80px 0;
+  }
+
+  .section-padding-sm {
+    padding: 60px 0;
+  }
+
+  .section-padding-lg {
+    padding: 120px 0;
+  }
+
+  @media (max-width: 768px) {
+    .section-padding {
+      padding: 60px 0;
+    }
+
+    .section-padding-sm {
+      padding: 40px 0;
+    }
+
+    .section-padding-lg {
+      padding: 80px 0;
+    }
   }
 }
 

@@ -3,23 +3,47 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 {% style %}
-  {% comment %} VersaCommerce Typography - Load Google Fonts {% endcomment %}
-  @import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Bebas+Neue:wght@400&family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  {% comment %} VersaCommerce Elegant Typography - Load Google Fonts {% endcomment %}
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Dancing+Script:wght@400;500;600&display=swap');
 
   :root {
-    {% comment %} VersaCommerce Font Variables {% endcomment %}
-    --font-display: 'Anton', 'Bebas Neue', system-ui, sans-serif;
-    --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
-    --font-body: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
+    {% comment %} Elegant Typography Hierarchy {% endcomment %}
+    --font-display: 'Playfair Display', 'Garamond', 'Times New Roman', serif;
+    --font-heading: 'Playfair Display', 'Garamond', 'Times New Roman', serif;
+    --font-body: 'Montserrat', 'Open Sans', 'Lato', system-ui, sans-serif;
+    --font-accent: 'Dancing Script', 'Brush Script MT', cursive;
 
-    {% comment %} VersaCommerce Color System {% endcomment %}
-    --color-primary: {{ settings.primary_color | default: '#111111' }};
-    --color-secondary: {{ settings.secondary_color | default: '#2B2B2B' }};
-    --color-accent: {{ settings.accent_color | default: '#FFD100' }};
-    --color-light-bg: {{ settings.light_bg_color | default: '#F9F9F9' }};
-    --color-neutral: {{ settings.neutral_color | default: '#6F6F6F' }};
-    --color-card-bg: {{ settings.card_bg_color | default: '#FFFFFF' }};
-    --color-border: {{ settings.border_color | default: '#E0E0E0' }};
+    {% comment %} Sophisticated Color Palette - Warm & Elegant {% endcomment %}
+    {% comment %} Primary Neutrals {% endcomment %}
+    --color-white: #FFFFFF;
+    --color-off-white: #F8F8F8;
+    --color-light-gray: #EAEAEA;
+    --color-lighter-gray: #F1F1F1;
+
+    {% comment %} Warm Accents & Text {% endcomment %}
+    --color-warm-brown: {{ settings.warm_brown_color | default: '#6A554A' }};
+    --color-taupe: {{ settings.taupe_color | default: '#D8C7B8' }};
+    --color-gold: {{ settings.gold_color | default: '#B08D57' }};
+    --color-light-gold: {{ settings.light_gold_color | default: '#C9A977' }};
+
+    {% comment %} Text & Dark Elements {% endcomment %}
+    --color-charcoal: {{ settings.charcoal_color | default: '#333333' }};
+    --color-dark: {{ settings.dark_color | default: '#212121' }};
+    --color-medium-gray: {{ settings.medium_gray_color | default: '#6F6F6F' }};
+
+    {% comment %} Accent Colors {% endcomment %}
+    --color-accent-red: {{ settings.accent_red_color | default: '#BF5700' }};
+    --color-success: {{ settings.success_color | default: '#4A7C59' }};
+    --color-error: {{ settings.error_color | default: '#B85450' }};
+
+    {% comment %} Legacy support - mapped to new sophisticated colors {% endcomment %}
+    --color-primary: var(--color-charcoal);
+    --color-secondary: var(--color-warm-brown);
+    --color-accent: var(--color-gold);
+    --color-light-bg: var(--color-off-white);
+    --color-neutral: var(--color-medium-gray);
+    --color-card-bg: var(--color-white);
+    --color-border: var(--color-light-gray);
 
     {% comment %} VersaCommerce Typography Scale {% endcomment %}
     --text-hero: 56px;

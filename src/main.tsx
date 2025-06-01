@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ComponentRegistry } from './components/shared/ComponentRegistry'
+import { QuickViewProvider, useQuickViewContext } from './components/versa/useQuickView'
+import { VersaQuickView } from './components/versa/VersaQuickView'
 
 // Extend Window interface for global functions
 declare global {
@@ -12,6 +14,107 @@ declare global {
 
 // Store roots for cleanup
 const componentRoots = new Map()
+
+// Quick View Modal Component (using React state)
+const QuickViewModalInner: React.FC = () => {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [product, setProduct] = React.useState(null)
+
+  // Update global functions to use React state
+  React.useEffect(() => {
+    globalQuickViewState.openQuickView = (productData: any) => {
+      console.log('Global openQuickView called with:', productData)
+      setIsOpen(true)
+      setProduct(productData)
+      document.body.style.overflow = 'hidden'
+    }
+
+    globalQuickViewState.closeQuickView = () => {
+      console.log('Global closeQuickView called')
+      setIsOpen(false)
+      setProduct(null)
+      document.body.style.overflow = 'unset'
+    }
+
+    // Update global state references
+    globalQuickViewState.isOpen = isOpen
+    globalQuickViewState.product = product
+  }, [isOpen, product])
+
+  // Update container pointer events based on modal state
+  React.useEffect(() => {
+    const container = document.getElementById('global-quickview-provider')
+    if (container) {
+      container.style.pointerEvents = isOpen ? 'auto' : 'none'
+    }
+  }, [isOpen])
+
+  const closeQuickView = () => {
+    setIsOpen(false)
+    setProduct(null)
+    document.body.style.overflow = 'unset'
+  }
+
+  const handleAddToCart = async (variantId: string, quantity: number) => {
+    try {
+      // Shopify cart add
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: quantity,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to add to cart')
+      }
+
+      // Optionally close quick view after successful add
+      // closeQuickView()
+
+      // Dispatch cart update event
+      window.dispatchEvent(new CustomEvent('cart:updated'))
+
+    } catch (error) {
+      console.error('Cart error:', error)
+      throw error
+    }
+  }
+
+  const handleToggleWishlist = (productId: string) => {
+    // Implement wishlist logic
+    console.log('Toggle wishlist for:', productId)
+  }
+
+  return (
+    <VersaQuickView
+      product={product}
+      isOpen={isOpen}
+      onClose={closeQuickView}
+      onAddToCart={handleAddToCart}
+      onToggleWishlist={handleToggleWishlist}
+    />
+  )
+}
+
+// Wrapper component (no provider needed since using global state)
+const QuickViewModalWithProvider: React.FC = () => {
+  return React.createElement(QuickViewModalInner)
+}
+
+// App Wrapper with QuickView Provider
+const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <QuickViewProvider>
+      {children}
+      <QuickViewModal />
+    </QuickViewProvider>
+  )
+}
 
 // Helper function to decode HTML entities and sanitize JSON
 function decodeHtmlEntities(str: string): string {
@@ -172,8 +275,55 @@ function validateComponentProps(componentName: string, props: any): any {
   }
 }
 
+// Global QuickView state (functions will be set by React component)
+let globalQuickViewState = {
+  isOpen: false,
+  product: null as any,
+  openQuickView: (product: any) => {
+    console.warn('QuickView not initialized yet')
+  },
+  closeQuickView: () => {
+    console.warn('QuickView not initialized yet')
+  }
+}
+
+// Global QuickView provider root
+let globalQuickViewRoot: ReactDOM.Root | null = null
+
+// No longer needed - React state handles updates
+
+// Initialize global QuickView provider
+function initializeGlobalQuickView() {
+  // Check if already initialized
+  if (globalQuickViewRoot || document.getElementById('global-quickview-provider')) {
+    return
+  }
+
+  // Create a container for the global QuickView provider
+  const container = document.createElement('div')
+  container.id = 'global-quickview-provider'
+  container.style.position = 'fixed'
+  container.style.top = '0'
+  container.style.left = '0'
+  container.style.zIndex = '9999'
+  container.style.pointerEvents = 'none' // Start with no interactions, will be enabled when modal opens
+  container.style.width = '100%'
+  container.style.height = '100%'
+  document.body.appendChild(container)
+
+  // Create root and render QuickView provider
+  globalQuickViewRoot = ReactDOM.createRoot(container)
+  globalQuickViewRoot.render(React.createElement(QuickViewModalWithProvider))
+
+  // Make global functions available
+  ;(window as any).globalQuickView = globalQuickViewState
+}
+
 // Initialize components
 function initializeComponents() {
+  // Initialize global QuickView provider first
+  initializeGlobalQuickView()
+
   // Find all elements with data-component or data-react-component attribute
   const componentElements = document.querySelectorAll('[data-component], [data-react-component]')
 
@@ -216,7 +366,7 @@ function initializeComponents() {
           props = validateComponentProps(componentName, parsedProps)
         }
 
-        // Create React root and render component
+        // Create React root and render component (QuickView provider is global now)
         const root = ReactDOM.createRoot(element as HTMLElement)
         root.render(React.createElement(Component, props))
 
